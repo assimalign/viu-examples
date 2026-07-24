@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/examples/">
+    <Project Path="examples/SimpleApp/SimpleApp.csproj" />
+  </Folder>
+</Solution>
