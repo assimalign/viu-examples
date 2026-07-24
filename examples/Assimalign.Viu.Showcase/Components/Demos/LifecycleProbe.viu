@@ -1,0 +1,184 @@
+@template {
+    <article class="lifecycle-probe">
+        <header class="lifecycle-probe__header">
+            <div>
+                <span class="lifecycle-probe__eyebrow">Mounted child instance</span>
+                <h3>{{ Label }}</h3>
+            </div>
+            <span class="lifecycle-probe__phase">{{ Phase }}</span>
+        </header>
+
+        <div class="lifecycle-probe__timeline" aria-label="Registered lifecycle hooks">
+            <span class="lifecycle-probe__step lifecycle-probe__step--complete">setup</span>
+            <i aria-hidden="true"></i>
+            <span class="lifecycle-probe__step lifecycle-probe__step--complete">before mount</span>
+            <i aria-hidden="true"></i>
+            <span class="lifecycle-probe__step lifecycle-probe__step--active">mounted</span>
+        </div>
+
+        <div class="lifecycle-probe__footer">
+            <span>
+                {{ PulseSummary }} · before-update hooks {{ BeforeUpdateCount }}
+            </span>
+            <button type="button" class="button button--secondary" @click="Pulse">
+                Trigger update
+            </button>
+        </div>
+    </article>
+}
+
+@script {
+    using System.Collections.Generic;
+
+    using Assimalign.Viu.Components;
+    using Assimalign.Viu.Reactivity;
+
+    private int _beforeUpdateCount;
+
+    public IReadOnlyList<IComponentParameter> Parameters { get; } =
+    [
+        new ComponentParameter("label", defaultFactory: static () => "Lifecycle probe"),
+    ];
+
+    public IReadOnlyList<IComponentEvent> Events { get; } =
+    [
+        new ComponentEvent("mounted"),
+        new ComponentEvent("unmounted"),
+    ];
+
+    public Reference<string> Phase { get; } =
+        Reactive.Reference("setup");
+
+    public Reference<int> PulseCount { get; } =
+        Reactive.Reference(0);
+
+    public string Label =>
+        Context.Arguments.Get<string>("label")
+        ?? "Lifecycle probe";
+
+    public int BeforeUpdateCount => _beforeUpdateCount;
+
+    public string PulseSummary =>
+        PulseCount.Value == 1
+            ? "1 reactive update"
+            : $"{PulseCount.Value} reactive updates";
+
+    partial void OnSetup()
+    {
+        Context.Lifecycle.OnBeforeMount(
+            () => Phase.Value = "before mount");
+        Context.Lifecycle.OnMounted(
+            () =>
+            {
+                Phase.Value = "mounted";
+                Context.Emit("mounted", Label);
+            });
+        Context.Lifecycle.OnBeforeUpdate(
+            () => _beforeUpdateCount++);
+        Context.Lifecycle.OnActivated(
+            () => Phase.Value = "activated");
+        Context.Lifecycle.OnDeactivated(
+            () => Phase.Value = "deactivated");
+        Context.Lifecycle.OnUnmounted(
+            () => Context.Emit("unmounted", Label));
+    }
+
+    private void Pulse()
+    {
+        PulseCount.Value++;
+    }
+}
+
+@style scoped {
+    .lifecycle-probe {
+        display: grid;
+        gap: 1.15rem;
+        padding: 1.2rem;
+        border: 1px solid color-mix(in srgb, var(--success) 30%, var(--border));
+        border-radius: 1.1rem;
+        background:
+            linear-gradient(
+                145deg,
+                color-mix(in srgb, var(--success) 7%, var(--surface)),
+                var(--surface));
+    }
+
+    .lifecycle-probe__header,
+    .lifecycle-probe__footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .lifecycle-probe__eyebrow {
+        color: var(--success);
+        font-size: 0.68rem;
+        font-weight: 850;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+
+    h3 {
+        margin: 0.32rem 0 0;
+        color: var(--text-strong);
+        font-size: 1rem;
+    }
+
+    .lifecycle-probe__phase {
+        padding: 0.36rem 0.62rem;
+        border-radius: 999px;
+        color: var(--success);
+        background: color-mix(in srgb, var(--success) 10%, var(--surface));
+        font-size: 0.7rem;
+        font-weight: 850;
+        letter-spacing: 0.04em;
+    }
+
+    .lifecycle-probe__timeline {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        overflow-x: auto;
+    }
+
+    .lifecycle-probe__timeline i {
+        width: 1.5rem;
+        height: 1px;
+        flex: 0 0 auto;
+        background: var(--border);
+    }
+
+    .lifecycle-probe__step {
+        flex: 0 0 auto;
+        padding: 0.4rem 0.58rem;
+        border: 1px solid var(--border);
+        border-radius: 0.65rem;
+        color: var(--text-muted);
+        background: var(--surface-muted);
+        font-size: 0.68rem;
+        font-weight: 760;
+    }
+
+    .lifecycle-probe__step--complete {
+        border-color: color-mix(in srgb, var(--success) 25%, var(--border));
+    }
+
+    .lifecycle-probe__step--active {
+        border-color: var(--success);
+        color: var(--success);
+    }
+
+    .lifecycle-probe__footer {
+        color: var(--text-muted);
+        font-size: 0.76rem;
+    }
+
+    @media (max-width: 620px) {
+        .lifecycle-probe__header,
+        .lifecycle-probe__footer {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+    }
+}

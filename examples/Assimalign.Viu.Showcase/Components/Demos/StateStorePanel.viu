@@ -1,0 +1,427 @@
+@template {
+    <section class="state-store-panel">
+        <div class="state-store-panel__heading">
+            <div>
+                <span class="section-kicker">Rich application state</span>
+                <h2>One typed store, observed from every angle.</h2>
+                <p>
+                    A source-generated reactive state object lives inside a resettable
+                    <code>StateStore&lt;TState&gt;</code>. The component resolves it through the
+                    application registry, then listens for grouped mutations and named actions.
+                </p>
+            </div>
+            <StatusPill :label="RegistryLabel" tone="success" />
+        </div>
+
+        <div class="state-store-layout">
+            <div class="state-store-readout">
+                <span class="state-store-readout__key">{{ StateStoreKey }}</span>
+                <strong>{{ Count }}</strong>
+                <span>current count</span>
+                <div class="state-store-readout__details">
+                    <span>Step <b>{{ Step }}</b></span>
+                    <span>Notifications <b>{{ MutationNotificationCount }}</b></span>
+                    <span>Actions <b>{{ ActionObservationCount }}</b></span>
+                </div>
+                <p>{{ LastOperation }}</p>
+            </div>
+
+            <div class="state-store-controls">
+                <div>
+                    <span class="state-store-controls__label">Observed action</span>
+                    <p>
+                        <code>Advance</code> opts into <code>OnAction</code> through
+                        <code>RunAction</code>, including an after-result hook.
+                    </p>
+                    <button
+                        type="button"
+                        class="button button--primary"
+                        @click="RunObservedAction">
+                        Advance by {{ Step }}
+                    </button>
+                </div>
+
+                <div>
+                    <span class="state-store-controls__label">Typed mutations</span>
+                    <p>
+                        Function and object patches use typed delegates, while reset reapplies a
+                        fresh factory state onto the same reactive object.
+                    </p>
+                    <div class="button-row">
+                        <button
+                            type="button"
+                            class="button button--secondary"
+                            @click="ApplyFunctionPatch">
+                            Function patch
+                        </button>
+                        <button
+                            type="button"
+                            class="button button--secondary"
+                            @click="ApplyObjectPatch">
+                            Object patch
+                        </button>
+                        <button
+                            type="button"
+                            class="button button--ghost"
+                            @click="ResetState">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="state-store-observers">
+                <div class="state-store-observers__heading">
+                    <div>
+                        <span class="state-store-controls__label">Subscription stream</span>
+                        <strong>{{ LastMutationKind }}</strong>
+                    </div>
+                    <StatusPill :label="ObserverLabel" tone="accent" />
+                </div>
+                <ol>
+                    <li
+                        v-for="entry in ObservationEntries"
+                        :key="entry">
+                        {{ entry }}
+                    </li>
+                    <li v-if="ObservationEntries.Count == 0">
+                        Run an action or patch to populate the observer stream.
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <footer class="state-store-panel__footer">
+            <code>StateStores.Define → Definition.Use(Context) → StateStoreRegistry</code>
+            <span>Both resolutions returned the same application-scoped instance.</span>
+        </footer>
+    </section>
+}
+
+@script {
+    using System;
+
+    using Assimalign.Viu.Examples.Showcase.State;
+    using Assimalign.Viu.Reactivity;
+    using Assimalign.Viu.State;
+
+    private readonly Reference<int> MutationNotificationReference =
+        Reactive.Reference(0);
+    private readonly Reference<int> ActionObservationReference =
+        Reactive.Reference(0);
+    private readonly Reference<string> LastMutationKindReference =
+        Reactive.Reference("No mutation observed yet");
+    private readonly ReactiveList<string> ObservationList = new();
+
+    private StateStoreDemonstrationStore DemonstrationStore { get; set; } = null!;
+
+    private StateStoreSubscription MutationSubscription { get; set; } = null!;
+
+    private StateStoreSubscription ActionSubscription { get; set; } = null!;
+
+    private bool RegistryReturnedSharedInstance { get; set; }
+
+    private int ObservationSequence { get; set; }
+
+    public string StateStoreKey => DemonstrationStore.Key;
+
+    public int Count => DemonstrationStore.State.Count;
+
+    public int Step => DemonstrationStore.State.Step;
+
+    public string LastOperation => DemonstrationStore.State.LastOperation;
+
+    public int MutationNotificationCount => MutationNotificationReference.Value;
+
+    public int ActionObservationCount => ActionObservationReference.Value;
+
+    public string LastMutationKind => LastMutationKindReference.Value;
+
+    public string RegistryLabel =>
+        RegistryReturnedSharedInstance
+            ? "Registry singleton confirmed"
+            : "Registry check pending";
+
+    public string ObserverLabel =>
+        $"{MutationNotificationCount} mutations · {ActionObservationCount} actions";
+
+    public ReactiveList<string> ObservationEntries => ObservationList;
+
+    partial void OnSetup()
+    {
+        DemonstrationStore =
+            ShowcaseState.StateStoreDemonstrationDefinition.Use(Context);
+        StateStoreDemonstrationStore secondResolution =
+            ShowcaseState.StateStoreDemonstrationDefinition.Use(Context);
+        RegistryReturnedSharedInstance =
+            ReferenceEquals(DemonstrationStore, secondResolution);
+
+        MutationSubscription = DemonstrationStore.Subscribe(
+            (mutation, state) =>
+            {
+                MutationNotificationReference.Value++;
+                LastMutationKindReference.Value = mutation.Kind.ToString();
+                AddObservation(
+                    $"Subscribe · {mutation.Kind} · count {state.Count}, step {state.Step}");
+            });
+        ActionSubscription = DemonstrationStore.OnAction(
+            context =>
+            {
+                ActionObservationReference.Value++;
+                AddObservation($"OnAction · before {context.Name}");
+                context.After(
+                    result => AddObservation(
+                        $"OnAction · after {context.Name} · result {result ?? "void"}"));
+                context.OnError(
+                    exception => AddObservation(
+                        $"OnAction · error {context.Name} · {exception.Message}"));
+            });
+
+        Context.Lifecycle.OnUnmounted(
+            () =>
+            {
+                MutationSubscription.Stop();
+                ActionSubscription.Stop();
+            });
+    }
+
+    private void RunObservedAction()
+    {
+        DemonstrationStore.Advance();
+    }
+
+    private void ApplyFunctionPatch()
+    {
+        DemonstrationStore.Patch(
+            state =>
+            {
+                state.Count += state.Step * 2;
+                state.Step = state.Step == 3 ? 1 : state.Step + 1;
+                state.LastOperation = "Grouped function patch changed three properties";
+            });
+    }
+
+    private void ApplyObjectPatch()
+    {
+        DemonstrationStore.Patch(
+            new StateStoreDemonstrationState
+            {
+                Count = DemonstrationStore.State.Count + 10,
+                Step = 3,
+                LastOperation = "Typed object patch copied a complete state",
+            });
+    }
+
+    private void ResetState()
+    {
+        DemonstrationStore.Reset();
+    }
+
+    private void AddObservation(string entry)
+    {
+        ObservationSequence++;
+        ObservationList.Insert(0, $"{ObservationSequence:D2} · {entry}");
+        if (ObservationList.Count > 6)
+        {
+            ObservationList.RemoveAt(ObservationList.Count - 1);
+        }
+    }
+}
+
+@style scoped {
+    .state-store-panel {
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 1.35rem;
+        background:
+            radial-gradient(circle at 88% 4%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 22rem),
+            var(--surface);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .state-store-panel__heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1.5rem;
+        padding: clamp(1.35rem, 3vw, 2rem);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .state-store-panel__heading h2 {
+        margin: 0.35rem 0 0.65rem;
+        color: var(--text-strong);
+        font-size: clamp(1.35rem, 2.5vw, 1.9rem);
+    }
+
+    .state-store-panel__heading p,
+    .state-store-controls p {
+        max-width: 48rem;
+        margin: 0;
+        color: var(--text-muted);
+        line-height: 1.65;
+    }
+
+    .state-store-layout {
+        display: grid;
+        grid-template-columns: minmax(12rem, 0.65fr) minmax(18rem, 1fr) minmax(18rem, 1fr);
+        gap: 1px;
+        background: var(--border);
+    }
+
+    .state-store-readout,
+    .state-store-controls,
+    .state-store-observers {
+        min-width: 0;
+        padding: 1.35rem;
+        background: color-mix(in srgb, var(--surface) 95%, transparent);
+    }
+
+    .state-store-readout {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .state-store-readout__key,
+    .state-store-controls__label {
+        color: var(--accent);
+        font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .state-store-readout > strong {
+        margin-top: 1rem;
+        color: var(--text-strong);
+        font-size: clamp(3.75rem, 9vw, 6rem);
+        line-height: 0.9;
+    }
+
+    .state-store-readout > span:not(.state-store-readout__key) {
+        margin-top: 0.45rem;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    .state-store-readout__details {
+        display: grid;
+        gap: 0.45rem;
+        width: 100%;
+        margin-top: 1.35rem;
+    }
+
+    .state-store-readout__details span {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: 0.75rem;
+    }
+
+    .state-store-readout__details b {
+        color: var(--text-strong);
+    }
+
+    .state-store-readout p {
+        margin: auto 0 0;
+        padding-top: 1.35rem;
+        color: var(--text-strong);
+        font-size: 0.78rem;
+        font-weight: 700;
+        line-height: 1.5;
+    }
+
+    .state-store-controls {
+        display: grid;
+        align-content: start;
+        gap: 1.5rem;
+    }
+
+    .state-store-controls p {
+        margin: 0.45rem 0 0.9rem;
+        font-size: 0.82rem;
+    }
+
+    .state-store-observers__heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .state-store-observers__heading strong {
+        display: block;
+        margin-top: 0.35rem;
+        color: var(--text-strong);
+        font-size: 0.9rem;
+    }
+
+    .state-store-observers ol {
+        display: grid;
+        gap: 0.5rem;
+        max-height: 18rem;
+        margin: 1rem 0 0;
+        padding: 0;
+        overflow: auto;
+        list-style: none;
+    }
+
+    .state-store-observers li {
+        padding: 0.68rem 0.75rem;
+        border-left: 2px solid var(--accent);
+        border-radius: 0 0.55rem 0.55rem 0;
+        color: var(--text-muted);
+        background: var(--surface-muted);
+        font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+        font-size: 0.69rem;
+        line-height: 1.45;
+    }
+
+    .state-store-panel__footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.9rem 1.35rem;
+        border-top: 1px solid var(--border);
+        color: var(--text-muted);
+        background: var(--surface-muted);
+        font-size: 0.74rem;
+    }
+
+    .state-store-panel__footer code {
+        color: var(--text-strong);
+    }
+
+    @media (max-width: 1050px) {
+        .state-store-layout {
+            grid-template-columns: minmax(12rem, 0.65fr) minmax(18rem, 1.35fr);
+        }
+
+        .state-store-observers {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .state-store-panel__heading,
+        .state-store-panel__footer {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .state-store-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .state-store-observers {
+            grid-column: auto;
+        }
+    }
+}

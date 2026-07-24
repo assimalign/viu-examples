@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#07111f">
+    <meta
+        name="description"
+        content="An interactive showcase of the Assimalign Viu SDK for .NET WebAssembly.">
+    <title>Viu SDK Showcase</title>
+    <link rel="preload" id="webassembly">
+    <script type="importmap"></script>
+    <script type="module" src="main#[.{fingerprint}].js"></script>
+</head>
+<body>
+    <main id="app" aria-live="polite">
+        <div class="boot-screen">
+            <div class="boot-mark">V</div>
+            <p>Starting the Viu runtime…</p>
+        </div>
+    </main>
+    <div id="modal-root"></div>
+</body>
+</html>

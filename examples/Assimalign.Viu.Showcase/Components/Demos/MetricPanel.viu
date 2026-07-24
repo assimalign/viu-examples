@@ -1,0 +1,127 @@
+@template {
+    <article :class="PanelClass">
+        <header class="metric-panel__header">
+            <span class="metric-panel__label">{{ Label }}</span>
+            <slot name="badge">
+                <span class="metric-panel__live-badge">Live</span>
+            </slot>
+        </header>
+        <strong class="metric-panel__value">{{ Value }}</strong>
+        <div class="metric-panel__detail">
+            <slot>
+                <span>{{ Detail }}</span>
+            </slot>
+        </div>
+    </article>
+}
+
+@script {
+    using System.Collections.Generic;
+
+    using Assimalign.Viu.Components;
+
+    public IReadOnlyList<IComponentParameter> Parameters { get; } =
+    [
+        new ComponentParameter("label", defaultFactory: static () => "Metric"),
+        new ComponentParameter("value", defaultFactory: static () => "—"),
+        new ComponentParameter("detail", defaultFactory: static () => "Live value"),
+        new ComponentParameter("tone", defaultFactory: static () => "accent"),
+    ];
+
+    public string Label => Context.Arguments.Get<string>("label") ?? "Metric";
+
+    public string Value => Context.Arguments.Get<string>("value") ?? "—";
+
+    public string Detail =>
+        Context.Arguments.Get<string>("detail")
+        ?? "Live value";
+
+    public string Tone =>
+        Context.Arguments.Get<string>("tone")
+        ?? "accent";
+
+    public string PanelClass => $"metric-panel metric-panel--{Tone}";
+}
+
+@style scoped {
+    .metric-panel {
+        position: relative;
+        display: grid;
+        gap: 0.7rem;
+        min-width: 0;
+        overflow: hidden;
+        padding: 1.2rem;
+        border: 1px solid var(--border);
+        border-radius: 1.15rem;
+        background: var(--surface);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .metric-panel::after {
+        position: absolute;
+        inset: auto -1.5rem -2rem auto;
+        width: 6rem;
+        height: 6rem;
+        border-radius: 50%;
+        background: color-mix(in srgb, var(--accent) 8%, transparent);
+        content: "";
+        pointer-events: none;
+    }
+
+    .metric-panel__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.8rem;
+    }
+
+    .metric-panel__label {
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        font-weight: 850;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+    }
+
+    .metric-panel__live-badge {
+        padding: 0.25rem 0.48rem;
+        border-radius: 999px;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+        font-size: 0.65rem;
+        font-weight: 850;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .metric-panel__value {
+        color: var(--text-strong);
+        font-size: clamp(1.45rem, 3vw, 2.15rem);
+        letter-spacing: -0.045em;
+        line-height: 1;
+    }
+
+    .metric-panel__detail {
+        position: relative;
+        z-index: 1;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        line-height: 1.5;
+    }
+
+    .metric-panel--success {
+        border-color: color-mix(in srgb, var(--success) 28%, var(--border));
+    }
+
+    .metric-panel--success::after {
+        background: color-mix(in srgb, var(--success) 9%, transparent);
+    }
+
+    .metric-panel--warm {
+        border-color: color-mix(in srgb, #f4b942 34%, var(--border));
+    }
+
+    .metric-panel--warm::after {
+        background: color-mix(in srgb, #f4b942 10%, transparent);
+    }
+}

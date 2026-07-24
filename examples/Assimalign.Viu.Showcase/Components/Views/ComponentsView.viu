@@ -1,0 +1,623 @@
+@template {
+    <div class="view-stack components-view">
+        <section class="section-heading">
+            <div>
+                <span class="section-kicker">Component contract</span>
+                <h2>Inputs are declared. Outputs are observable. Composition stays flexible.</h2>
+                <p>
+                    These examples exercise typed component parameters, custom events, slot
+                    projection, attribute fallthrough, lifecycle callbacks, and keyed lists.
+                </p>
+            </div>
+            <StatusPill label="Component runtime" tone="success" />
+        </section>
+
+        <section class="route-argument-panel" aria-labelledby="route-argument-title">
+            <div>
+                <span class="section-kicker">Official router arguments</span>
+                <h3 id="route-argument-title">
+                    The optional <code>:focus?</code> segment arrived as a component parameter.
+                </h3>
+                <p>
+                    <code>RouteComponentArguments.FromParameters()</code> maps the matched
+                    route value to this view's declared <code>focus</code> parameter.
+                </p>
+            </div>
+            <div class="route-argument-result">
+                <span>Resolved focus</span>
+                <strong>{{ FocusArgument }}</strong>
+            </div>
+            <nav class="route-focus-links" aria-label="Route parameter examples">
+                <RouterLink to="/components" exactActiveClass="route-focus-link--active">
+                    Default
+                </RouterLink>
+                <RouterLink to="/components/slots" activeClass="route-focus-link--active">
+                    Slots
+                </RouterLink>
+                <RouterLink to="/components/lifecycle" activeClass="route-focus-link--active">
+                    Lifecycle
+                </RouterLink>
+            </nav>
+        </section>
+
+        <section class="component-metric-grid" aria-label="Component examples">
+            <MetricPanel
+                label="Declared property"
+                :value="RatingText"
+                detail="A parent value passed through modelValue."
+                tone="warm" />
+            <MetricPanel
+                label="Emitted events"
+                :value="EventCountText"
+                detail="Validated child events observed by this view."
+                tone="success" />
+            <MetricPanel
+                class="fallthrough-highlight"
+                data-fallthrough="merged-on-component-root"
+                aria-label="Fallthrough attribute example"
+                label="Fallthrough attrs"
+                value="Merged"
+                tone="accent">
+                <template #badge>
+                    <span class="custom-slot-badge">data-*</span>
+                </template>
+                <span>
+                    The parent class, data attribute, and accessible label land on the child root.
+                </span>
+            </MetricPanel>
+        </section>
+
+        <section class="component-demo-grid">
+            <FeatureCard title="Custom v-model and emitted events" eyebrow="Two-way contract">
+                <div class="interactive-stack">
+                    <p class="supporting-copy">
+                        <code>RatingControl</code> declares <code>modelValue</code>,
+                        <code>update:modelValue</code>, and a validated <code>changed</code> event.
+                    </p>
+                    <RatingControl
+                        v-model="Rating"
+                        label="Rate the component authoring experience"
+                        @changed="HandleRatingChanged" />
+                    <div class="selection-readout">
+                        <span>Parent model</span>
+                        <strong>{{ RatingText }}</strong>
+                    </div>
+                </div>
+                <template #footer>
+                    <span class="footer-note">
+                        The model assignment and the independent event listener both run.
+                    </span>
+                </template>
+            </FeatureCard>
+
+            <QuotePanel author="Viu components" role="Compiled single-file component">
+                <template #mark>
+                    <span>VIU</span>
+                </template>
+                Default content occupies the quote slot, while the mark and footer are named
+                slots supplied by the parent.
+                <template #footer>
+                    <StatusPill label="3 slots" tone="accent" />
+                </template>
+            </QuotePanel>
+        </section>
+
+        <FeatureCard title="Conditional lifecycle ownership" eyebrow="Mount and teardown">
+            <template #badge>
+                <StatusPill :label="LifecycleStatus" :tone="LifecycleTone" />
+            </template>
+
+            <div class="lifecycle-laboratory">
+                <div class="lifecycle-laboratory__copy">
+                    <p>
+                        Toggle the child to mount a fresh component instance or tear down its
+                        effect scope. The child reports mounted and unmounted through declared events.
+                    </p>
+                    <button
+                        type="button"
+                        class="button button--secondary"
+                        @click="ToggleLifecycleProbe">
+                        {{ LifecycleButtonLabel }}
+                    </button>
+                </div>
+                <LifecycleProbe
+                    v-if="ShowLifecycleProbe"
+                    label="Conditional child"
+                    @mounted="HandleProbeMounted"
+                    @unmounted="HandleProbeUnmounted" />
+                <div v-else class="unmounted-placeholder">
+                    <span aria-hidden="true">◇</span>
+                    <strong>Child unmounted</strong>
+                    <small>Its lifecycle scope and rendered subtree were released.</small>
+                </div>
+            </div>
+        </FeatureCard>
+
+        <section class="component-bottom-grid">
+            <article class="surface-panel">
+                <header>
+                    <div>
+                        <span class="section-kicker">Keyed list rendering</span>
+                        <h3>One runtime, several composition primitives.</h3>
+                    </div>
+                    <span class="count-badge">{{ FeatureCountText }}</span>
+                </header>
+                <div class="feature-token-list">
+                    <span
+                        v-for="feature in ComponentFeatures"
+                        :key="feature"
+                        class="feature-token">
+                        <i aria-hidden="true"></i>
+                        {{ feature }}
+                    </span>
+                </div>
+            </article>
+
+            <article class="surface-panel event-stream">
+                <header>
+                    <div>
+                        <span class="section-kicker">Parent event stream</span>
+                        <h3>What the children have emitted.</h3>
+                    </div>
+                    <button
+                        v-if="HasEvents"
+                        type="button"
+                        class="text-button"
+                        @click="ClearEvents">
+                        Clear
+                    </button>
+                </header>
+                <ul v-if="HasEvents">
+                    <li v-for="eventEntry in EventLog" :key="eventEntry">
+                        <span aria-hidden="true">↳</span>
+                        {{ eventEntry }}
+                    </li>
+                </ul>
+                <p v-else class="empty-state">
+                    Interact with the rating or lifecycle example to receive an event.
+                </p>
+            </article>
+        </section>
+    </div>
+}
+
+@script {
+    using System;
+    using System.Collections.Generic;
+
+    using Assimalign.Viu.Components;
+    using Assimalign.Viu.Examples.Showcase.State;
+    using Assimalign.Viu.Reactivity;
+
+    private static readonly IReadOnlyList<string> Features =
+    [
+        "Declared parameters",
+        "Validated events",
+        "Default slots",
+        "Named slots",
+        "Fallthrough attributes",
+        "Lifecycle callbacks",
+        "Conditional branches",
+        "Keyed lists",
+    ];
+
+    private int _eventSequence;
+
+    private ShowcaseStore Store { get; set; } = null!;
+
+    public IReadOnlyList<IComponentParameter> Parameters { get; } =
+    [
+        new ComponentParameter(
+            "focus",
+            defaultFactory: static () => "all"),
+    ];
+
+    public Reference<object?> Rating { get; } =
+        Reactive.Reference<object?>(4);
+
+    public Reference<bool> ShowLifecycleProbe { get; } =
+        Reactive.Reference(true);
+
+    public ReactiveList<string> EventLog { get; } = new();
+
+    public IReadOnlyList<string> ComponentFeatures => Features;
+
+    public string FocusArgument =>
+        Context.Arguments.Get<string>("focus") ?? "all";
+
+    public bool HasEvents => EventLog.Count > 0;
+
+    public string RatingText =>
+        Rating.Value is int rating
+            ? $"{rating} / 5"
+            : "Not rated";
+
+    public string EventCountText =>
+        EventLog.Count == 1
+            ? "1 event"
+            : $"{EventLog.Count} events";
+
+    public string FeatureCountText => $"{Features.Count} features";
+
+    public string LifecycleStatus =>
+        ShowLifecycleProbe.Value
+            ? "Mounted"
+            : "Unmounted";
+
+    public string LifecycleTone =>
+        ShowLifecycleProbe.Value
+            ? "success"
+            : "neutral";
+
+    public string LifecycleButtonLabel =>
+        ShowLifecycleProbe.Value
+            ? "Unmount child"
+            : "Mount fresh child";
+
+    partial void OnSetup()
+    {
+        Store = ShowcaseState.Definition.Use(Context);
+    }
+
+    private void HandleRatingChanged(object? value)
+    {
+        string rating = Convert.ToString(value) ?? "unknown";
+        RecordEvent($"RatingControl changed → {rating}");
+        Store.Track($"Component rating changed to {rating}");
+    }
+
+    private void HandleProbeMounted(object? value)
+    {
+        string label = Convert.ToString(value) ?? "Lifecycle probe";
+        RecordEvent($"{label} mounted");
+    }
+
+    private void HandleProbeUnmounted(object? value)
+    {
+        string label = Convert.ToString(value) ?? "Lifecycle probe";
+        RecordEvent($"{label} unmounted");
+    }
+
+    private void ToggleLifecycleProbe()
+    {
+        ShowLifecycleProbe.Value = !ShowLifecycleProbe.Value;
+        Store.Track(
+            ShowLifecycleProbe.Value
+                ? "Mounted a lifecycle probe"
+                : "Unmounted a lifecycle probe");
+    }
+
+    private void ClearEvents()
+    {
+        EventLog.Clear();
+        Store.Track("Cleared the component event stream");
+    }
+
+    private void RecordEvent(string message)
+    {
+        _eventSequence++;
+        EventLog.Insert(0, $"{_eventSequence:D2} · {message}");
+        if (EventLog.Count > 5)
+        {
+            EventLog.RemoveAt(EventLog.Count - 1);
+        }
+    }
+}
+
+@style scoped {
+    .components-view .section-heading {
+        align-items: flex-end;
+    }
+
+    .section-heading p {
+        max-width: 48rem;
+        margin: 0.7rem 0 0;
+        color: var(--text-muted);
+        line-height: 1.65;
+    }
+
+    .route-argument-panel {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 1rem 1.5rem;
+        padding: 1.2rem;
+        border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+        border-radius: 1.2rem;
+        background:
+            linear-gradient(
+                135deg,
+                color-mix(in srgb, var(--accent) 8%, var(--surface)),
+                var(--surface));
+        box-shadow: var(--shadow-soft);
+    }
+
+    .route-argument-panel h3 {
+        margin: 0.32rem 0 0;
+        color: var(--text-strong);
+        font-size: 1rem;
+    }
+
+    .route-argument-panel p {
+        max-width: 48rem;
+        margin: 0.5rem 0 0;
+        color: var(--text-muted);
+        font-size: 0.82rem;
+        line-height: 1.6;
+    }
+
+    .route-argument-result {
+        display: grid;
+        gap: 0.22rem;
+        min-width: 9rem;
+        padding: 0.72rem 0.9rem;
+        border: 1px solid var(--border);
+        border-radius: 0.8rem;
+        background: var(--surface-muted);
+    }
+
+    .route-argument-result span {
+        color: var(--text-muted);
+        font-size: 0.66rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .route-argument-result strong {
+        color: var(--accent);
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.88rem;
+    }
+
+    .route-focus-links {
+        display: flex;
+        flex-wrap: wrap;
+        grid-column: 1 / -1;
+        gap: 0.5rem;
+    }
+
+    .route-focus-links a {
+        padding: 0.46rem 0.68rem;
+        border: 1px solid var(--border);
+        border-radius: 0.7rem;
+        color: var(--text-muted);
+        background: var(--surface);
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .route-focus-links a:hover,
+    .route-focus-links .route-focus-link--active {
+        border-color: color-mix(in srgb, var(--accent) 52%, var(--border));
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+    }
+
+    .component-metric-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .fallthrough-highlight {
+        outline: 3px solid color-mix(in srgb, var(--accent) 10%, transparent);
+        outline-offset: 3px;
+    }
+
+    .custom-slot-badge,
+    .count-badge {
+        padding: 0.28rem 0.52rem;
+        border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+        border-radius: 999px;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+        font-size: 0.66rem;
+        font-weight: 850;
+        letter-spacing: 0.05em;
+    }
+
+    .component-demo-grid,
+    .component-bottom-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .interactive-stack {
+        display: grid;
+        gap: 1.15rem;
+    }
+
+    .supporting-copy,
+    .lifecycle-laboratory__copy p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.86rem;
+        line-height: 1.65;
+    }
+
+    .selection-readout {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.8rem 0.9rem;
+        border: 1px dashed var(--border);
+        border-radius: 0.85rem;
+        color: var(--text-muted);
+        background: var(--surface-muted);
+        font-size: 0.78rem;
+    }
+
+    .selection-readout strong {
+        color: var(--text-strong);
+        font-size: 0.92rem;
+    }
+
+    .footer-note {
+        color: var(--text-muted);
+        font-size: 0.78rem;
+    }
+
+    .lifecycle-laboratory {
+        display: grid;
+        grid-template-columns: minmax(13rem, 0.55fr) minmax(0, 1.45fr);
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .lifecycle-laboratory__copy {
+        display: flex;
+        align-items: flex-start;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1rem;
+        border-radius: 1rem;
+        background: var(--surface-muted);
+    }
+
+    .unmounted-placeholder {
+        display: grid;
+        min-height: 10rem;
+        place-items: center;
+        align-content: center;
+        gap: 0.35rem;
+        border: 1px dashed var(--border);
+        border-radius: 1.1rem;
+        color: var(--text-muted);
+        background: var(--surface-muted);
+        text-align: center;
+    }
+
+    .unmounted-placeholder > span {
+        color: var(--accent);
+        font-size: 1.8rem;
+    }
+
+    .unmounted-placeholder strong {
+        color: var(--text-strong);
+    }
+
+    .unmounted-placeholder small {
+        font-size: 0.76rem;
+    }
+
+    .surface-panel {
+        display: grid;
+        align-content: start;
+        gap: 1.1rem;
+        min-width: 0;
+        padding: 1.25rem;
+        border: 1px solid var(--border);
+        border-radius: 1.2rem;
+        background: var(--surface);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .surface-panel header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .surface-panel h3 {
+        margin: 0.32rem 0 0;
+        color: var(--text-strong);
+        font-size: 1rem;
+    }
+
+    .feature-token-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+    }
+
+    .feature-token {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.42rem;
+        padding: 0.5rem 0.65rem;
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        color: var(--text-muted);
+        background: var(--surface-muted);
+        font-size: 0.74rem;
+        font-weight: 720;
+    }
+
+    .feature-token i {
+        width: 0.35rem;
+        height: 0.35rem;
+        border-radius: 50%;
+        background: var(--success);
+    }
+
+    .event-stream ul {
+        display: grid;
+        gap: 0.5rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .event-stream li {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.55rem;
+        padding: 0.62rem 0.72rem;
+        border-radius: 0.72rem;
+        color: var(--text-muted);
+        background: var(--surface-muted);
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.7rem;
+    }
+
+    .event-stream li span {
+        color: var(--accent);
+    }
+
+    .text-button {
+        padding: 0;
+        border: 0;
+        color: var(--accent);
+        background: transparent;
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.74rem;
+        font-weight: 800;
+    }
+
+    .empty-state {
+        margin: 0;
+        padding: 1.2rem;
+        border: 1px dashed var(--border);
+        border-radius: 0.8rem;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        text-align: center;
+    }
+
+    @media (max-width: 900px) {
+        .component-metric-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .component-demo-grid,
+        .component-bottom-grid,
+        .lifecycle-laboratory {
+            grid-template-columns: 1fr;
+        }
+
+        .route-argument-panel {
+            grid-template-columns: 1fr;
+        }
+
+        .route-argument-result {
+            min-width: 0;
+        }
+    }
+}

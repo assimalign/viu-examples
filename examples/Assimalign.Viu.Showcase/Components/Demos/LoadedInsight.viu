@@ -1,0 +1,191 @@
+@template {
+    <article class="loaded-insight">
+        <header class="loaded-insight__header">
+            <div class="loaded-insight__mark" aria-hidden="true">
+                <span></span>
+            </div>
+            <div>
+                <span class="loaded-insight__eyebrow">Resolved component</span>
+                <h3>Async target is live.</h3>
+            </div>
+            <span class="loaded-insight__status">ready</span>
+        </header>
+
+        <p class="loaded-insight__copy">
+            The loader returned an AOT-safe component target, Suspense revealed this branch, and
+            the activated instance now participates in ordinary reactive updates.
+        </p>
+
+        <dl class="loaded-insight__metrics">
+            <div>
+                <dt>Resolved</dt>
+                <dd>{{ LoadedAt }}</dd>
+            </div>
+            <div>
+                <dt>Local updates</dt>
+                <dd>{{ AcknowledgementCount }}</dd>
+            </div>
+            <div>
+                <dt>Activation</dt>
+                <dd>fresh</dd>
+            </div>
+        </dl>
+
+        <button type="button" class="loaded-insight__action" @click="Acknowledge">
+            Send local reactive signal
+            <span aria-hidden="true">→</span>
+        </button>
+    </article>
+}
+
+@script {
+    using System;
+    using Assimalign.Viu.Reactivity;
+
+    private readonly Reference<string> loadedAt =
+        Reactive.Reference("committing");
+
+    private readonly Reference<int> acknowledgementCount =
+        Reactive.Reference(0);
+
+    public string LoadedAt => loadedAt.Value;
+
+    public int AcknowledgementCount => acknowledgementCount.Value;
+
+    partial void OnSetup()
+    {
+        Context.Lifecycle.OnMounted(
+            () => loadedAt.Value = DateTime.Now.ToString("HH:mm:ss"));
+    }
+
+    private void Acknowledge()
+    {
+        acknowledgementCount.Value++;
+    }
+}
+
+@style scoped {
+    .loaded-insight {
+        display: grid;
+        min-height: 13.5rem;
+        padding: 1.25rem;
+        color: #edf8ff;
+        background:
+            radial-gradient(circle at 92% 10%, rgba(55, 211, 186, 0.25), transparent 14rem),
+            linear-gradient(145deg, #102b3d, #081827);
+    }
+
+    .loaded-insight__header {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .loaded-insight__mark {
+        display: grid;
+        width: 2.75rem;
+        height: 2.75rem;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 0.9rem;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .loaded-insight__mark span {
+        width: 0.7rem;
+        height: 0.7rem;
+        border: 2px solid #51dbc5;
+        border-radius: 50%;
+        box-shadow: 0 0 0 0.35rem rgba(81, 219, 197, 0.14);
+    }
+
+    .loaded-insight__eyebrow {
+        display: block;
+        color: #78dfcf;
+        font-size: 0.65rem;
+        font-weight: 850;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+    }
+
+    h3 {
+        margin: 0.2rem 0 0;
+        color: white;
+        font-size: 1.05rem;
+    }
+
+    .loaded-insight__status {
+        padding: 0.35rem 0.55rem;
+        border: 1px solid rgba(81, 219, 197, 0.28);
+        border-radius: 999px;
+        color: #78dfcf;
+        background: rgba(81, 219, 197, 0.08);
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .loaded-insight__copy {
+        margin: 1rem 0;
+        color: #b9cfda;
+        font-size: 0.8rem;
+        line-height: 1.55;
+    }
+
+    .loaded-insight__metrics {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.5rem;
+        margin: 0;
+    }
+
+    .loaded-insight__metrics div {
+        min-width: 0;
+        padding: 0.65rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    dt {
+        margin-bottom: 0.2rem;
+        color: #91aab8;
+        font-size: 0.62rem;
+    }
+
+    dd {
+        overflow: hidden;
+        margin: 0;
+        color: white;
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.74rem;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .loaded-insight__action {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        width: 100%;
+        margin-top: 0.85rem;
+        padding: 0.65rem 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        border-radius: 0.75rem;
+        color: #edf8ff;
+        background: rgba(255, 255, 255, 0.07);
+        font: inherit;
+        font-size: 0.72rem;
+        font-weight: 750;
+        cursor: pointer;
+    }
+
+    .loaded-insight__action:hover {
+        border-color: rgba(81, 219, 197, 0.42);
+        background: rgba(81, 219, 197, 0.1);
+    }
+}

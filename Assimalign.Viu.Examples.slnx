@@ -1,5 +1,5 @@
 <Solution>
   <Folder Name="/examples/">
-    <Project Path="examples/SimpleApp/SimpleApp.csproj" />
+    <Project Path="examples/Assimalign.Viu.Showcase/Assimalign.Viu.Showcase.csproj" />
   </Folder>
 </Solution>

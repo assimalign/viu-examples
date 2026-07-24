@@ -1,0 +1,293 @@
+@template {
+    <div class="view-stack">
+        <section class="page-introduction">
+            <div>
+                <span class="section-kicker">Application and browser runtime</span>
+                <h2>See the seams that make a Viu application production-ready.</h2>
+                <p>
+                    The host enables command buffering, performance instrumentation, shared
+                    services, a state registry, application hooks, generated CSS, and the
+                    integer-handle browser bridge.
+                </p>
+            </div>
+            <StatusPill
+                :label="PluginLabel"
+                :tone="PluginTone" />
+        </section>
+
+        <section class="metric-grid">
+            <div class="metric-card">
+                <span>JavaScript nodes</span>
+                <strong>{{ JavaScriptNodeCount }}</strong>
+                <small>registered integer handles</small>
+            </div>
+            <div class="metric-card">
+                <span>Listener maps</span>
+                <strong>{{ JavaScriptListenerMapCount }}</strong>
+                <small>JavaScript-side event tables</small>
+            </div>
+            <div class="metric-card">
+                <span>.NET listeners</span>
+                <strong>{{ DotnetListenerCount }}</strong>
+                <small>managed callback entries</small>
+            </div>
+            <div class="metric-card metric-card--accent">
+                <span>Rendering path</span>
+                <strong>01</strong>
+                <small>buffered frame per flush</small>
+            </div>
+        </section>
+
+        <div class="two-column-grid">
+            <FeatureCard title="Application composition" eyebrow="Host">
+                <ul class="check-list">
+                    <li><span>✓</span> Assimalign.Viu.Sdk consumer project</li>
+                    <li><span>✓</span> Assimalign.Viu.App shared framework</li>
+                    <li><span>✓</span> Explicit component factory</li>
+                    <li><span>✓</span> Application-scoped state registry</li>
+                    <li><span>✓</span> Official Router and browser click bridge</li>
+                    <li><span>✓</span> Command-buffered browser renderer</li>
+                </ul>
+                <template #footer>
+                    <button type="button" class="button button--secondary" @click="RefreshDiagnostics">
+                        Refresh handle diagnostics
+                    </button>
+                </template>
+            </FeatureCard>
+
+            <FeatureCard title="Plugin and application hooks" eyebrow="Runtime">
+                <div class="runtime-callout">
+                    <StatusPill :label="PluginLabel" :tone="PluginTone" />
+                    <p>{{ PluginMessage }}</p>
+                </div>
+                <p class="muted-copy">
+                    The host also installs warning and terminal error handlers. Router guards and
+                    lifecycle activity write into the same diagnostic stream below.
+                </p>
+                <template #footer>
+                    <button type="button" class="button button--secondary" @click="AddDiagnostic">
+                        Emit a diagnostic
+                    </button>
+                </template>
+            </FeatureCard>
+        </div>
+
+        <StateStorePanel />
+
+        <section :class="$style.diagnosticPanel">
+            <div class="section-heading">
+                <div>
+                    <span class="section-kicker">CSS pipeline + live telemetry</span>
+                    <h2>Global, scoped, module, and reactive styles compose.</h2>
+                </div>
+                <button type="button" class="button button--ghost" @click="CycleAccent">
+                    Change reactive accent
+                </button>
+            </div>
+            <div class="diagnostic-layout">
+                <div>
+                    <p class="muted-copy">
+                        This panel’s class is emitted by a CSS Module, scoped to this component,
+                        and its border/glow color is driven by a reactive <code>v-bind()</code>
+                        custom property.
+                    </p>
+                    <div class="pipeline-row">
+                        <span>global tokens</span>
+                        <b>→</b>
+                        <span>scoped rules</span>
+                        <b>→</b>
+                        <span>hashed module</span>
+                        <b>→</b>
+                        <span>live CSS variable</span>
+                    </div>
+                </div>
+                <ol class="diagnostic-log">
+                    <li
+                        v-for="entry in DiagnosticEntries"
+                        :key="entry">
+                        {{ entry }}
+                    </li>
+                    <li v-if="DiagnosticEntries.Count == 0">No diagnostics recorded yet.</li>
+                </ol>
+            </div>
+        </section>
+    </div>
+}
+
+@script {
+    using System;
+
+    using Assimalign.Viu.Browser;
+    using Assimalign.Viu.Examples.Showcase.Runtime;
+    using Assimalign.Viu.Examples.Showcase.State;
+    using Assimalign.Viu.Reactivity;
+
+    private static readonly string[] AccentPalette =
+    [
+        "#ff6b35",
+        "#28b8d8",
+        "#8c6ff7",
+    ];
+
+    private ShowcaseRuntimeStatus RuntimeStatus { get; set; } = null!;
+
+    private ShowcaseStore Store { get; set; } = null!;
+
+    private int AccentIndex { get; set; }
+
+    public Reference<string> AccentColor { get; } =
+        Reactive.Reference(AccentPalette[0]);
+
+    public Reference<int> JavaScriptNodes { get; } =
+        Reactive.Reference(0);
+
+    public Reference<int> JavaScriptListenerMaps { get; } =
+        Reactive.Reference(0);
+
+    public Reference<int> DotnetListeners { get; } =
+        Reactive.Reference(0);
+
+    public int JavaScriptNodeCount => JavaScriptNodes.Value;
+
+    public int JavaScriptListenerMapCount => JavaScriptListenerMaps.Value;
+
+    public int DotnetListenerCount => DotnetListeners.Value;
+
+    public bool IsPluginInstalled => RuntimeStatus.PluginInstalled.Value;
+
+    public string PluginLabel =>
+        IsPluginInstalled ? "Plugin installed" : "Plugin pending";
+
+    public string PluginTone =>
+        IsPluginInstalled ? "success" : "neutral";
+
+    public string PluginMessage => RuntimeStatus.PluginMessage.Value;
+
+    public ReactiveList<string> DiagnosticEntries => RuntimeStatus.Diagnostics;
+
+    partial void OnSetup()
+    {
+        RuntimeStatus =
+            (ShowcaseRuntimeStatus?)Context.Services.GetService(
+                typeof(ShowcaseRuntimeStatus))
+            ?? throw new InvalidOperationException(
+                "The runtime-status service is unavailable.");
+        Store = ShowcaseState.Definition.Use(Context);
+        Context.Lifecycle.OnMounted(RefreshDiagnostics);
+    }
+
+    private void RefreshDiagnostics()
+    {
+        (int nodes, int maps, int listeners) =
+            BrowserRuntime.GetRegistryDiagnostics();
+        Reactive.StartBatch();
+        try
+        {
+            JavaScriptNodes.Value = nodes;
+            JavaScriptListenerMaps.Value = maps;
+            DotnetListeners.Value = listeners;
+        }
+        finally
+        {
+            Reactive.EndBatch();
+        }
+        Store.Track("Browser handle diagnostics refreshed");
+    }
+
+    private void AddDiagnostic()
+    {
+        RuntimeStatus.AddDiagnostic("Manual diagnostic emitted by PlatformView");
+        Store.Track("Application diagnostic emitted");
+    }
+
+    private void CycleAccent()
+    {
+        AccentIndex = (AccentIndex + 1) % AccentPalette.Length;
+        AccentColor.Value = AccentPalette[AccentIndex];
+        Store.Track("Reactive CSS accent changed");
+    }
+}
+
+@style module scoped {
+    .diagnosticPanel {
+        padding: clamp(1.25rem, 3vw, 2rem);
+        border: 1px solid v-bind(AccentColor);
+        border-radius: 1.35rem;
+        background:
+            radial-gradient(
+                circle at 100% 0,
+                color-mix(in srgb, v-bind(AccentColor) 14%, transparent),
+                transparent 22rem),
+            var(--surface);
+        box-shadow:
+            0 1.2rem 3rem
+            color-mix(in srgb, v-bind(AccentColor) 10%, transparent);
+    }
+}
+
+@style scoped {
+    .runtime-callout {
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    .runtime-callout p {
+        margin: 0;
+        color: var(--text-strong);
+        font-weight: 700;
+        line-height: 1.55;
+    }
+
+    .diagnostic-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 0.85fr) minmax(18rem, 1.15fr);
+        gap: 1.5rem;
+    }
+
+    .pipeline-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.55rem;
+        margin-top: 1.25rem;
+    }
+
+    .pipeline-row span {
+        padding: 0.48rem 0.65rem;
+        border-radius: 0.55rem;
+        color: var(--text-strong);
+        background: var(--surface-muted);
+        font-size: 0.76rem;
+        font-weight: 800;
+    }
+
+    .pipeline-row b {
+        color: var(--accent);
+    }
+
+    .diagnostic-log {
+        display: grid;
+        gap: 0.5rem;
+        max-height: 18rem;
+        margin: 0;
+        padding: 0;
+        overflow: auto;
+        list-style: none;
+    }
+
+    .diagnostic-log li {
+        padding: 0.7rem 0.8rem;
+        border-left: 2px solid var(--accent);
+        border-radius: 0 0.6rem 0.6rem 0;
+        color: var(--text-muted);
+        background: var(--surface-muted);
+        font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+        font-size: 0.73rem;
+    }
+
+    @media (max-width: 800px) {
+        .diagnostic-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+}

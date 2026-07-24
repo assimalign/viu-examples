@@ -1,0 +1,981 @@
+@template {
+    <div class="view-stack motion-view">
+        <section class="motion-introduction">
+            <div>
+                <span class="section-kicker">Runtime composition</span>
+                <h2>Motion, identity, and async work in one component tree.</h2>
+                <p>
+                    The controls below exercise Viu's browser transitions and host-neutral
+                    built-ins. Every panel is a real mounted component with reactive state.
+                </p>
+            </div>
+            <div class="runtime-legend" aria-label="Runtime features in this view">
+                <span>Transition</span>
+                <span>KeepAlive</span>
+                <span>Suspense</span>
+                <span>Teleport</span>
+            </div>
+        </section>
+
+        <section class="motion-grid">
+            <FeatureCard title="A single entering branch" eyebrow="Transition">
+                <div class="control-row">
+                    <button type="button" class="motion-button motion-button--primary" @click="ToggleTransitionCard">
+                        {{ TransitionToggleLabel }}
+                    </button>
+                    <button type="button" class="motion-button" @click="ChangeTransitionCard">
+                        Change keyed card
+                    </button>
+                </div>
+
+                <div class="transition-stage" aria-live="polite">
+                    <Transition name="stage-card" mode="out-in">
+                        <article
+                            v-if="TransitionCardVisible"
+                            :key="TransitionCardKey"
+                            :class="TransitionCardClass">
+                            <span class="transition-card__index">{{ TransitionCardNumber }}</span>
+                            <div>
+                                <strong>{{ TransitionCardTitle }}</strong>
+                                <p>{{ TransitionCardCopy }}</p>
+                            </div>
+                        </article>
+                    </Transition>
+                </div>
+
+                <template #footer>
+                    <span class="feature-note">
+                        The changing key drives leave-before-enter replacement; hiding the branch
+                        exercises the ordinary leave path.
+                    </span>
+                </template>
+            </FeatureCard>
+
+            <FeatureCard title="A keyed, reorderable collection" eyebrow="TransitionGroup">
+                <div class="control-row">
+                    <button type="button" class="motion-button motion-button--primary" @click="AddMotionItem">
+                        Add item
+                    </button>
+                    <button type="button" class="motion-button" @click="RotateMotionItems">
+                        Rotate order
+                    </button>
+                </div>
+
+                <TransitionGroup tag="div" name="motion-item" class="motion-list" aria-live="polite">
+                    <div
+                        v-for="item in MotionItems"
+                        :key="item.Identifier"
+                        class="motion-list__item">
+                        <span>{{ item.Label }}</span>
+                        <button
+                            type="button"
+                            class="motion-list__remove"
+                            aria-label="Remove item"
+                            :disabled="CannotRemoveMotionItem"
+                            @click="RemoveMotionItem(item.Identifier)">
+                            ×
+                        </button>
+                    </div>
+                </TransitionGroup>
+
+                <template #footer>
+                    <span class="feature-note">
+                        Stable integer keys preserve identity while the browser renderer applies
+                        enter, leave, and FLIP move classes.
+                    </span>
+                </template>
+            </FeatureCard>
+        </section>
+
+        <section class="motion-grid">
+            <FeatureCard title="Switch without throwing state away" eyebrow="Dynamic component + KeepAlive">
+                <div class="panel-tabs" role="tablist" aria-label="Cached component selection">
+                    <button
+                        type="button"
+                        :class="MetricPanelTabClass"
+                        :aria-pressed="MetricPanelSelected"
+                        @click="ShowMetricPanel">
+                        Metric
+                    </button>
+                    <button
+                        type="button"
+                        :class="QuotePanelTabClass"
+                        :aria-pressed="QuotePanelSelected"
+                        @click="ShowQuotePanel">
+                        Quote
+                    </button>
+                    <button
+                        type="button"
+                        :class="LifecyclePanelTabClass"
+                        :aria-pressed="LifecyclePanelSelected"
+                        @click="ShowLifecyclePanel">
+                        Lifecycle
+                    </button>
+                </div>
+
+                <div class="dynamic-stage">
+                    <KeepAlive include="MetricPanel,QuotePanel,LifecycleProbe" max="3">
+                        <component :is="ActivePanel" :key="ActivePanelName" />
+                    </KeepAlive>
+                </div>
+
+                <div class="implementation-strip">
+                    <code>DynamicComponents.Named("{{ ActivePanelName }}")</code>
+                    <span>cache limit · 3</span>
+                </div>
+
+                <template #footer>
+                    <span class="feature-note">
+                        Explicit named selectors stay AOT-safe, and KeepAlive moves inactive
+                        component roots into renderer-owned storage.
+                    </span>
+                </template>
+            </FeatureCard>
+
+            <FeatureCard title="Load once, reveal as one branch" eyebrow="Suspense + async component">
+                <div class="asynchronous-header">
+                    <div>
+                        <strong>AsyncInsight</strong>
+                        <span>900 ms simulated loader</span>
+                    </div>
+                    <button type="button" class="motion-button motion-button--primary" @click="ToggleAsynchronousInsight">
+                        {{ AsynchronousToggleLabel }}
+                    </button>
+                </div>
+
+                <div class="asynchronous-stage" aria-live="polite">
+                    <div v-if="!AsynchronousInsightVisible" class="asynchronous-empty">
+                        <span class="empty-symbol">↯</span>
+                        <strong>Boundary is idle</strong>
+                        <p>Mount the registered async component to start its loader.</p>
+                    </div>
+                    <Suspense v-else :key="AsynchronousBoundaryKey">
+                        <template #default>
+                            <AsyncInsight />
+                        </template>
+                        <template #fallback>
+                            <div class="asynchronous-fallback">
+                                <span class="loading-orbit" aria-hidden="true"></span>
+                                <div>
+                                    <strong>Resolving component target</strong>
+                                    <p>Suspense keeps the pending branch hidden until it settles.</p>
+                                </div>
+                            </div>
+                        </template>
+                    </Suspense>
+                </div>
+
+                <template #footer>
+                    <span class="feature-note">
+                        The first mount displays the fallback; later mounts reuse the definition's
+                        resolved target while still activating a fresh component instance.
+                    </span>
+                </template>
+            </FeatureCard>
+        </section>
+
+        <section class="teleport-callout">
+            <div>
+                <span class="section-kicker">Outside the application root</span>
+                <h2>Teleport keeps logical ownership while changing DOM placement.</h2>
+                <p>
+                    Open the dialog and inspect <code>#modal-root</code>: the renderer places the
+                    nodes there while this view still owns their lifecycle.
+                </p>
+            </div>
+            <button type="button" class="motion-button motion-button--light" @click="OpenTeleport">
+                Open teleported dialog
+            </button>
+        </section>
+
+        <Teleport to="#modal-root">
+            <Transition name="teleport-dialog">
+                <div v-if="TeleportVisible" class="teleport-backdrop">
+                    <section
+                        class="teleport-dialog"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="teleport-dialog-title">
+                        <button
+                            type="button"
+                            class="teleport-dialog__close"
+                            aria-label="Close dialog"
+                            @click="CloseTeleport">
+                            ×
+                        </button>
+                        <span class="teleport-dialog__mark" aria-hidden="true">↗</span>
+                        <span class="section-kicker">Teleported successfully</span>
+                        <h2 id="teleport-dialog-title">Same component tree, different DOM target.</h2>
+                        <p>
+                            Events, reactive dependencies, and unmount ownership remain connected
+                            to MotionView even though this element lives under <code>#modal-root</code>.
+                        </p>
+                        <button type="button" class="motion-button motion-button--primary" @click="CloseTeleport">
+                            Return to the showcase
+                        </button>
+                    </section>
+                </div>
+            </Transition>
+        </Teleport>
+    </div>
+}
+
+@script {
+    using System.Collections.Generic;
+
+    using Assimalign.Viu;
+    using Assimalign.Viu.Examples.Showcase.Models;
+    using Assimalign.Viu.Examples.Showcase.State;
+    using Assimalign.Viu.Reactivity;
+
+    private readonly Reference<bool> transitionCardVisible =
+        Reactive.Reference(true);
+
+    private readonly Reference<int> transitionCardVersion =
+        Reactive.Reference(1);
+
+    private readonly Reference<IReadOnlyList<MotionItem>> motionItems =
+        Reactive.Reference<IReadOnlyList<MotionItem>>(
+        [
+            new MotionItem(1, "Compile template"),
+            new MotionItem(2, "Patch keyed nodes"),
+            new MotionItem(3, "Commit one frame"),
+        ]);
+
+    private readonly Reference<string> activePanelName =
+        Reactive.Reference("MetricPanel");
+
+    private readonly Reference<bool> asynchronousInsightVisible =
+        Reactive.Reference(false);
+
+    private readonly Reference<int> asynchronousBoundaryKey =
+        Reactive.Reference(0);
+
+    private readonly Reference<bool> teleportVisible =
+        Reactive.Reference(false);
+
+    private ShowcaseStore Store { get; set; } = null!;
+
+    private int nextMotionItemIdentifier = 4;
+
+    public bool TransitionCardVisible => transitionCardVisible.Value;
+
+    public string TransitionToggleLabel =>
+        TransitionCardVisible ? "Hide card" : "Show card";
+
+    public int TransitionCardKey => transitionCardVersion.Value;
+
+    public string TransitionCardNumber =>
+        transitionCardVersion.Value.ToString("00");
+
+    public string TransitionCardTitle =>
+        transitionCardVersion.Value % 2 == 0
+            ? "Patch only what changed"
+            : "Identity unlocks choreography";
+
+    public string TransitionCardCopy =>
+        transitionCardVersion.Value % 2 == 0
+            ? "A new key replaces this branch after its predecessor leaves."
+            : "Viu carries the key from generated component code into the renderer.";
+
+    public string TransitionCardClass =>
+        transitionCardVersion.Value % 2 == 0
+            ? "transition-card transition-card--cool"
+            : "transition-card transition-card--warm";
+
+    public IReadOnlyList<MotionItem> MotionItems => motionItems.Value;
+
+    public bool CannotRemoveMotionItem => motionItems.Value.Count <= 1;
+
+    public string ActivePanelName => activePanelName.Value;
+
+    public DynamicComponentName ActivePanel =>
+        DynamicComponents.Named(ActivePanelName);
+
+    public bool MetricPanelSelected => ActivePanelName == "MetricPanel";
+
+    public bool QuotePanelSelected => ActivePanelName == "QuotePanel";
+
+    public bool LifecyclePanelSelected => ActivePanelName == "LifecycleProbe";
+
+    public string MetricPanelTabClass =>
+        PanelTabClass(MetricPanelSelected);
+
+    public string QuotePanelTabClass =>
+        PanelTabClass(QuotePanelSelected);
+
+    public string LifecyclePanelTabClass =>
+        PanelTabClass(LifecyclePanelSelected);
+
+    public bool AsynchronousInsightVisible =>
+        asynchronousInsightVisible.Value;
+
+    public int AsynchronousBoundaryKey => asynchronousBoundaryKey.Value;
+
+    public string AsynchronousToggleLabel =>
+        AsynchronousInsightVisible
+            ? "Unmount insight"
+            : "Mount async insight";
+
+    public bool TeleportVisible => teleportVisible.Value;
+
+    partial void OnSetup()
+    {
+        Store = ShowcaseState.Definition.Use(Context);
+    }
+
+    private void ToggleTransitionCard()
+    {
+        transitionCardVisible.Value = !transitionCardVisible.Value;
+        Store.Track(
+            transitionCardVisible.Value
+                ? "Transition card entered"
+                : "Transition card left");
+    }
+
+    private void ChangeTransitionCard()
+    {
+        if (!transitionCardVisible.Value)
+        {
+            transitionCardVisible.Value = true;
+        }
+
+        transitionCardVersion.Value++;
+        Store.Track("Transition card replaced by key");
+    }
+
+    private void AddMotionItem()
+    {
+        string[] labels =
+        [
+            "Schedule reactive job",
+            "Measure previous layout",
+            "Apply move transform",
+            "Flush DOM commands",
+        ];
+        int identifier = nextMotionItemIdentifier++;
+        List<MotionItem> next = new(motionItems.Value)
+        {
+            new MotionItem(
+                identifier,
+                labels[(identifier - 4) % labels.Length]),
+        };
+        motionItems.Value = next;
+        Store.Track("TransitionGroup item entered");
+    }
+
+    private void RotateMotionItems()
+    {
+        IReadOnlyList<MotionItem> current = motionItems.Value;
+        if (current.Count < 2)
+        {
+            return;
+        }
+
+        List<MotionItem> reordered = new(current.Count)
+        {
+            current[current.Count - 1],
+        };
+        for (int index = 0; index < current.Count - 1; index++)
+        {
+            reordered.Add(current[index]);
+        }
+
+        motionItems.Value = reordered;
+        Store.Track("TransitionGroup order rotated");
+    }
+
+    private void RemoveMotionItem(int identifier)
+    {
+        IReadOnlyList<MotionItem> current = motionItems.Value;
+        if (current.Count <= 1)
+        {
+            return;
+        }
+
+        List<MotionItem> next = new(current.Count - 1);
+        for (int index = 0; index < current.Count; index++)
+        {
+            if (current[index].Identifier != identifier)
+            {
+                next.Add(current[index]);
+            }
+        }
+
+        motionItems.Value = next;
+        Store.Track("TransitionGroup item left");
+    }
+
+    private void ShowMetricPanel() => SelectPanel("MetricPanel");
+
+    private void ShowQuotePanel() => SelectPanel("QuotePanel");
+
+    private void ShowLifecyclePanel() => SelectPanel("LifecycleProbe");
+
+    private void SelectPanel(string name)
+    {
+        if (activePanelName.Value == name)
+        {
+            return;
+        }
+
+        activePanelName.Value = name;
+        Store.Track($"KeepAlive selected {name}");
+    }
+
+    private void ToggleAsynchronousInsight()
+    {
+        asynchronousInsightVisible.Value =
+            !asynchronousInsightVisible.Value;
+        if (asynchronousInsightVisible.Value)
+        {
+            asynchronousBoundaryKey.Value++;
+            Store.Track("AsyncInsight mounted inside Suspense");
+        }
+        else
+        {
+            Store.Track("AsyncInsight unmounted");
+        }
+    }
+
+    private void OpenTeleport()
+    {
+        teleportVisible.Value = true;
+        Store.Track("Teleported dialog opened");
+    }
+
+    private void CloseTeleport()
+    {
+        teleportVisible.Value = false;
+        Store.Track("Teleported dialog closed");
+    }
+
+    private static string PanelTabClass(bool active) =>
+        active
+            ? "panel-tab panel-tab--active"
+            : "panel-tab";
+}
+
+@style scoped {
+    .motion-view {
+        --motion-blue: #2497e3;
+        --motion-violet: #7b61ff;
+    }
+
+    .motion-introduction,
+    .teleport-callout {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+        padding: clamp(1.5rem, 4vw, 2.8rem);
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 1.5rem;
+    }
+
+    .motion-introduction {
+        background:
+            radial-gradient(circle at 88% 20%, rgba(123, 97, 255, 0.18), transparent 20rem),
+            var(--surface);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .motion-introduction h2,
+    .teleport-callout h2 {
+        max-width: 18ch;
+        margin: 0.45rem 0 0.75rem;
+        color: var(--text-strong);
+        font-size: clamp(1.8rem, 4vw, 3.1rem);
+        letter-spacing: -0.045em;
+        line-height: 1.05;
+    }
+
+    .motion-introduction p,
+    .teleport-callout p {
+        max-width: 48rem;
+        margin: 0;
+        color: var(--text-muted);
+        line-height: 1.7;
+    }
+
+    .runtime-legend {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(7.2rem, 1fr));
+        flex: 0 0 auto;
+        gap: 0.55rem;
+    }
+
+    .runtime-legend span {
+        padding: 0.72rem 0.9rem;
+        border: 1px solid color-mix(in srgb, var(--motion-violet) 24%, var(--border));
+        border-radius: 0.8rem;
+        color: var(--text-strong);
+        background: color-mix(in srgb, var(--motion-violet) 7%, var(--surface));
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+
+    .motion-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .control-row,
+    .asynchronous-header,
+    .panel-tabs {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+    }
+
+    .motion-button,
+    .panel-tab {
+        min-height: 2.35rem;
+        padding: 0.55rem 0.85rem;
+        border: 1px solid var(--border);
+        border-radius: 0.72rem;
+        color: var(--text-strong);
+        background: var(--surface);
+        font: inherit;
+        font-size: 0.78rem;
+        font-weight: 750;
+        cursor: pointer;
+        transition:
+            border-color 160ms ease,
+            color 160ms ease,
+            background 160ms ease,
+            transform 160ms ease;
+    }
+
+    .motion-button:hover,
+    .panel-tab:hover {
+        border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+        transform: translateY(-1px);
+    }
+
+    .motion-button--primary,
+    .panel-tab--active {
+        border-color: transparent;
+        color: white;
+        background: linear-gradient(135deg, var(--accent), #f14d70);
+    }
+
+    .motion-button--light {
+        border-color: rgba(255, 255, 255, 0.22);
+        color: white;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .transition-stage {
+        display: grid;
+        min-height: 10rem;
+        margin-top: 1rem;
+        place-items: center;
+        overflow: hidden;
+        border: 1px dashed var(--border);
+        border-radius: 1rem;
+        background: var(--surface-muted);
+    }
+
+    .transition-card {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.9rem;
+        width: min(100% - 2rem, 28rem);
+        padding: 1.2rem;
+        border-radius: 1rem;
+        color: white;
+        box-shadow: 0 1.2rem 2.6rem rgba(12, 30, 55, 0.2);
+    }
+
+    .transition-card--warm {
+        background: linear-gradient(135deg, #ff6b35, #ee4266);
+    }
+
+    .transition-card--cool {
+        background: linear-gradient(135deg, var(--motion-blue), var(--motion-violet));
+    }
+
+    .transition-card__index {
+        display: grid;
+        width: 2.6rem;
+        height: 2.6rem;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 0.8rem;
+        background: rgba(255, 255, 255, 0.12);
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.75rem;
+        font-weight: 900;
+    }
+
+    .transition-card strong {
+        display: block;
+        margin-bottom: 0.3rem;
+    }
+
+    .transition-card p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 0.82rem;
+        line-height: 1.5;
+    }
+
+    .stage-card-enter-active,
+    .stage-card-leave-active {
+        transition:
+            opacity 260ms ease,
+            transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .stage-card-enter-from {
+        opacity: 0;
+        transform: translateY(1rem) scale(0.96);
+    }
+
+    .stage-card-leave-to {
+        opacity: 0;
+        transform: translateY(-0.75rem) scale(0.98);
+    }
+
+    .motion-list {
+        position: relative;
+        display: grid;
+        gap: 0.55rem;
+        min-height: 10rem;
+        margin-top: 1rem;
+    }
+
+    .motion-list__item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        min-height: 2.8rem;
+        padding: 0.65rem 0.7rem 0.65rem 0.9rem;
+        border: 1px solid var(--border);
+        border-radius: 0.85rem;
+        color: var(--text-strong);
+        background: var(--surface-muted);
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .motion-list__item::before {
+        width: 0.5rem;
+        height: 0.5rem;
+        margin-right: 0.15rem;
+        border-radius: 50%;
+        background: var(--motion-violet);
+        content: "";
+    }
+
+    .motion-list__item > span {
+        flex: 1;
+    }
+
+    .motion-list__remove {
+        display: grid;
+        width: 1.8rem;
+        height: 1.8rem;
+        place-items: center;
+        border: 0;
+        border-radius: 0.55rem;
+        color: var(--text-muted);
+        background: color-mix(in srgb, var(--text-muted) 9%, transparent);
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    .motion-list__remove:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+
+    .motion-item-enter-active,
+    .motion-item-leave-active,
+    .motion-item-move {
+        transition: all 360ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .motion-item-enter-from,
+    .motion-item-leave-to {
+        opacity: 0;
+        transform: translateX(1.25rem);
+    }
+
+    .motion-item-leave-active {
+        position: absolute;
+    }
+
+    .panel-tabs {
+        padding: 0.25rem;
+        border-radius: 0.85rem;
+        background: var(--surface-muted);
+    }
+
+    .panel-tab {
+        flex: 1 1 6rem;
+        border-color: transparent;
+        background: transparent;
+    }
+
+    .dynamic-stage,
+    .asynchronous-stage {
+        min-height: 13.5rem;
+        margin-top: 1rem;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 1rem;
+        background: var(--surface-muted);
+    }
+
+    .dynamic-stage {
+        padding: 1rem;
+    }
+
+    .implementation-strip {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 0.75rem;
+        color: var(--text-muted);
+        font-size: 0.7rem;
+    }
+
+    .implementation-strip code {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .asynchronous-header {
+        justify-content: space-between;
+    }
+
+    .asynchronous-header div {
+        display: grid;
+        gap: 0.15rem;
+    }
+
+    .asynchronous-header strong {
+        color: var(--text-strong);
+        font-size: 0.86rem;
+    }
+
+    .asynchronous-header span {
+        color: var(--text-muted);
+        font-size: 0.72rem;
+    }
+
+    .asynchronous-stage {
+        display: grid;
+        place-items: stretch;
+    }
+
+    .asynchronous-empty,
+    .asynchronous-fallback {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        min-height: 13.5rem;
+        padding: 1.5rem;
+        text-align: left;
+    }
+
+    .asynchronous-empty {
+        flex-direction: column;
+        color: var(--text-muted);
+        text-align: center;
+    }
+
+    .asynchronous-empty strong,
+    .asynchronous-fallback strong {
+        color: var(--text-strong);
+    }
+
+    .asynchronous-empty p,
+    .asynchronous-fallback p {
+        margin: 0.25rem 0 0;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        line-height: 1.55;
+    }
+
+    .empty-symbol {
+        display: grid;
+        width: 3rem;
+        height: 3rem;
+        place-items: center;
+        border-radius: 50%;
+        color: var(--motion-violet);
+        background: color-mix(in srgb, var(--motion-violet) 10%, var(--surface));
+        font-size: 1.25rem;
+    }
+
+    .loading-orbit {
+        width: 2.6rem;
+        height: 2.6rem;
+        flex: 0 0 auto;
+        border: 3px solid color-mix(in srgb, var(--motion-violet) 16%, transparent);
+        border-top-color: var(--motion-violet);
+        border-radius: 50%;
+        animation: loading-spin 760ms linear infinite;
+    }
+
+    .feature-note {
+        color: var(--text-muted);
+        font-size: 0.76rem;
+        line-height: 1.5;
+    }
+
+    .teleport-callout {
+        color: white;
+        background:
+            radial-gradient(circle at 88% 20%, rgba(55, 211, 186, 0.25), transparent 18rem),
+            linear-gradient(135deg, #081a2c, #143d53);
+        box-shadow: 0 1.8rem 4rem rgba(8, 26, 44, 0.2);
+    }
+
+    .teleport-callout h2 {
+        color: white;
+    }
+
+    .teleport-callout p {
+        color: #b8d0dd;
+    }
+
+    .teleport-backdrop {
+        position: fixed;
+        z-index: 1000;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 1.25rem;
+        background: rgba(3, 12, 22, 0.72);
+        backdrop-filter: blur(12px);
+    }
+
+    .teleport-dialog {
+        position: relative;
+        width: min(100%, 35rem);
+        padding: clamp(1.6rem, 5vw, 2.8rem);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 1.5rem;
+        color: #eef7ff;
+        background:
+            radial-gradient(circle at 90% 8%, rgba(123, 97, 255, 0.28), transparent 16rem),
+            linear-gradient(145deg, #10243a, #07131f);
+        box-shadow: 0 2.5rem 7rem rgba(0, 0, 0, 0.45);
+    }
+
+    .teleport-dialog h2 {
+        margin: 0.65rem 0 0.85rem;
+        color: white;
+        font-size: clamp(1.65rem, 4vw, 2.5rem);
+        letter-spacing: -0.04em;
+        line-height: 1.08;
+    }
+
+    .teleport-dialog p {
+        margin: 0 0 1.4rem;
+        color: #b8cbd9;
+        line-height: 1.65;
+    }
+
+    .teleport-dialog__mark {
+        display: grid;
+        width: 3.2rem;
+        height: 3.2rem;
+        margin-bottom: 1rem;
+        place-items: center;
+        border-radius: 1rem;
+        color: white;
+        background: linear-gradient(135deg, var(--motion-blue), var(--motion-violet));
+        font-size: 1.25rem;
+        font-weight: 900;
+    }
+
+    .teleport-dialog__close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        display: grid;
+        width: 2.2rem;
+        height: 2.2rem;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 0.7rem;
+        color: white;
+        background: rgba(255, 255, 255, 0.06);
+        font-size: 1.2rem;
+        cursor: pointer;
+    }
+
+    .teleport-dialog-enter-active,
+    .teleport-dialog-leave-active {
+        transition: opacity 220ms ease;
+    }
+
+    .teleport-dialog-enter-active .teleport-dialog,
+    .teleport-dialog-leave-active .teleport-dialog {
+        transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .teleport-dialog-enter-from,
+    .teleport-dialog-leave-to {
+        opacity: 0;
+    }
+
+    .teleport-dialog-enter-from .teleport-dialog,
+    .teleport-dialog-leave-to .teleport-dialog {
+        transform: translateY(1.5rem) scale(0.96);
+    }
+
+    @keyframes loading-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @media (max-width: 900px) {
+        .motion-introduction,
+        .teleport-callout {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .motion-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .runtime-legend {
+            width: 100%;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .stage-card-enter-active,
+        .stage-card-leave-active,
+        .motion-item-enter-active,
+        .motion-item-leave-active,
+        .motion-item-move,
+        .teleport-dialog-enter-active,
+        .teleport-dialog-leave-active,
+        .teleport-dialog-enter-active .teleport-dialog,
+        .teleport-dialog-leave-active .teleport-dialog {
+            transition-duration: 1ms;
+        }
+
+        .loading-orbit {
+            animation-duration: 2s;
+        }
+    }
+}

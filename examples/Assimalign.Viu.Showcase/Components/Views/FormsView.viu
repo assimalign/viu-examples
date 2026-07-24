@@ -1,0 +1,948 @@
+@template {
+    <div class="view-stack forms-view">
+        <section class="section-heading">
+            <div>
+                <span class="section-kicker">Browser directives</span>
+                <h2>Native form controls stay synchronized with C# state.</h2>
+                <p>
+                    Edit every field. Text, number, checkbox, radio, select, multiple select,
+                    dynamic input, custom component model, and event modifiers are all live.
+                </p>
+            </div>
+            <StatusPill label="v-model active" tone="success" />
+        </section>
+
+        <form class="form-workbench" @submit.prevent="SubmitForm">
+            <section class="form-surface">
+                <header class="form-surface__header">
+                    <div>
+                        <span class="section-kicker">Text models</span>
+                        <h3>Input transforms and commit timing</h3>
+                    </div>
+                    <span class="syntax-chip">.trim · .number · .lazy</span>
+                </header>
+
+                <div class="field-grid">
+                    <label class="field">
+                        <span>Display name <code>.trim</code></span>
+                        <input
+                            v-model.trim="DisplayName"
+                            type="text"
+                            autocomplete="name"
+                            placeholder="Ada Lovelace" />
+                        <small>Whitespace is removed before the model receives the value.</small>
+                    </label>
+
+                    <label class="field">
+                        <span>Team seats <code>.number</code></span>
+                        <input
+                            v-model.number="SeatCount"
+                            type="number"
+                            min="1"
+                            max="99"
+                            inputmode="numeric" />
+                        <small>The browser string is coerced to a number when possible.</small>
+                    </label>
+
+                    <label class="field field--wide">
+                        <span>Release note <code>.lazy</code></span>
+                        <textarea
+                            v-model.lazy="ReleaseNote"
+                            rows="3"
+                            placeholder="Committed on change rather than every input"></textarea>
+                        <small>Blur or change commits this value to the model.</small>
+                    </label>
+                </div>
+            </section>
+
+            <section class="form-surface">
+                <header class="form-surface__header">
+                    <div>
+                        <span class="section-kicker">Selection models</span>
+                        <h3>Booleans, collections, radios, and selects</h3>
+                    </div>
+                    <span class="syntax-chip">raw values</span>
+                </header>
+
+                <div class="selection-grid">
+                    <fieldset class="choice-group">
+                        <legend>Boolean and custom values</legend>
+                        <label class="choice">
+                            <input v-model="NewsletterEnabled" type="checkbox" />
+                            <span>
+                                <strong>Runtime dispatch notes</strong>
+                                <small>Boolean checkbox model</small>
+                            </span>
+                        </label>
+                        <label class="choice">
+                            <input
+                                v-model="Availability"
+                                type="checkbox"
+                                true-value="Available"
+                                false-value="Focused" />
+                            <span>
+                                <strong>Available for collaboration</strong>
+                                <small>true-value / false-value</small>
+                            </span>
+                        </label>
+                    </fieldset>
+
+                    <fieldset class="choice-group">
+                        <legend>Collection checkbox model</legend>
+                        <label class="choice">
+                            <input
+                                v-model="SelectedCapabilities"
+                                type="checkbox"
+                                value="Reactivity" />
+                            <span>Reactivity</span>
+                        </label>
+                        <label class="choice">
+                            <input
+                                v-model="SelectedCapabilities"
+                                type="checkbox"
+                                value="Components" />
+                            <span>Components</span>
+                        </label>
+                        <label class="choice">
+                            <input
+                                v-model="SelectedCapabilities"
+                                type="checkbox"
+                                value="Router" />
+                            <span>Router</span>
+                        </label>
+                    </fieldset>
+
+                    <fieldset class="choice-group">
+                        <legend>Radio model</legend>
+                        <label class="choice">
+                            <input v-model="SelectedPlan" type="radio" value="Explorer" />
+                            <span>Explorer</span>
+                        </label>
+                        <label class="choice">
+                            <input v-model="SelectedPlan" type="radio" value="Builder" />
+                            <span>Builder</span>
+                        </label>
+                        <label class="choice">
+                            <input v-model="SelectedPlan" type="radio" value="Platform" />
+                            <span>Platform</span>
+                        </label>
+                    </fieldset>
+
+                    <div class="select-stack">
+                        <label class="field">
+                            <span>Primary region</span>
+                            <select v-model="SelectedRegion">
+                                <option value="Americas">Americas</option>
+                                <option value="Europe">Europe</option>
+                                <option value="Asia Pacific">Asia Pacific</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>Learning tracks <code>multiple</code></span>
+                            <select v-model="SelectedTracks" multiple="multiple" size="3">
+                                <option value="Rendering">Rendering</option>
+                                <option value="Reactivity">Reactivity</option>
+                                <option value="Tooling">Tooling</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-surface">
+                <header class="form-surface__header">
+                    <div>
+                        <span class="section-kicker">Dynamic and component models</span>
+                        <h3>The directive follows the rendered control</h3>
+                    </div>
+                    <span class="syntax-chip">vModelDynamic</span>
+                </header>
+
+                <div class="dynamic-model-grid">
+                    <div class="dynamic-input-panel">
+                        <label class="field">
+                            <span>Deployment token</span>
+                            <input
+                                v-model="DeploymentToken"
+                                :type="DeploymentTokenType"
+                                autocomplete="off"
+                                @keyup.enter="RecordEnterKey" />
+                            <small>Press Enter to exercise the <code>.enter</code> key guard.</small>
+                        </label>
+                        <label class="choice choice--compact">
+                            <input v-model="RevealDeploymentToken" type="checkbox" />
+                            <span>Reveal token by changing the bound input type</span>
+                        </label>
+                    </div>
+
+                    <div class="component-model-panel">
+                        <span class="field-label">Experience rating</span>
+                        <RatingControl
+                            v-model="Rating"
+                            label="Rate the forms experience"
+                            @changed="RecordRatingChanged" />
+                        <small>
+                            A component model uses <code>modelValue</code> and
+                            <code>update:modelValue</code>.
+                        </small>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-surface">
+                <header class="form-surface__header">
+                    <div>
+                        <span class="section-kicker">DOM event modifiers</span>
+                        <h3>Guards are compiled around typed browser events</h3>
+                    </div>
+                    <span class="syntax-chip">.prevent · .stop · .self · .once · .enter</span>
+                </header>
+
+                <div class="modifier-grid">
+                    <div class="modifier-demo modifier-demo--propagation" @click="RecordOuterClick">
+                        <span>Outer click area</span>
+                        <strong>{{ OuterClickSummary }}</strong>
+                        <button
+                            type="button"
+                            class="button button--secondary"
+                            @click.stop="RecordStoppedClick">
+                            Stop propagation
+                        </button>
+                        <small>Stopped button count: {{ StoppedClickCount }}</small>
+                    </div>
+
+                    <div class="modifier-demo">
+                        <span>One-time listener</span>
+                        <strong>{{ OnceClickSummary }}</strong>
+                        <button
+                            type="button"
+                            class="button button--secondary"
+                            @click.once="RecordOnceClick">
+                            This handler runs once
+                        </button>
+                        <small>
+                            Reset keeps the native listener consumed; leave and return to remount it.
+                            Enter key guard count: {{ EnterKeyCount }}
+                        </small>
+                    </div>
+
+                    <div class="modifier-demo modifier-demo--self">
+                        <span>Exact-target guard</span>
+                        <strong>{{ SelfClickSummary }}</strong>
+                        <div class="self-click-target" @click.self="RecordSelfClick">
+                            <span>Click this parent surface</span>
+                            <button
+                                type="button"
+                                class="button button--secondary"
+                                @click="RecordSelfChildClick">
+                                Click nested child
+                            </button>
+                        </div>
+                        <small>
+                            Child clicks: {{ SelfChildClickCount }}. They bubble, but
+                            <code>.self</code> prevents the parent handler.
+                        </small>
+                    </div>
+                </div>
+            </section>
+
+            <div class="form-actions">
+                <button type="submit" class="button button--primary">
+                    Submit with .prevent
+                </button>
+                <button type="button" class="button button--secondary" @click="ResetForm">
+                    Reset models
+                </button>
+                <span>The page does not reload when the form submits.</span>
+            </div>
+        </form>
+
+        <section v-show="HasSubmitted" class="submission-banner" role="status">
+            <span aria-hidden="true">✓</span>
+            <div>
+                <strong>Form state captured</strong>
+                <p>{{ SubmissionMessage }}</p>
+            </div>
+        </section>
+
+        <section class="model-inspector">
+            <header>
+                <div>
+                    <span class="section-kicker">Live model inspector</span>
+                    <h3>Every value below comes from reactive C# state.</h3>
+                </div>
+                <StatusPill label="Synchronized" tone="accent" />
+            </header>
+            <dl>
+                <div>
+                    <dt>Name</dt>
+                    <dd>{{ DisplayNameText }}</dd>
+                </div>
+                <div>
+                    <dt>Seats</dt>
+                    <dd>{{ SeatCountText }}</dd>
+                </div>
+                <div>
+                    <dt>Newsletter</dt>
+                    <dd>{{ NewsletterText }}</dd>
+                </div>
+                <div>
+                    <dt>Availability</dt>
+                    <dd>{{ AvailabilityText }}</dd>
+                </div>
+                <div>
+                    <dt>Capabilities</dt>
+                    <dd>{{ CapabilitySelectionText }}</dd>
+                </div>
+                <div>
+                    <dt>Plan</dt>
+                    <dd>{{ SelectedPlanText }}</dd>
+                </div>
+                <div>
+                    <dt>Region</dt>
+                    <dd>{{ SelectedRegionText }}</dd>
+                </div>
+                <div>
+                    <dt>Tracks</dt>
+                    <dd>{{ TrackSelectionText }}</dd>
+                </div>
+                <div>
+                    <dt>Rating</dt>
+                    <dd>{{ RatingText }}</dd>
+                </div>
+                <div>
+                    <dt>Lazy note</dt>
+                    <dd>{{ ReleaseNoteText }}</dd>
+                </div>
+            </dl>
+        </section>
+    </div>
+}
+
+@script {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Globalization;
+
+    using Assimalign.Viu.Examples.Showcase.State;
+    using Assimalign.Viu.Reactivity;
+
+    private ShowcaseStore Store { get; set; } = null!;
+
+    public Reference<object?> DisplayName { get; } =
+        Reactive.Reference<object?>("Ada Lovelace");
+
+    public Reference<object?> SeatCount { get; } =
+        Reactive.Reference<object?>(6);
+
+    public Reference<object?> ReleaseNote { get; } =
+        Reactive.Reference<object?>("Ship the smallest useful update.");
+
+    public Reference<object?> NewsletterEnabled { get; } =
+        Reactive.Reference<object?>(true);
+
+    public Reference<object?> Availability { get; } =
+        Reactive.Reference<object?>("Available");
+
+    public Reference<object?> SelectedCapabilities { get; } =
+        Reactive.Reference<object?>(
+            new List<object?> { "Reactivity", "Components" });
+
+    public Reference<object?> SelectedPlan { get; } =
+        Reactive.Reference<object?>("Builder");
+
+    public Reference<object?> SelectedRegion { get; } =
+        Reactive.Reference<object?>("Americas");
+
+    public Reference<object?> SelectedTracks { get; } =
+        Reactive.Reference<object?>(
+            new List<object?> { "Rendering", "Tooling" });
+
+    public Reference<object?> DeploymentToken { get; } =
+        Reactive.Reference<object?>("viu-preview");
+
+    public Reference<object?> RevealDeploymentToken { get; } =
+        Reactive.Reference<object?>(false);
+
+    public Reference<object?> Rating { get; } =
+        Reactive.Reference<object?>(5);
+
+    public Reference<int> OuterClickCount { get; } =
+        Reactive.Reference(0);
+
+    public Reference<int> StoppedClickCount { get; } =
+        Reactive.Reference(0);
+
+    public Reference<int> OnceClickCount { get; } =
+        Reactive.Reference(0);
+
+    public Reference<int> SelfClickCount { get; } =
+        Reactive.Reference(0);
+
+    public Reference<int> SelfChildClickCount { get; } =
+        Reactive.Reference(0);
+
+    public Reference<int> EnterKeyCount { get; } =
+        Reactive.Reference(0);
+
+    public Reference<int> RatingEventCount { get; } =
+        Reactive.Reference(0);
+
+    public Reference<bool> HasSubmitted { get; } =
+        Reactive.Reference(false);
+
+    public Reference<string> SubmissionMessage { get; } =
+        Reactive.Reference("No submission has been captured.");
+
+    public string DeploymentTokenType =>
+        RevealDeploymentToken.Value is true
+            ? "text"
+            : "password";
+
+    public string DisplayNameText => FormatScalar(DisplayName.Value, "Empty");
+
+    public string SeatCountText => FormatScalar(SeatCount.Value, "Not set");
+
+    public string NewsletterText =>
+        NewsletterEnabled.Value is true
+            ? "Enabled"
+            : "Disabled";
+
+    public string AvailabilityText =>
+        FormatScalar(Availability.Value, "Focused");
+
+    public string CapabilitySelectionText =>
+        FormatSelection(SelectedCapabilities.Value);
+
+    public string SelectedPlanText =>
+        FormatScalar(SelectedPlan.Value, "None");
+
+    public string SelectedRegionText =>
+        FormatScalar(SelectedRegion.Value, "None");
+
+    public string TrackSelectionText =>
+        FormatSelection(SelectedTracks.Value);
+
+    public string RatingText =>
+        Rating.Value is int rating
+            ? $"{rating} of 5"
+            : "Not rated";
+
+    public string ReleaseNoteText =>
+        FormatScalar(ReleaseNote.Value, "Empty");
+
+    public string OuterClickSummary =>
+        OuterClickCount.Value == 1
+            ? "1 outer click"
+            : $"{OuterClickCount.Value} outer clicks";
+
+    public string OnceClickSummary =>
+        OnceClickCount.Value == 0
+            ? "Listener ready"
+            : "Listener consumed";
+
+    public string SelfClickSummary =>
+        SelfClickCount.Value == 1
+            ? "1 parent-only click"
+            : $"{SelfClickCount.Value} parent-only clicks";
+
+    partial void OnSetup()
+    {
+        Store = ShowcaseState.Definition.Use(Context);
+    }
+
+    private void SubmitForm()
+    {
+        SubmissionMessage.Value =
+            $"{DisplayNameText} selected {CapabilitySelectionText}, "
+            + $"{SelectedPlanText}, and {TrackSelectionText}.";
+        HasSubmitted.Value = true;
+        Store.Track("Submitted the forms laboratory");
+    }
+
+    private void ResetForm()
+    {
+        Reactive.StartBatch();
+        try
+        {
+            DisplayName.Value = "Ada Lovelace";
+            SeatCount.Value = 6;
+            ReleaseNote.Value = "Ship the smallest useful update.";
+            NewsletterEnabled.Value = true;
+            Availability.Value = "Available";
+            SelectedCapabilities.Value =
+                new List<object?> { "Reactivity", "Components" };
+            SelectedPlan.Value = "Builder";
+            SelectedRegion.Value = "Americas";
+            SelectedTracks.Value =
+                new List<object?> { "Rendering", "Tooling" };
+            DeploymentToken.Value = "viu-preview";
+            RevealDeploymentToken.Value = false;
+            Rating.Value = 5;
+            OuterClickCount.Value = 0;
+            StoppedClickCount.Value = 0;
+            SelfClickCount.Value = 0;
+            SelfChildClickCount.Value = 0;
+            EnterKeyCount.Value = 0;
+            RatingEventCount.Value = 0;
+            HasSubmitted.Value = false;
+            SubmissionMessage.Value = "No submission has been captured.";
+        }
+        finally
+        {
+            Reactive.EndBatch();
+        }
+
+        Store.Track("Reset the forms laboratory");
+    }
+
+    private void RecordOuterClick()
+    {
+        OuterClickCount.Value++;
+    }
+
+    private void RecordStoppedClick()
+    {
+        StoppedClickCount.Value++;
+    }
+
+    private void RecordOnceClick()
+    {
+        OnceClickCount.Value++;
+        Store.Track("Triggered a once-only DOM listener");
+    }
+
+    private void RecordSelfClick()
+    {
+        SelfClickCount.Value++;
+    }
+
+    private void RecordSelfChildClick()
+    {
+        SelfChildClickCount.Value++;
+    }
+
+    private void RecordEnterKey()
+    {
+        EnterKeyCount.Value++;
+        Store.Track("Triggered the Enter key modifier");
+    }
+
+    private void RecordRatingChanged(object? value)
+    {
+        RatingEventCount.Value++;
+        Store.Track(
+            $"Forms rating changed to {FormatScalar(value, "unknown")}");
+    }
+
+    private static string FormatScalar(object? value, string fallback)
+    {
+        string? text = Convert.ToString(value, CultureInfo.InvariantCulture);
+        return string.IsNullOrWhiteSpace(text)
+            ? fallback
+            : text;
+    }
+
+    private static string FormatSelection(object? value)
+    {
+        if (value is string text)
+        {
+            return string.IsNullOrWhiteSpace(text)
+                ? "None"
+                : text;
+        }
+
+        if (value is not IEnumerable values)
+        {
+            return "None";
+        }
+
+        List<string> entries = [];
+        foreach (object? entry in values)
+        {
+            string? formatted =
+                Convert.ToString(
+                    entry,
+                    CultureInfo.InvariantCulture);
+            if (!string.IsNullOrWhiteSpace(formatted))
+            {
+                entries.Add(formatted);
+            }
+        }
+
+        return entries.Count == 0
+            ? "None"
+            : string.Join(", ", entries);
+    }
+}
+
+@style scoped {
+    .forms-view .section-heading {
+        align-items: flex-end;
+    }
+
+    .section-heading p {
+        max-width: 52rem;
+        margin: 0.7rem 0 0;
+        color: var(--text-muted);
+        line-height: 1.65;
+    }
+
+    .form-workbench {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .form-surface,
+    .model-inspector {
+        display: grid;
+        gap: 1.25rem;
+        padding: 1.35rem;
+        border: 1px solid var(--border);
+        border-radius: 1.3rem;
+        background: var(--surface);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .form-surface__header,
+    .model-inspector > header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .form-surface h3,
+    .model-inspector h3 {
+        margin: 0.35rem 0 0;
+        color: var(--text-strong);
+        font-size: 1.05rem;
+    }
+
+    .syntax-chip {
+        padding: 0.35rem 0.58rem;
+        border: 1px solid var(--border);
+        border-radius: 0.68rem;
+        color: var(--accent);
+        background: var(--surface-muted);
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.66rem;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+    .field-grid,
+    .dynamic-model-grid,
+    .modifier-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .field {
+        display: grid;
+        align-content: start;
+        gap: 0.48rem;
+        color: var(--text-strong);
+        font-size: 0.78rem;
+        font-weight: 760;
+    }
+
+    .field--wide {
+        grid-column: 1 / -1;
+    }
+
+    .field code,
+    .component-model-panel code {
+        color: var(--accent);
+        font-size: 0.7rem;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+        width: 100%;
+        min-width: 0;
+        padding: 0.78rem 0.85rem;
+        border: 1px solid var(--border);
+        border-radius: 0.8rem;
+        outline: none;
+        color: var(--text-strong);
+        background: var(--surface-muted);
+        font: inherit;
+        font-weight: 520;
+        transition:
+            border-color 160ms ease,
+            box-shadow 160ms ease;
+    }
+
+    .field select[multiple] {
+        padding: 0.4rem;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 13%, transparent);
+    }
+
+    .field textarea {
+        resize: vertical;
+    }
+
+    .field small,
+    .component-model-panel small,
+    .modifier-demo small {
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        font-weight: 500;
+        line-height: 1.5;
+    }
+
+    .selection-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.9rem;
+    }
+
+    .choice-group,
+    .select-stack,
+    .dynamic-input-panel,
+    .component-model-panel,
+    .modifier-demo {
+        min-width: 0;
+        padding: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 1rem;
+        background: var(--surface-muted);
+    }
+
+    .choice-group {
+        display: grid;
+        align-content: start;
+        gap: 0.7rem;
+        margin: 0;
+    }
+
+    .choice-group legend,
+    .field-label {
+        padding: 0 0.25rem;
+        color: var(--text-strong);
+        font-size: 0.76rem;
+        font-weight: 820;
+    }
+
+    .choice {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.62rem;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 0.76rem;
+        line-height: 1.4;
+    }
+
+    .choice input {
+        width: 1rem;
+        height: 1rem;
+        flex: 0 0 auto;
+        margin-top: 0.12rem;
+        accent-color: var(--accent);
+    }
+
+    .choice strong,
+    .choice small {
+        display: block;
+    }
+
+    .choice strong {
+        color: var(--text-strong);
+        font-size: 0.76rem;
+    }
+
+    .choice small {
+        margin-top: 0.18rem;
+        color: var(--text-muted);
+        font-size: 0.68rem;
+    }
+
+    .choice--compact {
+        margin-top: 0.85rem;
+    }
+
+    .select-stack,
+    .dynamic-input-panel,
+    .component-model-panel {
+        display: grid;
+        align-content: start;
+        gap: 0.9rem;
+    }
+
+    .component-model-panel {
+        gap: 0.85rem;
+    }
+
+    .modifier-demo {
+        display: grid;
+        align-content: start;
+        gap: 0.7rem;
+    }
+
+    .modifier-demo > span {
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .modifier-demo > strong {
+        color: var(--text-strong);
+        font-size: 1.15rem;
+    }
+
+    .modifier-demo--propagation {
+        border-style: dashed;
+        cursor: pointer;
+    }
+
+    .modifier-demo--self {
+        grid-column: 1 / -1;
+    }
+
+    .self-click-target {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        min-height: 4.5rem;
+        padding: 0.9rem;
+        border: 1px dashed color-mix(in srgb, var(--accent) 48%, var(--border));
+        border-radius: 0.8rem;
+        color: var(--text-strong);
+        background: color-mix(in srgb, var(--accent) 5%, var(--surface));
+        cursor: pointer;
+        font-size: 0.76rem;
+        font-weight: 760;
+    }
+
+    .form-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0.25rem 0;
+    }
+
+    .form-actions > span {
+        margin-left: auto;
+        color: var(--text-muted);
+        font-size: 0.72rem;
+    }
+
+    .submission-banner {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        gap: 0.9rem;
+        padding: 1rem 1.15rem;
+        border: 1px solid color-mix(in srgb, var(--success) 32%, var(--border));
+        border-radius: 1rem;
+        color: var(--success);
+        background: color-mix(in srgb, var(--success) 8%, var(--surface));
+    }
+
+    .submission-banner > span {
+        display: grid;
+        width: 2.1rem;
+        height: 2.1rem;
+        place-items: center;
+        border-radius: 50%;
+        color: white;
+        background: var(--success);
+        font-weight: 900;
+    }
+
+    .submission-banner strong {
+        color: var(--text-strong);
+    }
+
+    .submission-banner p {
+        margin: 0.2rem 0 0;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+    }
+
+    .model-inspector dl {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0.7rem;
+        margin: 0;
+    }
+
+    .model-inspector dl > div {
+        min-width: 0;
+        padding: 0.78rem;
+        border-radius: 0.78rem;
+        background: var(--surface-muted);
+    }
+
+    .model-inspector dt {
+        color: var(--text-muted);
+        font-size: 0.66rem;
+        font-weight: 820;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .model-inspector dd {
+        overflow: hidden;
+        margin: 0.34rem 0 0;
+        color: var(--text-strong);
+        font-size: 0.78rem;
+        font-weight: 720;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 1050px) {
+        .selection-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .model-inspector dl {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 700px) {
+        .field-grid,
+        .dynamic-model-grid,
+        .modifier-grid,
+        .selection-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .field--wide {
+            grid-column: auto;
+        }
+
+        .form-surface__header,
+        .model-inspector > header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .form-actions > span {
+            width: 100%;
+            margin-left: 0;
+        }
+
+        .model-inspector dl {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+}

@@ -1,0 +1,108 @@
+# The showcase is an external consumer of Viu's packaged SDK and framework. CI
+# checks both repositories out as siblings, packs the current Viu main branch into
+# viu/_out/packages, and then restores through this repository's nuget.config.
+name: showcase
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'examples/**'
+      - 'Assimalign.Viu.Examples.slnx'
+      - 'global.json'
+      - 'nuget.config'
+      - '.github/workflows/showcase.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'examples/**'
+      - 'Assimalign.Viu.Examples.slnx'
+      - 'global.json'
+      - 'nuget.config'
+      - '.github/workflows/showcase.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  packaged-consumer:
+    name: packaged-consumer publish
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout showcase
+        uses: actions/checkout@v4
+        with:
+          path: viu-examples
+
+      - name: Checkout Viu
+        uses: actions/checkout@v4
+        with:
+          repository: assimalign/viu
+          path: viu
+
+      - name: Set up .NET
+        # actions/setup-dotnet v4
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        with:
+          global-json-file: viu/global.json
+
+      - name: Install wasm-tools
+        run: dotnet workload install wasm-tools --skip-manifest-update
+
+      - name: Pack local SDK, libraries, and framework
+        shell: pwsh
+        working-directory: ./viu
+        run: |
+          $feed = Join-Path $PWD '_out/packages'
+          dotnet pack ./sdks/Assimalign.Viu.Sdk/Tasks/Assimalign.Viu.Sdk.Tasks.csproj `
+            --configuration Release `
+            -p:PackViuProjects=true `
+            "-p:PackageOutputPath=$feed"
+          if ($LASTEXITCODE -ne 0) { throw 'SDK and library pack failed.' }
+
+          dotnet pack ./frameworks/Assimalign.Viu.App.Runtime/src/Assimalign.Viu.App.Runtime.csproj `
+            --configuration Release `
+            -p:RuntimeIdentifier=browser-wasm `
+            "-p:PackageOutputPath=$feed"
+          if ($LASTEXITCODE -ne 0) { throw 'Runtime pack failed.' }
+
+          dotnet pack ./frameworks/Assimalign.Viu.App.Refs/src/Assimalign.Viu.App.Refs.csproj `
+            --configuration Release `
+            "-p:PackageOutputPath=$feed"
+          if ($LASTEXITCODE -ne 0) { throw 'Reference pack failed.' }
+
+      - name: Restore from the local package feed
+        working-directory: ./viu-examples
+        run: >-
+          dotnet restore
+          ./examples/Assimalign.Viu.Showcase/Assimalign.Viu.Showcase.csproj
+          --configfile ./nuget.config
+          --force
+          --no-cache
+
+      - name: Publish trimmed showcase
+        working-directory: ./viu-examples
+        run: >-
+          dotnet publish
+          ./examples/Assimalign.Viu.Showcase/Assimalign.Viu.Showcase.csproj
+          --configuration Release
+          --no-restore
+          -warnaserror
+          --output ./_out/showcase
+
+      - name: Verify packaged Router browser module
+        shell: pwsh
+        working-directory: ./viu-examples
+        run: |
+          $routerAssetDirectory = './_out/showcase/wwwroot/_content/Assimalign.Viu.Router'
+          $historyModules = @(
+            Get-ChildItem -LiteralPath $routerAssetDirectory -File -Filter 'viu-history*.js'
+          )
+          if ($historyModules.Count -ne 1) {
+            throw "Expected one published Router history module; found $($historyModules.Count)."
+          }
+
+          $hostPage = Get-Content -Raw -LiteralPath './_out/showcase/wwwroot/index.html'
+          if (-not $hostPage.Contains('./_content/Assimalign.Viu.Router/viu-history.js')) {
+            throw 'The host-page import map does not expose the stable Router history module URL.'
+          }

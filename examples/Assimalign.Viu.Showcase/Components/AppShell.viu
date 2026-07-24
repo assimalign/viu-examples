@@ -1,0 +1,150 @@
+@template {
+    <div :class="ShellClass">
+        <aside class="app-sidebar">
+            <div class="brand-lockup">
+                <div class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 40 40" role="img">
+                        <path d="M8 8h7l5 17 5-17h7L23 33h-6L8 8Z" />
+                    </svg>
+                </div>
+                <div>
+                    <span class="brand-name">Viu</span>
+                    <span class="brand-caption">SDK showcase</span>
+                </div>
+            </div>
+
+            <nav class="primary-navigation" aria-label="Showcase sections">
+                <div
+                    v-for="navigation in NavigationItems"
+                    :key="navigation.Path"
+                    :class="NavigationClass(navigation.Path)">
+                    <RouterLink
+                        :to="navigation.Path"
+                        activeClass="router-link-active"
+                        exactActiveClass="router-link-exact-active">
+                        <span class="navigation-glyph" aria-hidden="true">{{ navigation.Glyph }}</span>
+                        <span class="navigation-copy">
+                            <strong>{{ navigation.Label }}</strong>
+                            <small>{{ navigation.Description }}</small>
+                        </span>
+                    </RouterLink>
+                </div>
+            </nav>
+
+            <div class="sidebar-runtime-card">
+                <span class="live-indicator"><i></i> Runtime live</span>
+                <strong>{{ InteractionSummary }}</strong>
+                <span>State persists while you move between views.</span>
+            </div>
+        </aside>
+
+        <div class="app-workspace">
+            <header class="topbar">
+                <div class="history-actions" aria-label="Browser history">
+                    <button type="button" class="icon-button" title="Back" @click="GoBack">←</button>
+                    <button type="button" class="icon-button" title="Forward" @click="GoForward">→</button>
+                </div>
+                <div class="page-heading">
+                    <span class="page-kicker">Assimalign.Viu.App</span>
+                    <h1>{{ PageTitle }}</h1>
+                </div>
+                <button type="button" class="theme-toggle" @click="ToggleTheme">
+                    <span aria-hidden="true">{{ ThemeGlyph }}</span>
+                    {{ ThemeLabel }}
+                </button>
+            </header>
+
+            <Transition name="route" mode="out-in">
+                <section :key="CurrentPath" class="view-frame">
+                    <RouterView :depth="1" />
+                </section>
+            </Transition>
+
+            <footer class="app-footer">
+                <span>Compiled C# components · .NET WebAssembly · no runtime reflection</span>
+                <a href="https://github.com/assimalign/viu" target="_blank" rel="noreferrer">
+                    View framework source ↗
+                </a>
+            </footer>
+        </div>
+    </div>
+}
+
+@script {
+    using System;
+    using System.Collections.Generic;
+
+    using Assimalign.Viu.Examples.Showcase.Models;
+    using Assimalign.Viu.Examples.Showcase.State;
+
+    using ViuRouter = Assimalign.Viu.Router.Router;
+
+    private static readonly IReadOnlyList<NavigationItem> Items =
+    [
+        new("/", "Overview", "SDK surface", "01"),
+        new("/reactivity", "Reactivity", "Refs and effects", "02"),
+        new("/components", "Components", "Props and slots", "03"),
+        new("/forms", "Forms", "DOM directives", "04"),
+        new("/motion", "Motion", "Transitions", "05"),
+        new("/platform", "Platform", "Runtime internals", "06"),
+    ];
+
+    private ViuRouter Router { get; set; } = null!;
+
+    private ShowcaseStore Store { get; set; } = null!;
+
+    public IReadOnlyList<NavigationItem> NavigationItems => Items;
+
+    public string CurrentPath => Router.CurrentRoute.Value.Path;
+
+    public string PageTitle
+    {
+        get
+        {
+            IReadOnlyDictionary<string, object?> metadata =
+                Router.CurrentRoute.Value.Meta;
+            return metadata.TryGetValue("title", out object? title)
+                && title is string text
+                    ? text
+                    : "Viu SDK Showcase";
+        }
+    }
+
+    public string ShellClass =>
+        Store.IsDarkTheme.Value
+            ? "app-shell theme-dark"
+            : "app-shell";
+
+    public string ThemeGlyph => Store.IsDarkTheme.Value ? "☀" : "◐";
+
+    public string ThemeLabel => Store.IsDarkTheme.Value ? "Light mode" : "Dark mode";
+
+    public string InteractionSummary => Store.InteractionSummary.Value;
+
+    partial void OnSetup()
+    {
+        Router = (ViuRouter?)Context.Services.GetService(typeof(ViuRouter))
+            ?? throw new InvalidOperationException("The Viu router service is unavailable.");
+        Store = ShowcaseState.Definition.Use(Context);
+    }
+
+    private string NavigationClass(string path) =>
+        IsActive(path)
+            ? "navigation-link navigation-link--active"
+            : "navigation-link";
+
+    private bool IsActive(string path)
+    {
+        string current = CurrentPath;
+        return path == "/"
+            ? current == "/"
+            : current == path
+                || current.StartsWith(path + "/", StringComparison.Ordinal);
+    }
+
+    private void GoBack() => Router.Back();
+
+    private void GoForward() => Router.Forward();
+
+    private void ToggleTheme() => Store.ToggleTheme();
+}

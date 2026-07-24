@@ -1,0 +1,151 @@
+@template {
+    <figure class="quote-panel">
+        <div class="quote-panel__mark" aria-hidden="true">
+            <slot name="mark">“</slot>
+        </div>
+        <blockquote class="quote-panel__copy">
+            <slot>
+                Components stay explicit at the boundary and expressive in the template.
+            </slot>
+        </blockquote>
+        <figcaption class="quote-panel__attribution">
+            <div class="quote-panel__avatar" aria-hidden="true">{{ Initials }}</div>
+            <div>
+                <strong>{{ Author }}</strong>
+                <span>{{ Role }}</span>
+            </div>
+            <div class="quote-panel__footer">
+                <slot name="footer">
+                    <span>Default footer slot</span>
+                </slot>
+            </div>
+        </figcaption>
+    </figure>
+}
+
+@script {
+    using System;
+    using System.Collections.Generic;
+
+    using Assimalign.Viu.Components;
+
+    public IReadOnlyList<IComponentParameter> Parameters { get; } =
+    [
+        new ComponentParameter("author", defaultFactory: static () => "Viu team"),
+        new ComponentParameter("role", defaultFactory: static () => "SDK sample"),
+    ];
+
+    public string Author =>
+        Context.Arguments.Get<string>("author")
+        ?? "Viu team";
+
+    public string Role =>
+        Context.Arguments.Get<string>("role")
+        ?? "SDK sample";
+
+    public string Initials
+    {
+        get
+        {
+            string author = Author.Trim();
+            if (author.Length == 0)
+            {
+                return "V";
+            }
+
+            string[] words =
+                author.Split(
+                    ' ',
+                    StringSplitOptions.RemoveEmptyEntries);
+            return words.Length > 1
+                ? $"{char.ToUpperInvariant(words[0][0])}{char.ToUpperInvariant(words[^1][0])}"
+                : char.ToUpperInvariant(words[0][0]).ToString();
+        }
+    }
+}
+
+@style scoped {
+    .quote-panel {
+        position: relative;
+        display: grid;
+        gap: 1.25rem;
+        min-height: 100%;
+        margin: 0;
+        overflow: hidden;
+        padding: 1.5rem;
+        border: 1px solid var(--border);
+        border-radius: 1.3rem;
+        background:
+            linear-gradient(
+                145deg,
+                color-mix(in srgb, var(--accent) 7%, var(--surface)),
+                var(--surface));
+        box-shadow: var(--shadow-soft);
+    }
+
+    .quote-panel__mark {
+        position: absolute;
+        inset: -1.8rem 0.65rem auto auto;
+        color: color-mix(in srgb, var(--accent) 16%, transparent);
+        font-family: Georgia, serif;
+        font-size: 9rem;
+        line-height: 1;
+        pointer-events: none;
+    }
+
+    .quote-panel__copy {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        color: var(--text-strong);
+        font-size: clamp(1.05rem, 2vw, 1.35rem);
+        font-weight: 650;
+        letter-spacing: -0.022em;
+        line-height: 1.55;
+    }
+
+    .quote-panel__attribution {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .quote-panel__avatar {
+        display: grid;
+        width: 2.55rem;
+        height: 2.55rem;
+        place-items: center;
+        border-radius: 0.8rem;
+        color: white;
+        background: linear-gradient(145deg, var(--accent), #f14d70);
+        font-size: 0.72rem;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+    }
+
+    .quote-panel__attribution strong,
+    .quote-panel__attribution span {
+        display: block;
+    }
+
+    .quote-panel__attribution strong {
+        color: var(--text-strong);
+        font-size: 0.84rem;
+    }
+
+    .quote-panel__attribution span {
+        margin-top: 0.12rem;
+        color: var(--text-muted);
+        font-size: 0.72rem;
+    }
+
+    .quote-panel__footer {
+        color: var(--accent);
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-align: right;
+    }
+}

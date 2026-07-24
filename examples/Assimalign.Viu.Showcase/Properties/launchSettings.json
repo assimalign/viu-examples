@@ -1,12 +1,13 @@
 {
   "profiles": {
-    "SimpleApp": {
+    "Assimalign.Viu.Showcase": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:49986;http://localhost:49987"
+      "applicationUrl": "http://localhost:8080"
     }
-  }
+  },
+  "$schema": "http://json.schemastore.org/launchsettings.json"
 }

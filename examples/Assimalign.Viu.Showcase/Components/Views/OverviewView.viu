@@ -1,0 +1,389 @@
+@template {
+    <div class="view-stack">
+        <section class="hero-panel">
+            <div class="hero-copy">
+                <span class="section-kicker">One SDK · one shared framework</span>
+                <h2>Vue-shaped UI development, built for C# and WebAssembly.</h2>
+                <p>
+                    This application is compiled from .viu files, rendered through integer DOM
+                    handles, and kept reactive without reflection or runtime code generation.
+                </p>
+                <div class="hero-actions">
+                    <button type="button" class="button button--primary" @click="OpenReactivity">
+                        Explore reactivity
+                    </button>
+                    <button type="button" class="button button--secondary" @click="OpenPlatform">
+                        Inspect the runtime
+                    </button>
+                </div>
+            </div>
+            <div class="hero-orbit" aria-hidden="true">
+                <div class="orbit orbit--outer"></div>
+                <div class="orbit orbit--inner"></div>
+                <div class="hero-core">V</div>
+                <span class="orbit-label orbit-label--one">C#</span>
+                <span class="orbit-label orbit-label--two">WASM</span>
+                <span class="orbit-label orbit-label--three">AOT</span>
+            </div>
+        </section>
+
+        <section class="metric-grid" aria-label="Showcase metrics">
+            <div class="metric-card">
+                <span>Compiled views</span>
+                <strong>6</strong>
+                <small>plus reusable components</small>
+            </div>
+            <div class="metric-card">
+                <span>Runtime reflection</span>
+                <strong>0</strong>
+                <small>AOT-safe activation</small>
+            </div>
+            <div class="metric-card">
+                <span>DOM bridge mode</span>
+                <strong>01</strong>
+                <small>buffered command frames</small>
+            </div>
+            <div class="metric-card metric-card--accent">
+                <span>Session activity</span>
+                <strong>{{ InteractionCount }}</strong>
+                <small>stored application-wide</small>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-heading">
+                <div>
+                    <span class="section-kicker">Coverage map</span>
+                    <h2>Everything is live, not a screenshot.</h2>
+                </div>
+                <StatusPill label="SDK consumer" tone="success" />
+            </div>
+            <div class="capability-grid">
+                <article v-for="capability in Capabilities" :key="capability.Label" class="capability-row">
+                    <div class="capability-index">{{ capability.Status }}</div>
+                    <div>
+                        <h3>{{ capability.Label }}</h3>
+                        <p>{{ capability.Detail }}</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <FeatureCard title="The consumer boundary is the feature" eyebrow="Packaging">
+            <p>
+                The project file uses <code>Assimalign.Viu.Sdk</code>. Components, reactivity,
+                state, browser rendering, source generators, CSS bundling, and the JavaScript
+                bridge arrive through the shared framework automatically. The official Router
+                and Router.Browser packages are installed from the same local feed.
+            </p>
+            <pre class="code-window"><code>&lt;Project Sdk="Assimalign.Viu.Sdk"&gt;
+  &lt;PropertyGroup&gt;
+    &lt;TargetFramework&gt;net10.0&lt;/TargetFramework&gt;
+  &lt;/PropertyGroup&gt;
+  &lt;ItemGroup&gt;
+    &lt;PackageReference Include="Assimalign.Viu.Router" Version="10.0.1-preview.2" /&gt;
+    &lt;PackageReference Include="Assimalign.Viu.Router.Browser" Version="10.0.1-preview.2" /&gt;
+  &lt;/ItemGroup&gt;
+&lt;/Project&gt;</code></pre>
+            <template #footer>
+                <span class="footer-note">All Viu artifacts restore from ..\viu\_out\packages.</span>
+            </template>
+        </FeatureCard>
+    </div>
+}
+
+@script {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
+    using Assimalign.Viu.Examples.Showcase.Models;
+    using Assimalign.Viu.Examples.Showcase.State;
+
+    using ViuRouter = Assimalign.Viu.Router.Router;
+
+    private static readonly IReadOnlyList<CapabilityItem> Items =
+    [
+        new("Single-file components", "Templates, scripts, scoped styles, CSS modules, and reactive CSS variables.", "01"),
+        new("Reactive engine", "References, computed values, effects, watchers, batching, generated objects, and collections.", "02"),
+        new("Component runtime", "Explicit activation, arguments, emitted events, slots, lifecycle, dynamic and async components.", "03"),
+        new("Browser renderer", "Typed DOM events, v-model, v-show, transitions, teleport, and command-buffered mutations.", "04"),
+        new("Application state", "One registry-scoped store instance shared safely across every routed view.", "05"),
+        new("AOT packaging", "Source generators replace proxies and runtime compilation throughout the app.", "06"),
+    ];
+
+    private ViuRouter Router { get; set; } = null!;
+
+    private ShowcaseStore Store { get; set; } = null!;
+
+    public IReadOnlyList<CapabilityItem> Capabilities => Items;
+
+    public int InteractionCount => Store.TotalInteractions.Value;
+
+    partial void OnSetup()
+    {
+        Router = (ViuRouter?)Context.Services.GetService(typeof(ViuRouter))
+            ?? throw new InvalidOperationException("The Viu router service is unavailable.");
+        Store = ShowcaseState.Definition.Use(Context);
+    }
+
+    private void OpenReactivity()
+    {
+        Store.Track("Opened the reactivity laboratory");
+        _ = NavigateAsync("/reactivity");
+    }
+
+    private void OpenPlatform()
+    {
+        Store.Track("Opened platform diagnostics");
+        _ = NavigateAsync("/platform");
+    }
+
+    private async Task NavigateAsync(string path)
+    {
+        try
+        {
+            await Router.Push(path);
+        }
+        catch (Exception exception)
+        {
+            Store.Track($"Navigation failed: {exception.Message}");
+        }
+    }
+}
+
+@style scoped {
+    .hero-panel {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(16rem, 0.75fr);
+        gap: 2rem;
+        min-height: 25rem;
+        overflow: hidden;
+        padding: clamp(2rem, 4vw, 4rem);
+        border: 1px solid var(--border);
+        border-radius: 1.75rem;
+        color: #eff7ff;
+        background:
+            radial-gradient(circle at 78% 16%, rgba(68, 202, 255, 0.18), transparent 24rem),
+            linear-gradient(135deg, #07111f 0%, #102945 58%, #0f4860 100%);
+        box-shadow: 0 2rem 5rem rgba(4, 15, 28, 0.22);
+    }
+
+    .hero-copy {
+        position: relative;
+        z-index: 2;
+        align-self: center;
+        max-width: 45rem;
+    }
+
+    .hero-copy h2 {
+        max-width: 14ch;
+        margin: 0.65rem 0 1rem;
+        font-size: clamp(2.35rem, 5vw, 4.8rem);
+        font-weight: 760;
+        letter-spacing: -0.055em;
+        line-height: 0.98;
+    }
+
+    .hero-copy p {
+        max-width: 40rem;
+        margin: 0;
+        color: #b8c9da;
+        font-size: 1.02rem;
+        line-height: 1.75;
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-top: 1.6rem;
+    }
+
+    .hero-orbit {
+        position: relative;
+        min-height: 18rem;
+        align-self: center;
+    }
+
+    .orbit,
+    .hero-core,
+    .orbit-label {
+        position: absolute;
+        inset: 50% auto auto 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .orbit {
+        border: 1px solid rgba(184, 216, 239, 0.22);
+        border-radius: 50%;
+    }
+
+    .orbit--outer {
+        width: 18rem;
+        height: 18rem;
+        animation: slow-spin 24s linear infinite;
+    }
+
+    .orbit--inner {
+        width: 11rem;
+        height: 11rem;
+        border-style: dashed;
+        animation: slow-spin 18s linear infinite reverse;
+    }
+
+    .hero-core {
+        display: grid;
+        width: 6rem;
+        height: 6rem;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 1.4rem;
+        color: white;
+        background: linear-gradient(145deg, #ff6b35, #ff3d71);
+        box-shadow: 0 1.5rem 3rem rgba(255, 74, 75, 0.28);
+        font-size: 3rem;
+        font-weight: 900;
+    }
+
+    .orbit-label {
+        display: grid;
+        min-width: 3.2rem;
+        height: 2rem;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 999px;
+        color: #d9edf9;
+        background: rgba(7, 17, 31, 0.72);
+        font-size: 0.66rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        backdrop-filter: blur(10px);
+    }
+
+    .orbit-label--one {
+        transform: translate(5rem, -8rem);
+    }
+
+    .orbit-label--two {
+        transform: translate(-10rem, 3rem);
+    }
+
+    .orbit-label--three {
+        transform: translate(4rem, 6rem);
+    }
+
+    .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .metric-card {
+        display: grid;
+        gap: 0.25rem;
+        padding: 1.2rem;
+        border: 1px solid var(--border);
+        border-radius: 1.15rem;
+        background: var(--surface);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .metric-card span,
+    .metric-card small {
+        color: var(--text-muted);
+        font-size: 0.76rem;
+    }
+
+    .metric-card strong {
+        color: var(--text-strong);
+        font-size: 2rem;
+        letter-spacing: -0.05em;
+    }
+
+    .metric-card--accent {
+        border-color: transparent;
+        color: white;
+        background: linear-gradient(135deg, var(--accent), #f14d70);
+    }
+
+    .metric-card--accent span,
+    .metric-card--accent small,
+    .metric-card--accent strong {
+        color: white;
+    }
+
+    .capability-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.85rem;
+    }
+
+    .capability-row {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 1rem;
+        padding: 1.15rem;
+        border: 1px solid var(--border);
+        border-radius: 1rem;
+        background: var(--surface);
+    }
+
+    .capability-index {
+        display: grid;
+        width: 2.4rem;
+        height: 2.4rem;
+        place-items: center;
+        border-radius: 0.75rem;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+        font-size: 0.72rem;
+        font-weight: 900;
+    }
+
+    .capability-row h3 {
+        margin: 0 0 0.25rem;
+        color: var(--text-strong);
+        font-size: 0.95rem;
+    }
+
+    .capability-row p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.84rem;
+        line-height: 1.55;
+    }
+
+    .footer-note {
+        color: var(--text-muted);
+        font-size: 0.82rem;
+    }
+
+    @keyframes slow-spin {
+        to {
+            rotate: 360deg;
+        }
+    }
+
+    @media (max-width: 900px) {
+        .hero-panel {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-orbit {
+            display: none;
+        }
+
+        .metric-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 620px) {
+        .metric-grid,
+        .capability-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+}

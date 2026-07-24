@@ -1,0 +1,1305 @@
+@template {
+    <div class="reactivity-view">
+        <section class="laboratory-hero">
+            <div>
+                <span class="section-kicker">Reactive laboratory</span>
+                <h2>Change one value. Watch the dependency graph answer.</h2>
+                <p>
+                    Every read below is tracked by Viu’s reactivity engine. Computed values stay
+                    lazy, effects rerun only for their dependencies, and batches collapse several
+                    writes into one notification.
+                </p>
+            </div>
+            <div class="hero-equation" aria-label="Current reactive equation">
+                <span>{{ Count }}</span>
+                <i>×</i>
+                <span>{{ Multiplier }}</span>
+                <i>=</i>
+                <strong>{{ Product }}</strong>
+            </div>
+        </section>
+
+        <section class="reactivity-grid">
+            <FeatureCard title="Reference → Computed → Effect" eyebrow="Dependency graph">
+                <template #badge>
+                    <StatusPill :label="EffectStatus" tone="success" />
+                </template>
+
+                <div class="equation-workbench">
+                    <div class="value-control">
+                        <span class="value-control__label">Reference&lt;int&gt;</span>
+                        <strong>{{ Count }}</strong>
+                        <div class="button-row">
+                            <button type="button" class="mini-button" @click="DecrementCount">−</button>
+                            <button type="button" class="mini-button mini-button--accent" @click="IncrementCount">+</button>
+                        </div>
+                    </div>
+                    <div class="dependency-arrow" aria-hidden="true">→</div>
+                    <div class="value-control">
+                        <span class="value-control__label">Multiplier ref</span>
+                        <strong>× {{ Multiplier }}</strong>
+                        <button type="button" class="text-button" @click="CycleMultiplier">
+                            Cycle 2 / 3 / 4
+                        </button>
+                    </div>
+                    <div class="dependency-arrow" aria-hidden="true">→</div>
+                    <div class="value-control value-control--result">
+                        <span class="value-control__label">Computed&lt;int&gt;</span>
+                        <strong>{{ Product }}</strong>
+                        <small>cached until a source changes</small>
+                    </div>
+                </div>
+
+                <div class="effect-readout">
+                    <span>Latest effect snapshot</span>
+                    <code>{{ EffectSummary }}</code>
+                    <small>The effect has executed {{ EffectRuns }} time(s), including setup.</small>
+                </div>
+
+                <template #footer>
+                    <button type="button" class="button button--primary" @click="RunBatch">
+                        Apply two writes in one batch
+                    </button>
+                    <span class="footer-message">{{ BatchSummary }}</span>
+                </template>
+            </FeatureCard>
+
+            <FeatureCard title="[Reactive] object + Watch" eyebrow="Generated object">
+                <template #badge>
+                    <StatusPill :label="WatchStatus" tone="accent" />
+                </template>
+
+                <div class="profile-card">
+                    <div class="profile-avatar" aria-hidden="true">{{ ProfileInitial }}</div>
+                    <div>
+                        <span>Generated reactive profile</span>
+                        <strong>{{ Profile.Name }}</strong>
+                        <small>Score {{ Profile.Score }}</small>
+                    </div>
+                </div>
+
+                <p class="card-copy">
+                    The source generator instruments each partial property without reflection or a
+                    JavaScript proxy. A watcher observes the name and score as one derived source.
+                </p>
+
+                <div class="watch-readout">
+                    <span>Last watcher delivery</span>
+                    <strong>{{ WatchSummary }}</strong>
+                    <small>{{ WatchRuns }} callback(s), including the immediate snapshot</small>
+                </div>
+
+                <template #footer>
+                    <button type="button" class="button button--secondary" @click="MutateProfile">
+                        Mutate name + score together
+                    </button>
+                </template>
+            </FeatureCard>
+
+            <FeatureCard title="ReactiveList&lt;T&gt;" eyebrow="Tracked collection">
+                <template #badge>
+                    <StatusPill :label="QueueStatus" tone="neutral" />
+                </template>
+
+                <p class="card-copy">
+                    Iteration, length, and indexed reads have independent dependencies. Adding or
+                    removing an item updates this list without replacing the collection.
+                </p>
+
+                <ol class="signal-list">
+                    <li v-for="signal in Signals" :key="signal">
+                        <span class="signal-dot" aria-hidden="true"></span>
+                        <code>{{ signal }}</code>
+                    </li>
+                </ol>
+
+                <template #footer>
+                    <div class="button-row">
+                        <button type="button" class="button button--primary" @click="AddSignal">
+                            Append signal
+                        </button>
+                        <button
+                            type="button"
+                            class="button button--secondary"
+                            :disabled="Signals.Count == 0"
+                            @click="RemoveSignal">
+                            Remove latest
+                        </button>
+                    </div>
+                </template>
+            </FeatureCard>
+
+            <FeatureCard title="ReactiveDictionary&lt;TKey, TValue&gt;" eyebrow="Keyed dependencies">
+                <template #badge>
+                    <StatusPill :label="DictionaryStatus" tone="success" />
+                </template>
+
+                <p class="card-copy">
+                    A dictionary tracks individual keys separately from key and value iteration.
+                    Updating one entry leaves unrelated key subscribers alone.
+                </p>
+
+                <div class="dictionary-table" role="table" aria-label="Reactive runtime counters">
+                    <div
+                        v-for="entry in RuntimeCounters"
+                        :key="entry.Key"
+                        class="dictionary-row"
+                        role="row">
+                        <code role="cell">{{ entry.Key }}</code>
+                        <strong role="cell">{{ entry.Value }}</strong>
+                    </div>
+                </div>
+
+                <template #footer>
+                    <button type="button" class="button button--secondary" @click="UpdateDictionary">
+                        Update one key
+                    </button>
+                </template>
+            </FeatureCard>
+        </section>
+
+        <section class="advanced-reactivity">
+            <header class="advanced-reactivity__header">
+                <div>
+                    <span class="section-kicker">Advanced reactivity</span>
+                    <h3>Control identity, notification, and lifetime explicitly.</h3>
+                </div>
+                <p>
+                    These escape hatches stay composable with the same dependency graph while
+                    exposing the points where a library author may need precise control.
+                </p>
+            </header>
+
+            <div class="advanced-reactivity__grid">
+                <FeatureCard title="ReactiveSet&lt;T&gt;" eyebrow="Unique membership">
+                    <template #badge>
+                        <StatusPill :label="SetStatus" tone="success" />
+                    </template>
+
+                    <p class="card-copy">
+                        Membership and iteration are tracked independently. Duplicate inserts are
+                        true no-ops; toggling one member invalidates the rendered set.
+                    </p>
+
+                    <div class="token-cloud" aria-label="Reactive set members">
+                        <code v-for="capability in CapabilitySet" :key="capability">
+                            {{ capability }}
+                        </code>
+                    </div>
+
+                    <div class="advanced-readout">
+                        <span>Latest set operation</span>
+                        <strong>{{ SetSummary }}</strong>
+                    </div>
+
+                    <template #footer>
+                        <div class="button-row">
+                            <button type="button" class="button button--primary" @click="ToggleSetMember">
+                                {{ SetAction }}
+                            </button>
+                            <button type="button" class="button button--secondary" @click="AttemptDuplicate">
+                                Try duplicate
+                            </button>
+                        </div>
+                    </template>
+                </FeatureCard>
+
+                <FeatureCard title="Shallow + custom references" eyebrow="Notification control">
+                    <template #badge>
+                        <StatusPill label="Explicit triggers" tone="accent" />
+                    </template>
+
+                    <div class="reference-stack">
+                        <div class="reference-row">
+                            <div>
+                                <code>ShallowReference&lt;List&lt;string&gt;&gt;</code>
+                                <small>Inner object / subscriber snapshot</small>
+                            </div>
+                            <strong>{{ ShallowRawCount }} / {{ ShallowObservedCount }}</strong>
+                        </div>
+                        <div class="reference-row">
+                            <div>
+                                <code>CustomReference&lt;string&gt;</code>
+                                <small>Staged / published</small>
+                            </div>
+                            <strong>{{ CustomPendingValue }} / {{ CustomPublishedValue }}</strong>
+                        </div>
+                    </div>
+
+                    <p class="reference-note">{{ ReferenceSummary }}</p>
+
+                    <template #footer>
+                        <div class="reference-actions">
+                            <button type="button" class="text-button" @click="MutateShallowReference">
+                                Mutate inner list
+                            </button>
+                            <button type="button" class="text-button" @click="TriggerShallowReference">
+                                Trigger shallow ref
+                            </button>
+                            <button type="button" class="text-button" @click="StageCustomReference">
+                                Stage custom value
+                            </button>
+                            <button type="button" class="text-button" @click="PublishCustomReference">
+                                Publish custom value
+                            </button>
+                        </div>
+                    </template>
+                </FeatureCard>
+
+                <FeatureCard title="WatchEffect + EffectScope" eyebrow="Scoped lifetime">
+                    <template #badge>
+                        <StatusPill :label="ScopeStatus" :tone="ScopeTone" />
+                    </template>
+
+                    <p class="card-copy">
+                        The watch effect owns a cleanup for every run. Stopping its effect scope
+                        executes the final cleanup and prevents later pulse writes from rerunning it.
+                    </p>
+
+                    <div class="scope-metrics">
+                        <div>
+                            <span>Pulse</span>
+                            <strong>{{ AdvancedPulse }}</strong>
+                        </div>
+                        <div>
+                            <span>Runs</span>
+                            <strong>{{ WatchEffectRuns }}</strong>
+                        </div>
+                        <div>
+                            <span>Cleanups</span>
+                            <strong>{{ WatchEffectCleanups }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="advanced-readout advanced-readout--scope">
+                        <span>Scope trace</span>
+                        <strong>{{ ScopeSummary }}</strong>
+                    </div>
+
+                    <template #footer>
+                        <div class="button-row">
+                            <button type="button" class="button button--primary" @click="AdvancePulse">
+                                Advance pulse
+                            </button>
+                            <button
+                                type="button"
+                                class="button button--secondary"
+                                :disabled="ScopeStopped"
+                                @click="StopAdvancedScope">
+                                Stop scope
+                            </button>
+                            <button
+                                type="button"
+                                class="button button--secondary"
+                                :disabled="ScopeActive"
+                                @click="StartAdvancedScope">
+                                Restart scope
+                            </button>
+                        </div>
+                    </template>
+                </FeatureCard>
+            </div>
+        </section>
+
+        <section class="implementation-strip">
+            <div>
+                <span class="section-kicker">AOT-safe by construction</span>
+                <h3>No reflection. No dynamic proxy. No runtime code generation.</h3>
+            </div>
+            <code>References · Effects · Watch · Scopes · Batches · Reactive collections</code>
+            <button type="button" class="text-button" @click="ResetLaboratory">Reset laboratory</button>
+        </section>
+    </div>
+}
+
+@script {
+    using System;
+    using System.Collections.Generic;
+
+    using Assimalign.Viu.Examples.Showcase.Models;
+    using Assimalign.Viu.Examples.Showcase.State;
+    using Assimalign.Viu.Reactivity;
+
+    private readonly Reference<int> CountReference = Reactive.Reference(4);
+    private readonly Reference<int> MultiplierReference = Reactive.Reference(3);
+    private readonly Reference<int> EffectRunReference = Reactive.Reference(0);
+    private readonly Reference<int> WatchRunReference = Reactive.Reference(0);
+    private readonly Reference<string> EffectSummaryReference = Reactive.Reference("Waiting for the first effect run");
+    private readonly Reference<string> WatchSummaryReference = Reactive.Reference("Waiting for the first watcher delivery");
+    private readonly Reference<string> BatchSummaryReference = Reactive.Reference("Batching is ready");
+    private readonly ReactiveList<string> SignalList =
+        new(["count:tracked", "computed:cached", "effect:scheduled"]);
+    private readonly ReactiveDictionary<string, int> CounterDictionary =
+        new(StringComparer.Ordinal)
+        {
+            ["reference writes"] = 0,
+            ["collection writes"] = 0,
+            ["batched writes"] = 0,
+        };
+    private readonly ReactiveSet<string> CapabilitySet =
+        new(["render", "watch", "scope"]);
+    private readonly ShallowReference<List<string>> ShallowQueueReference =
+        Reactive.ShallowReference(new List<string> { "frame:01" });
+    private readonly Reference<int> ShallowRawCountReference = Reactive.Reference(1);
+    private readonly Reference<int> ShallowObservedCountReference = Reactive.Reference(1);
+    private readonly Reference<string> ReferenceSummaryReference =
+        Reactive.Reference("Mutate first, then notify on your own terms.");
+    private readonly Reference<string> SetSummaryReference =
+        Reactive.Reference("Three unique capabilities are active.");
+    private readonly Reference<string> CustomPendingValueReference =
+        Reactive.Reference("signal:alpha");
+    private readonly Reference<int> AdvancedPulseReference = Reactive.Reference(0);
+    private readonly Reference<int> WatchEffectRunReference = Reactive.Reference(0);
+    private readonly Reference<int> WatchEffectCleanupReference = Reactive.Reference(0);
+    private readonly Reference<bool> ScopeActiveReference = Reactive.Reference(false);
+    private readonly Reference<string> ScopeSummaryReference =
+        Reactive.Reference("The scoped watch effect is ready.");
+    private readonly ReactiveProfile Profile = new()
+    {
+        Name = "Ada",
+        Score = 84,
+    };
+
+    private Computed<int> ProductComputed { get; set; } = null!;
+
+    private ReactiveEffect DemonstrationEffect { get; set; } = null!;
+
+    private WatchHandle ProfileWatch { get; set; } = null!;
+
+    private ReactiveEffect ShallowObserverEffect { get; set; } = null!;
+
+    private CustomReference<string> DeferredCustomReference { get; set; } = null!;
+
+    private EffectScope? AdvancedEffectScope { get; set; }
+
+    private ShowcaseStore Store { get; set; } = null!;
+
+    private Action? TriggerCustomReferenceAction { get; set; }
+
+    private string StagedCustomValue { get; set; } = "signal:alpha";
+
+    private string PublishedCustomValue { get; set; } = "signal:alpha";
+
+    private int EffectRunTotal { get; set; }
+
+    private int WatchRunTotal { get; set; }
+
+    private int WatchEffectRunTotal { get; set; }
+
+    private int WatchEffectCleanupTotal { get; set; }
+
+    private int NextSignalNumber { get; set; } = 4;
+
+    private int ProfileVersion { get; set; }
+
+    private int CustomValueVersion { get; set; }
+
+    public int Count => CountReference.Value;
+
+    public int Multiplier => MultiplierReference.Value;
+
+    public int Product => ProductComputed.Value;
+
+    public int EffectRuns => EffectRunReference.Value;
+
+    public int WatchRuns => WatchRunReference.Value;
+
+    public string EffectSummary => EffectSummaryReference.Value;
+
+    public string WatchSummary => WatchSummaryReference.Value;
+
+    public string BatchSummary => BatchSummaryReference.Value;
+
+    public string EffectStatus => $"{EffectRuns} effect runs";
+
+    public string WatchStatus => $"{WatchRuns} watch calls";
+
+    public string QueueStatus =>
+        SignalList.Count == 1
+            ? "1 tracked item"
+            : $"{SignalList.Count} tracked items";
+
+    public string DictionaryStatus => $"{CounterDictionary.Count} keyed cells";
+
+    public string SetStatus => $"{CapabilitySet.Count} unique members";
+
+    public string SetSummary => SetSummaryReference.Value;
+
+    public string SetAction =>
+        CapabilitySet.Contains("scheduler")
+            ? "Remove scheduler"
+            : "Add scheduler";
+
+    public int ShallowRawCount => ShallowRawCountReference.Value;
+
+    public int ShallowObservedCount => ShallowObservedCountReference.Value;
+
+    public string ReferenceSummary => ReferenceSummaryReference.Value;
+
+    public string CustomPendingValue => CustomPendingValueReference.Value;
+
+    public string CustomPublishedValue => DeferredCustomReference.Value;
+
+    public int AdvancedPulse => AdvancedPulseReference.Value;
+
+    public int WatchEffectRuns => WatchEffectRunReference.Value;
+
+    public int WatchEffectCleanups => WatchEffectCleanupReference.Value;
+
+    public bool ScopeActive => ScopeActiveReference.Value;
+
+    public bool ScopeStopped => !ScopeActiveReference.Value;
+
+    public string ScopeStatus =>
+        ScopeActive
+            ? "Scope active"
+            : "Scope stopped";
+
+    public string ScopeTone =>
+        ScopeActive
+            ? "success"
+            : "neutral";
+
+    public string ScopeSummary => ScopeSummaryReference.Value;
+
+    public string ProfileInitial =>
+        string.IsNullOrEmpty(Profile.Name)
+            ? "?"
+            : Profile.Name[..1];
+
+    public ReactiveList<string> Signals => SignalList;
+
+    public ReactiveDictionary<string, int> RuntimeCounters => CounterDictionary;
+
+    partial void OnSetup()
+    {
+        Store = ShowcaseState.Definition.Use(Context);
+        DeferredCustomReference = Reactive.CustomReference<string>((track, trigger) =>
+        {
+            TriggerCustomReferenceAction = trigger;
+            return (
+                Get: () =>
+                {
+                    track();
+                    return PublishedCustomValue;
+                },
+                Set: value => StagedCustomValue = value);
+        });
+        ProductComputed = Reactive.Computed(
+            () => CountReference.Value * MultiplierReference.Value);
+
+        DemonstrationEffect = Reactive.Effect(() =>
+        {
+            int count = CountReference.Value;
+            int multiplier = MultiplierReference.Value;
+            int product = ProductComputed.Value;
+            EffectRunTotal++;
+            EffectSummaryReference.Value =
+                $"{count} × {multiplier} resolved to {product}";
+            EffectRunReference.Value = EffectRunTotal;
+        });
+
+        ProfileWatch = Reactive.Watch(
+            () => $"{Profile.Name}|{Profile.Score}",
+            (current, previous, _) =>
+            {
+                WatchRunTotal++;
+                WatchSummaryReference.Value =
+                    WatchRunTotal == 1
+                        ? $"{Profile.Name} entered at {Profile.Score}"
+                        : $"{previous.Replace("|", " · ", StringComparison.Ordinal)} → {current.Replace("|", " · ", StringComparison.Ordinal)}";
+                WatchRunReference.Value = WatchRunTotal;
+            },
+            new WatchOptions { Immediate = true });
+
+        ShallowObserverEffect = Reactive.Effect(() =>
+        {
+            ShallowObservedCountReference.Value = ShallowQueueReference.Value.Count;
+        });
+
+        CreateAdvancedScope();
+
+        Context.Lifecycle.OnUnmounted(() =>
+        {
+            AdvancedEffectScope?.Stop();
+            ShallowObserverEffect.Stop();
+            DemonstrationEffect.Stop();
+            ProfileWatch.Stop();
+        });
+    }
+
+    private void IncrementCount()
+    {
+        CountReference.Value++;
+        IncrementCounter("reference writes");
+        Store.Track("Incremented a reactive reference");
+    }
+
+    private void DecrementCount()
+    {
+        CountReference.Value--;
+        IncrementCounter("reference writes");
+        Store.Track("Decremented a reactive reference");
+    }
+
+    private void CycleMultiplier()
+    {
+        MultiplierReference.Value =
+            MultiplierReference.Value >= 4
+                ? 2
+                : MultiplierReference.Value + 1;
+        IncrementCounter("reference writes");
+        Store.Track("Changed a computed dependency");
+    }
+
+    private void RunBatch()
+    {
+        int runsBeforeBatch = EffectRunTotal;
+        Reactive.StartBatch();
+        try
+        {
+            CountReference.Value += 2;
+            MultiplierReference.Value =
+                MultiplierReference.Value >= 4
+                    ? 2
+                    : MultiplierReference.Value + 1;
+            CounterDictionary["reference writes"] += 2;
+            CounterDictionary["batched writes"] += 2;
+        }
+        finally
+        {
+            Reactive.EndBatch();
+        }
+
+        int deliveredRuns = EffectRunTotal - runsBeforeBatch;
+        BatchSummaryReference.Value =
+            $"2 source writes → {deliveredRuns} effect run";
+        Store.Track("Coalesced two dependency writes in one batch");
+    }
+
+    private void MutateProfile()
+    {
+        string[] names = ["Ada", "Grace", "Lin", "Margaret"];
+        ProfileVersion = (ProfileVersion + 1) % names.Length;
+
+        Reactive.StartBatch();
+        try
+        {
+            Profile.Name = names[ProfileVersion];
+            Profile.Score += 7;
+        }
+        finally
+        {
+            Reactive.EndBatch();
+        }
+
+        Store.Track("Updated a source-generated reactive object");
+    }
+
+    private void AddSignal()
+    {
+        SignalList.Add($"signal:{NextSignalNumber:00}");
+        NextSignalNumber++;
+        IncrementCounter("collection writes");
+        Store.Track("Appended to a ReactiveList");
+    }
+
+    private void RemoveSignal()
+    {
+        if (SignalList.Count == 0)
+        {
+            return;
+        }
+
+        SignalList.RemoveAt(SignalList.Count - 1);
+        IncrementCounter("collection writes");
+        Store.Track("Removed from a ReactiveList");
+    }
+
+    private void UpdateDictionary()
+    {
+        IncrementCounter("collection writes");
+        Store.Track("Updated one ReactiveDictionary key");
+    }
+
+    private void ToggleSetMember()
+    {
+        if (CapabilitySet.Remove("scheduler"))
+        {
+            SetSummaryReference.Value = "Removed scheduler; membership subscribers reran.";
+            Store.Track("Removed a ReactiveSet member");
+            return;
+        }
+
+        CapabilitySet.Add("scheduler");
+        SetSummaryReference.Value = "Added scheduler exactly once.";
+        Store.Track("Added a ReactiveSet member");
+    }
+
+    private void AttemptDuplicate()
+    {
+        bool wasAdded = CapabilitySet.Add("render");
+        SetSummaryReference.Value =
+            wasAdded
+                ? "Added render."
+                : "Duplicate render was ignored without a set notification.";
+        Store.Track("Attempted a duplicate ReactiveSet insert");
+    }
+
+    private void MutateShallowReference()
+    {
+        int nextFrame = ShallowQueueReference.Value.Count + 1;
+        ShallowQueueReference.Value.Add($"frame:{nextFrame:00}");
+        ShallowRawCountReference.Value = ShallowQueueReference.Value.Count;
+        ReferenceSummaryReference.Value =
+            "The inner list changed, but the subscriber snapshot stayed put.";
+        Store.Track("Mutated a shallow reference in place");
+    }
+
+    private void TriggerShallowReference()
+    {
+        Reactive.TriggerReference(ShallowQueueReference);
+        ReferenceSummaryReference.Value =
+            "TriggerReference delivered the in-place list mutation.";
+        Store.Track("Triggered a shallow reference explicitly");
+    }
+
+    private void StageCustomReference()
+    {
+        string[] values = ["signal:alpha", "signal:beta", "signal:gamma"];
+        CustomValueVersion = (CustomValueVersion + 1) % values.Length;
+        string nextValue = values[CustomValueVersion];
+        DeferredCustomReference.Value = nextValue;
+        CustomPendingValueReference.Value = nextValue;
+        ReferenceSummaryReference.Value =
+            "The custom setter staged a value without notifying subscribers.";
+        Store.Track("Staged a custom reference value");
+    }
+
+    private void PublishCustomReference()
+    {
+        PublishedCustomValue = StagedCustomValue;
+        TriggerCustomReferenceAction?.Invoke();
+        ReferenceSummaryReference.Value =
+            "The custom trigger published the staged value.";
+        Store.Track("Published a custom reference value");
+    }
+
+    private void AdvancePulse()
+    {
+        AdvancedPulseReference.Value++;
+        if (!ScopeActive)
+        {
+            ScopeSummaryReference.Value =
+                $"Pulse {AdvancedPulse} changed; the stopped scope did not rerun.";
+        }
+
+        Store.Track("Advanced the WatchEffect pulse");
+    }
+
+    private void StartAdvancedScope()
+    {
+        if (CreateAdvancedScope())
+        {
+            Store.Track("Started an advanced EffectScope");
+        }
+    }
+
+    private bool CreateAdvancedScope()
+    {
+        if (AdvancedEffectScope?.IsActive == true)
+        {
+            return false;
+        }
+
+        AdvancedEffectScope = Reactive.EffectScope(detached: true);
+        ScopeActiveReference.Value = true;
+        AdvancedEffectScope.Run(() =>
+        {
+            Reactive.WatchEffect(onCleanup =>
+            {
+                int pulse = AdvancedPulseReference.Value;
+                WatchEffectRunTotal++;
+                WatchEffectRunReference.Value = WatchEffectRunTotal;
+                ScopeSummaryReference.Value =
+                    $"Run {WatchEffectRunTotal} observed pulse {pulse}.";
+
+                onCleanup(() =>
+                {
+                    WatchEffectCleanupTotal++;
+                    WatchEffectCleanupReference.Value = WatchEffectCleanupTotal;
+                });
+            });
+
+            Reactive.OnScopeDispose(() =>
+            {
+                ScopeActiveReference.Value = false;
+                ScopeSummaryReference.Value =
+                    $"Scope stopped after {WatchEffectRunTotal} run(s); future pulses are ignored.";
+            });
+        });
+
+        return true;
+    }
+
+    private void StopAdvancedScope()
+    {
+        AdvancedEffectScope?.Stop();
+        Store.Track("Stopped an EffectScope and its WatchEffect");
+    }
+
+    private void ResetLaboratory()
+    {
+        AdvancedEffectScope?.Stop();
+
+        Reactive.StartBatch();
+        try
+        {
+            CountReference.Value = 4;
+            MultiplierReference.Value = 3;
+            Profile.Name = "Ada";
+            Profile.Score = 84;
+
+            SignalList.Clear();
+            SignalList.AddRange(["count:tracked", "computed:cached", "effect:scheduled"]);
+            CounterDictionary["reference writes"] = 0;
+            CounterDictionary["collection writes"] = 0;
+            CounterDictionary["batched writes"] = 0;
+            CapabilitySet.Clear();
+            CapabilitySet.UnionWith(["render", "watch", "scope"]);
+            ShallowQueueReference.Value = new List<string> { "frame:01" };
+            ShallowRawCountReference.Value = 1;
+            SetSummaryReference.Value = "Three unique capabilities are active.";
+            ReferenceSummaryReference.Value =
+                "Mutate first, then notify on your own terms.";
+            AdvancedPulseReference.Value = 0;
+            ScopeActiveReference.Value = false;
+        }
+        finally
+        {
+            Reactive.EndBatch();
+        }
+
+        StagedCustomValue = "signal:alpha";
+        PublishedCustomValue = "signal:alpha";
+        CustomPendingValueReference.Value = "signal:alpha";
+        TriggerCustomReferenceAction?.Invoke();
+        NextSignalNumber = 4;
+        ProfileVersion = 0;
+        CustomValueVersion = 0;
+        WatchEffectRunTotal = 0;
+        WatchEffectCleanupTotal = 0;
+        WatchEffectRunReference.Value = 0;
+        WatchEffectCleanupReference.Value = 0;
+        BatchSummaryReference.Value = "Laboratory restored";
+        CreateAdvancedScope();
+        Store.Track("Reset the reactivity laboratory");
+    }
+
+    private void IncrementCounter(string key) =>
+        CounterDictionary[key] = CounterDictionary[key] + 1;
+}
+
+@style scoped {
+    .reactivity-view {
+        display: grid;
+        gap: 1.25rem;
+    }
+
+    .laboratory-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 2rem;
+        align-items: center;
+        overflow: hidden;
+        padding: clamp(1.5rem, 4vw, 2.6rem);
+        border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border));
+        border-radius: 1.5rem;
+        background:
+            radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 20rem),
+            var(--surface);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .laboratory-hero h2 {
+        max-width: 18ch;
+        margin: 0.45rem 0 0.7rem;
+        color: var(--text-strong);
+        font-size: clamp(1.75rem, 4vw, 3rem);
+        letter-spacing: -0.045em;
+        line-height: 1.05;
+    }
+
+    .laboratory-hero p,
+    .card-copy {
+        margin: 0;
+        color: var(--text-muted);
+        line-height: 1.65;
+    }
+
+    .laboratory-hero p {
+        max-width: 47rem;
+    }
+
+    .hero-equation {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 1rem 1.15rem;
+        border: 1px solid var(--border);
+        border-radius: 1rem;
+        background: var(--surface-muted);
+        box-shadow: inset 0 1px rgba(255, 255, 255, 0.08);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .hero-equation span,
+    .hero-equation strong {
+        display: grid;
+        min-width: 2.6rem;
+        height: 2.6rem;
+        place-items: center;
+        border-radius: 0.7rem;
+        color: var(--text-strong);
+        background: var(--surface);
+        font-size: 1.1rem;
+    }
+
+    .hero-equation strong {
+        min-width: 3.5rem;
+        color: white;
+        background: linear-gradient(135deg, var(--accent), #f14d70);
+    }
+
+    .hero-equation i {
+        color: var(--text-muted);
+        font-style: normal;
+    }
+
+    .reactivity-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .equation-workbench {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr auto 1fr;
+        gap: 0.55rem;
+        align-items: center;
+    }
+
+    .value-control {
+        display: grid;
+        min-height: 8.7rem;
+        align-content: center;
+        gap: 0.55rem;
+        padding: 0.9rem;
+        border: 1px solid var(--border);
+        border-radius: 0.95rem;
+        background: var(--surface-muted);
+        text-align: center;
+    }
+
+    .value-control--result {
+        border-color: color-mix(in srgb, var(--accent) 32%, var(--border));
+        background: color-mix(in srgb, var(--accent) 7%, var(--surface));
+    }
+
+    .value-control__label,
+    .value-control small,
+    .effect-readout span,
+    .effect-readout small,
+    .watch-readout span,
+    .watch-readout small,
+    .profile-card span,
+    .profile-card small {
+        color: var(--text-muted);
+        font-size: 0.72rem;
+    }
+
+    .value-control strong {
+        color: var(--text-strong);
+        font-size: 1.65rem;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .dependency-arrow {
+        color: var(--text-muted);
+    }
+
+    .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+    }
+
+    .value-control .button-row {
+        justify-content: center;
+    }
+
+    .mini-button {
+        display: grid;
+        width: 2rem;
+        height: 2rem;
+        place-items: center;
+        border: 1px solid var(--border);
+        border-radius: 0.55rem;
+        color: var(--text-strong);
+        background: var(--surface);
+        cursor: pointer;
+        font: inherit;
+        font-weight: 800;
+    }
+
+    .mini-button--accent {
+        border-color: transparent;
+        color: white;
+        background: var(--accent);
+    }
+
+    .text-button {
+        padding: 0;
+        border: 0;
+        color: var(--accent);
+        background: transparent;
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.75rem;
+        font-weight: 800;
+    }
+
+    .effect-readout,
+    .watch-readout {
+        display: grid;
+        gap: 0.25rem;
+        margin-top: 1rem;
+        padding: 0.9rem 1rem;
+        border-left: 3px solid var(--success);
+        border-radius: 0.25rem 0.75rem 0.75rem 0.25rem;
+        background: var(--surface-muted);
+    }
+
+    .effect-readout code,
+    .watch-readout strong {
+        color: var(--text-strong);
+        font-size: 0.86rem;
+    }
+
+    .watch-readout {
+        border-left-color: var(--accent);
+    }
+
+    .profile-card {
+        display: flex;
+        gap: 0.9rem;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 1rem;
+        background: var(--surface-muted);
+    }
+
+    .profile-card > div:last-child {
+        display: grid;
+        gap: 0.15rem;
+    }
+
+    .profile-card strong {
+        color: var(--text-strong);
+        font-size: 1rem;
+    }
+
+    .profile-avatar {
+        display: grid;
+        width: 3.25rem;
+        height: 3.25rem;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 1rem;
+        color: white;
+        background: linear-gradient(135deg, var(--accent), #f14d70);
+        font-size: 1.25rem;
+        font-weight: 900;
+    }
+
+    .signal-list {
+        display: grid;
+        gap: 0.55rem;
+        margin: 1rem 0 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .signal-list li {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.72rem 0.8rem;
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        color: var(--text-strong);
+        background: var(--surface-muted);
+    }
+
+    .signal-dot {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        background: var(--success);
+        box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--success) 13%, transparent);
+    }
+
+    .dictionary-table {
+        display: grid;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .dictionary-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.75rem 0.85rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .dictionary-row code {
+        color: var(--text-muted);
+        font-size: 0.78rem;
+    }
+
+    .dictionary-row strong {
+        display: grid;
+        min-width: 2.25rem;
+        height: 2.25rem;
+        place-items: center;
+        border-radius: 0.65rem;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+        font-variant-numeric: tabular-nums;
+    }
+
+    .footer-message {
+        align-self: center;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+    }
+
+    .advanced-reactivity {
+        display: grid;
+        gap: 1rem;
+        padding-top: 0.25rem;
+    }
+
+    .advanced-reactivity__header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.75fr);
+        gap: 1.5rem;
+        align-items: end;
+        padding: 0.25rem 0.25rem 0;
+    }
+
+    .advanced-reactivity__header h3 {
+        max-width: 28ch;
+        margin: 0.35rem 0 0;
+        color: var(--text-strong);
+        font-size: clamp(1.3rem, 2vw, 1.8rem);
+        letter-spacing: -0.025em;
+    }
+
+    .advanced-reactivity__header p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.88rem;
+        line-height: 1.6;
+    }
+
+    .advanced-reactivity__grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .token-cloud {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .token-cloud code {
+        padding: 0.45rem 0.65rem;
+        border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
+        border-radius: 999px;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 7%, var(--surface));
+        font-size: 0.75rem;
+    }
+
+    .advanced-readout {
+        display: grid;
+        gap: 0.25rem;
+        margin-top: 1rem;
+        padding: 0.8rem 0.9rem;
+        border-radius: 0.8rem;
+        background: var(--surface-muted);
+    }
+
+    .advanced-readout span,
+    .reference-row small,
+    .scope-metrics span {
+        color: var(--text-muted);
+        font-size: 0.7rem;
+    }
+
+    .advanced-readout strong {
+        color: var(--text-strong);
+        font-size: 0.78rem;
+        line-height: 1.45;
+    }
+
+    .advanced-readout--scope {
+        border-left: 3px solid var(--success);
+        border-radius: 0.25rem 0.8rem 0.8rem 0.25rem;
+    }
+
+    .reference-stack {
+        display: grid;
+        gap: 0.65rem;
+    }
+
+    .reference-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0.75rem;
+        align-items: center;
+        padding: 0.8rem;
+        border: 1px solid var(--border);
+        border-radius: 0.85rem;
+        background: var(--surface-muted);
+    }
+
+    .reference-row > div {
+        display: grid;
+        gap: 0.2rem;
+        min-width: 0;
+    }
+
+    .reference-row code {
+        overflow: hidden;
+        color: var(--text-strong);
+        font-size: 0.72rem;
+        text-overflow: ellipsis;
+    }
+
+    .reference-row strong {
+        color: var(--accent);
+        font-size: 0.78rem;
+        white-space: nowrap;
+    }
+
+    .reference-note {
+        margin: 0.8rem 0 0;
+        color: var(--text-muted);
+        font-size: 0.76rem;
+        line-height: 1.5;
+    }
+
+    .reference-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem 1rem;
+    }
+
+    .scope-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.6rem;
+        margin-top: 1rem;
+    }
+
+    .scope-metrics > div {
+        display: grid;
+        gap: 0.2rem;
+        padding: 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: 0.8rem;
+        background: var(--surface-muted);
+        text-align: center;
+    }
+
+    .scope-metrics strong {
+        color: var(--text-strong);
+        font-size: 1.15rem;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .implementation-strip {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: 1rem;
+        align-items: center;
+        padding: 1.2rem 1.35rem;
+        border: 1px solid var(--border);
+        border-radius: 1.15rem;
+        background: var(--surface);
+    }
+
+    .implementation-strip h3 {
+        margin: 0.25rem 0 0;
+        color: var(--text-strong);
+        font-size: 1rem;
+    }
+
+    .implementation-strip > code {
+        color: var(--text-muted);
+        font-size: 0.72rem;
+    }
+
+    button:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+    }
+
+    @media (max-width: 1120px) {
+        .reactivity-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .advanced-reactivity__grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 760px) {
+        .laboratory-hero {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-equation {
+            width: fit-content;
+        }
+
+        .equation-workbench {
+            grid-template-columns: 1fr;
+        }
+
+        .dependency-arrow {
+            rotate: 90deg;
+            text-align: center;
+        }
+
+        .advanced-reactivity__header {
+            grid-template-columns: 1fr;
+        }
+
+        .implementation-strip {
+            grid-template-columns: 1fr;
+        }
+    }
+}

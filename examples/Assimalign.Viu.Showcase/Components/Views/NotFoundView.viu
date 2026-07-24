@@ -1,0 +1,86 @@
+@template {
+    <section class="not-found-panel">
+        <span class="not-found-code">404</span>
+        <span class="section-kicker">Route not found</span>
+        <h2>The Viu router matched the catch-all route.</h2>
+        <p>
+            No showcase view is registered for
+            <code>/{{ RequestedPath }}</code>.
+            The catch-all parameter arrived as a declared component argument.
+        </p>
+        <div class="not-found-actions">
+            <RouterLink to="/">
+                Return to the overview
+            </RouterLink>
+        </div>
+    </section>
+}
+
+@script {
+    using System.Collections.Generic;
+
+    using Assimalign.Viu.Components;
+
+    public IReadOnlyList<IComponentParameter> Parameters { get; } =
+    [
+        new ComponentParameter(
+            "pathMatch",
+            defaultFactory: static () => "unknown"),
+    ];
+
+    public string RequestedPath =>
+        Context.Arguments.Get<string>("pathMatch") ?? "unknown";
+}
+
+@style scoped {
+    .not-found-panel {
+        display: grid;
+        min-height: 32rem;
+        place-items: center;
+        align-content: center;
+        padding: 3rem 1.5rem;
+        border: 1px solid var(--border);
+        border-radius: 1.5rem;
+        text-align: center;
+        background:
+            radial-gradient(
+                circle at 50% 20%,
+                color-mix(in srgb, var(--accent) 15%, transparent),
+                transparent 18rem),
+            var(--surface);
+    }
+
+    .not-found-code {
+        color: color-mix(in srgb, var(--accent) 22%, var(--surface));
+        font-size: clamp(6rem, 22vw, 13rem);
+        font-weight: 950;
+        letter-spacing: -0.09em;
+        line-height: 0.75;
+    }
+
+    h2 {
+        max-width: 22ch;
+        margin: 0.8rem 0 0;
+        color: var(--text-strong);
+        font-size: clamp(1.6rem, 4vw, 2.5rem);
+    }
+
+    p {
+        max-width: 42rem;
+        color: var(--text-muted);
+        line-height: 1.7;
+    }
+
+    .not-found-actions {
+        margin-top: 0.8rem;
+        padding: 0.82rem 1.1rem;
+        border-radius: 0.75rem;
+        background: var(--accent);
+    }
+
+    .not-found-actions a {
+        color: white;
+        font-weight: 850;
+        text-decoration: none;
+    }
+}

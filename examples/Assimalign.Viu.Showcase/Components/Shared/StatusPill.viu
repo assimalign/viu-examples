@@ -1,0 +1,60 @@
+@template {
+    <span :class="CssClass">
+        <i aria-hidden="true"></i>
+        {{ Label }}
+    </span>
+}
+
+@script {
+    using System.Collections.Generic;
+
+    using Assimalign.Viu.Components;
+
+    public IReadOnlyList<IComponentParameter> Parameters { get; } =
+    [
+        new ComponentParameter("label", isRequired: true),
+        new ComponentParameter("tone", defaultFactory: static () => "neutral"),
+    ];
+
+    public string Label => Context.Arguments.Get<string>("label") ?? "Unknown";
+
+    public string Tone => Context.Arguments.Get<string>("tone") ?? "neutral";
+
+    public string CssClass => $"status-pill status-pill--{Tone}";
+}
+
+@style scoped {
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.42rem;
+        width: fit-content;
+        padding: 0.38rem 0.68rem;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        color: var(--text-muted);
+        background: var(--surface-muted);
+        font-size: 0.74rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+    }
+
+    i {
+        width: 0.42rem;
+        height: 0.42rem;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .status-pill--success {
+        border-color: color-mix(in srgb, var(--success) 32%, transparent);
+        color: var(--success);
+        background: color-mix(in srgb, var(--success) 10%, var(--surface));
+    }
+
+    .status-pill--accent {
+        border-color: color-mix(in srgb, var(--accent) 32%, transparent);
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 9%, var(--surface));
+    }
+}
