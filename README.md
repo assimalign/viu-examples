@@ -7,9 +7,11 @@ references back into the framework repository.
 ## What it demonstrates
 
 - A responsive nested-route application shell with hash routing, active links, route metadata,
-  route arguments, guards, browser back/forward support, and six views.
-- Compiled `.viu` templates, interpolation, bindings, conditionals, keyed loops, slots, declared
-  component parameters and emitted events.
+  route arguments, guards, browser back/forward support, and seven views.
+- Compiled `.viu` and tag-based `.vue` templates, interpolation, bindings, conditionals, keyed
+  loops, slots, declared component parameters, emitted events, and explicit C# script setup.
+- Standalone Viu Utilities with CSS-first theme configuration, responsive and custom variants,
+  custom utilities, and generated utility CSS without Tailwind, Node, or PostCSS dependencies.
 - References, computed values, effects, watchers, batching, reactive collections, and a
   source-generated `[Reactive]` object.
 - Application-scoped state through `StateStoreDefinition<T>` and `StateStoreRegistry`.
@@ -54,9 +56,17 @@ dotnet build Assimalign.Viu.Examples.slnx
 dotnet run --project examples\Assimalign.Viu.Showcase
 ```
 
-When repacking the same preview version, clear only this repository's cached Viu packages before
-restoring. This avoids NuGet reusing earlier package contents while leaving the machine-wide package
-cache untouched:
+Repacking the same preview version no longer needs a manual cache prune. This repository redirects
+its extracts with `globalPackagesFolder` in `nuget.config`, and the framework's
+`scripts/Install-Local.ps1` discovers that cache and prunes it alongside the machine-wide one, so a
+repack is picked up on the next restore:
+
+```powershell
+# from the viu repository
+.\scripts\Install-Local.ps1
+```
+
+If you pack by some other route and need to clear this repository's cached Viu packages by hand:
 
 ```powershell
 $localViuPackageCache = Join-Path $PWD '.nuget\packages'
@@ -69,18 +79,23 @@ dotnet restore Assimalign.Viu.Examples.slnx --force --no-cache
 ```
 
 Open the URL printed by `dotnet run`. The starting route is `#/`; deep links such as
-`#/reactivity`, `#/components`, `#/forms`, `#/motion`, and `#/platform` can be refreshed safely
-because routing stays behind the document hash.
+`#/reactivity`, `#/components`, `#/forms`, `#/motion`, `#/platform`, and `#/utilities` can be
+refreshed safely because routing stays behind the document hash.
+
+For the focused hot-reload probe, run the project with `dotnet watch`, open `#/utilities`, and
+increment the displayed interaction count. A template-only edit to `UtilitiesView.vue` should
+update the mounted view without resetting that count; edits to `Styles/Utilities.css` should update
+the generated utility stylesheet without remounting the application.
 
 ## Project shape
 
 ```text
 examples/Assimalign.Viu.Showcase/
-  Components/       .viu application shell, views, shared UI, and demos
+  Components/       .viu/.vue application shell, views, shared UI, and demos
   Models/           source-generated reactive and display models
   Routing/          official Viu Router route records, metadata, arguments, and guards
   State/            application-scoped Viu state-store definition
   Runtime/          service provider, plugin, component catalog, async definition
-  Styles/           global .viu CSS bundle entry
+  Styles/           global component CSS and CSS-first Viu Utilities entries
   wwwroot/          host page and JavaScript boot modules
 ```

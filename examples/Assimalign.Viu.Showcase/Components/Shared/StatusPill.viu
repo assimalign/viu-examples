@@ -1,9 +1,9 @@
-@template {
+<template>
     <span :class="CssClass">
         <i aria-hidden="true"></i>
         {{ Label }}
     </span>
-}
+</template>
 
 @script {
     using System.Collections.Generic;
@@ -23,7 +23,7 @@
     public string CssClass => $"status-pill status-pill--{Tone}";
 }
 
-@style scoped {
+<style scoped>
     .status-pill {
         display: inline-flex;
         align-items: center;
@@ -57,4 +57,4 @@
         color: var(--accent);
         background: color-mix(in srgb, var(--accent) 9%, var(--surface));
     }
-}
+</style>

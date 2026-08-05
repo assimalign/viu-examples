@@ -1,4 +1,4 @@
-@template {
+<template>
     <article class="lifecycle-probe">
         <header class="lifecycle-probe__header">
             <div>
@@ -25,7 +25,7 @@
             </button>
         </div>
     </article>
-}
+</template>
 
 @script {
     using System.Collections.Generic;
@@ -89,7 +89,7 @@
     }
 }
 
-@style scoped {
+<style scoped>
     .lifecycle-probe {
         display: grid;
         gap: 1.15rem;
@@ -181,4 +181,4 @@
             flex-direction: column;
         }
     }
-}
+</style>

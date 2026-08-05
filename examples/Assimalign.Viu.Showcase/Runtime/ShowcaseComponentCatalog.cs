@@ -28,6 +28,7 @@ public static class ShowcaseComponentCatalog
             Register<FormsView>("FormsView"),
             Register<MotionView>("MotionView"),
             Register<PlatformView>("PlatformView"),
+            Register<UtilitiesView>("UtilitiesView"),
             Register<NotFoundView>("NotFoundView"),
             Register<RouterLink>("RouterLink"),
             Register<RouterView>("RouterView"),

@@ -1,4 +1,4 @@
-@template {
+<template>
     <article class="loaded-insight">
         <header class="loaded-insight__header">
             <div class="loaded-insight__mark" aria-hidden="true">
@@ -36,7 +36,7 @@
             <span aria-hidden="true">→</span>
         </button>
     </article>
-}
+</template>
 
 @script {
     using System;
@@ -64,7 +64,7 @@
     }
 }
 
-@style scoped {
+<style scoped>
     .loaded-insight {
         display: grid;
         min-height: 13.5rem;
@@ -188,4 +188,4 @@
         border-color: rgba(81, 219, 197, 0.42);
         background: rgba(81, 219, 197, 0.1);
     }
-}
+</style>

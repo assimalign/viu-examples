@@ -1,4 +1,4 @@
-@template {
+<template>
     <section class="state-store-panel">
         <div class="state-store-panel__heading">
             <div>
@@ -96,7 +96,7 @@
             <span>Both resolutions returned the same application-scoped instance.</span>
         </footer>
     </section>
-}
+</template>
 
 @script {
     using System;
@@ -228,7 +228,7 @@
     }
 }
 
-@style scoped {
+<style scoped>
     .state-store-panel {
         overflow: hidden;
         border: 1px solid var(--border);
@@ -424,4 +424,4 @@
             grid-column: auto;
         }
     }
-}
+</style>

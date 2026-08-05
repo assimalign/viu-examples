@@ -1,4 +1,4 @@
-@template {
+<template>
     <section class="not-found-panel">
         <span class="not-found-code">404</span>
         <span class="section-kicker">Route not found</span>
@@ -8,13 +8,13 @@
             <code>/{{ RequestedPath }}</code>.
             The catch-all parameter arrived as a declared component argument.
         </p>
-        <div class="not-found-actions">
+        <div class="not-found-actions m-5">
             <RouterLink to="/">
                 Return to the overview
             </RouterLink>
         </div>
     </section>
-}
+</template>
 
 @script {
     using System.Collections.Generic;
@@ -32,7 +32,7 @@
         Context.Arguments.Get<string>("pathMatch") ?? "unknown";
 }
 
-@style scoped {
+<style scoped>
     .not-found-panel {
         display: grid;
         min-height: 32rem;
@@ -83,4 +83,4 @@
         font-weight: 850;
         text-decoration: none;
     }
-}
+</style>

@@ -1,4 +1,4 @@
-@template {
+<template>
     <article :class="PanelClass">
         <header class="metric-panel__header">
             <span class="metric-panel__label">{{ Label }}</span>
@@ -13,7 +13,7 @@
             </slot>
         </div>
     </article>
-}
+</template>
 
 @script {
     using System.Collections.Generic;
@@ -43,7 +43,7 @@
     public string PanelClass => $"metric-panel metric-panel--{Tone}";
 }
 
-@style scoped {
+<style scoped>
     .metric-panel {
         position: relative;
         display: grid;
@@ -124,4 +124,4 @@
     .metric-panel--warm::after {
         background: color-mix(in srgb, #f4b942 10%, transparent);
     }
-}
+</style>

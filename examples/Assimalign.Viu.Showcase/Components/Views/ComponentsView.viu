@@ -1,4 +1,4 @@
-@template {
+<template>
     <div class="view-stack components-view">
         <section class="section-heading">
             <div>
@@ -68,7 +68,7 @@
         </section>
 
         <section class="component-demo-grid">
-            <FeatureCard title="Custom v-model and emitted events" eyebrow="Two-way contract">
+            <FeatureCard title="Custom v-model and emitted events" eyebrow="Two-way contract" header="test">
                 <div class="interactive-stack">
                     <p class="supporting-copy">
                         <code>RatingControl</code> declares <code>modelValue</code>,
@@ -179,12 +179,11 @@
             </article>
         </section>
     </div>
-}
+</template>
 
 @script {
     using System;
     using System.Collections.Generic;
-
     using Assimalign.Viu.Components;
     using Assimalign.Viu.Examples.Showcase.State;
     using Assimalign.Viu.Reactivity;
@@ -257,6 +256,7 @@
     partial void OnSetup()
     {
         Store = ShowcaseState.Definition.Use(Context);
+
     }
 
     private void HandleRatingChanged(object? value)
@@ -304,7 +304,7 @@
     }
 }
 
-@style scoped {
+<style scoped>
     .components-view .section-heading {
         align-items: flex-end;
     }
@@ -620,4 +620,4 @@
             min-width: 0;
         }
     }
-}
+</style>
