@@ -68,7 +68,7 @@
         </section>
 
         <section class="component-demo-grid">
-            <FeatureCard title="Custom v-model and emitted events" eyebrow="Two-way contract" header="test">
+            <FeatureCard title="Custom v-model and emitted events" eyebrow="Two-way contract">
                 <div class="interactive-stack">
                     <p class="supporting-copy">
                         <code>RatingControl</code> declares <code>modelValue</code>,

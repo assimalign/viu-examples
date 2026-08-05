@@ -34,7 +34,7 @@
             </div>
         </aside>
 
-        <div class="app-workspace m-">
+        <div class="app-workspace">
             <header class="topbar">
                 <div class="history-actions" aria-label="Browser history">
                     <button type="button" class="icon-button" title="Back" @click="GoBack">←</button>
