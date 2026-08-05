@@ -1,4 +1,4 @@
-@template {
+<template>
     <div class="view-stack motion-view">
         <section class="motion-introduction">
             <div>
@@ -23,7 +23,7 @@
                     <button type="button" class="motion-button motion-button--primary" @click="ToggleTransitionCard">
                         {{ TransitionToggleLabel }}
                     </button>
-                    <button type="button" class="motion-button" @click="ChangeTransitionCard">
+                    <button type="button" class="motion-button m" @click="ChangeTransitionCard">
                         Change keyed card
                     </button>
                 </div>
@@ -218,7 +218,7 @@
             </Transition>
         </Teleport>
     </div>
-}
+</template>
 
 @script {
     using System.Collections.Generic;
@@ -456,7 +456,7 @@
             : "panel-tab";
 }
 
-@style scoped {
+<style scoped>
     .motion-view {
         --motion-blue: #2497e3;
         --motion-violet: #7b61ff;
@@ -978,4 +978,4 @@
             animation-duration: 2s;
         }
     }
-}
+</style>

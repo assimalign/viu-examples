@@ -1,4 +1,4 @@
-@style {
+<style>
     :root {
         color-scheme: light;
         --page: #f3f6f9;
@@ -602,7 +602,7 @@
         }
 
         .primary-navigation {
-            grid-template-columns: repeat(6, minmax(0, 1fr));
+            grid-template-columns: repeat(7, minmax(0, 1fr));
             gap: 0.2rem;
         }
 
@@ -646,4 +646,4 @@
             display: none;
         }
     }
-}
+</style>

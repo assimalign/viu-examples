@@ -1,0 +1,95 @@
+<template>
+    <div class="mx-auto grid max-w-full gap-4">
+        <section
+            class="grid gap-4 rounded-lg border border-viu-500/50 bg-white p-4 shadow-lg md:grid-cols-2 theme-dark:border-gray-700 theme-dark:bg-gray-900">
+            <div class="grid gap-4">
+                <div>
+                    <span class="text-sm font-semibold text-viu-500">Viu Utilities</span>
+                    <h2 class="viu-balanced text-lg font-bold text-viu-950 theme-dark:text-white">
+        Utility-first styling compiled entirely by Viu.
+                    </h2>
+                </div>
+                <p class="text-sm text-gray-500 theme-dark:text-gray-300">
+                    This tag-based .vue component uses the Viu-owned v4-compatible utility
+                    catalog, CSS-first theme tokens, responsive variants, and a custom variant.
+                    No Tailwind package, CLI, or runtime is present.
+                </p>
+                <div class="flex gap-4">
+                    <button
+                        type="button"
+                        class="rounded-lg bg-viu-500 px-6 py-2 font-semibold text-white hover:bg-viu-700 focus:bg-viu-700"
+                        @click="IncrementInteractionCount">
+                        Add interaction
+                    </button>
+                    <button
+                        type="button"
+                        class="rounded-lg border border-gray-500 px-6 py-2 font-semibold text-gray-900 hover:bg-gray-100 theme-dark:text-white theme-dark:hover:bg-gray-800"
+                        @click="ResetInteractionCount">
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <div
+                class="grid place-items-center gap-4 rounded-lg bg-viu-50 p-4 theme-dark:bg-gray-800"
+                aria-live="polite">
+                <span class="text-sm font-medium text-gray-500 theme-dark:text-gray-300">
+                    Mounted component state
+                </span>
+                <strong
+                    class="text-lg font-bold text-viu-950 theme-dark:text-white"
+                    data-hot-reload-state="interaction-count">
+                    {{ InteractionCount }}
+                </strong>
+                <span class="text-sm text-gray-500 theme-dark:text-gray-300">
+                    {{ InteractionSummary }}
+                </span>
+            </div>
+        </section>
+
+        <section class="grid gap-4 md:grid-cols-3">
+            <article
+                class="rounded-lg border border-gray-500 bg-white p-4 theme-dark:border-gray-700 theme-dark:bg-gray-900">
+                <strong class="font-semibold text-viu-950 theme-dark:text-white">Standalone</strong>
+                <p class="text-sm text-gray-500 theme-dark:text-gray-300">
+                    The generated stylesheet comes from Viu assemblies and the project source.
+                </p>
+            </article>
+            <article
+                class="rounded-lg border border-gray-500 bg-white p-4 theme-dark:border-gray-700 theme-dark:bg-gray-900">
+                <strong class="font-semibold text-viu-950 theme-dark:text-white">Tag-based C#</strong>
+                <p class="text-sm text-gray-500 theme-dark:text-gray-300">
+                    The script setup block is compiled as C# partial-class members.
+                </p>
+            </article>
+            <article
+                class="rounded-lg border border-gray-500 bg-white p-4 theme-dark:border-gray-700 theme-dark:bg-gray-900">
+                <strong class="font-semibold text-viu-950 theme-dark:text-white">Hot-reload probe</strong>
+                <p class="text-sm text-gray-500 theme-dark:text-gray-300">
+                    Increment the counter, then make a template-only edit while this route remains
+                    mounted. Style-only edits preserve the number; managed template or script edits
+                    remount this component on .NET 10 and reset it.
+                </p>
+            </article>
+        </section>
+    </div>
+</template>
+@script {
+using Assimalign.Viu.Reactivity;
+
+private readonly Reference<int>
+	InteractionCountReference = Reactive.Reference(0);
+
+	public int InteractionCount => InteractionCountReference.Value;
+
+	public string InteractionSummary =>
+	InteractionCount == 0
+	? "No interactions recorded yet."
+	: InteractionCount == 1
+	? "1 interaction survived in this component instance."
+	: $"{InteractionCount} interactions survived in this component instance.";
+
+	private void IncrementInteractionCount() => InteractionCountReference.Value++;
+
+	private void ResetInteractionCount() => InteractionCountReference.Value = 0;
+}

@@ -1,4 +1,4 @@
-@template {
+<template>
     <div class="view-stack forms-view">
         <section class="section-heading">
             <div>
@@ -317,7 +317,7 @@
             </dl>
         </section>
     </div>
-}
+</template>
 
 @script {
     using System;
@@ -577,7 +577,7 @@
     }
 }
 
-@style scoped {
+<style scoped>
     .forms-view .section-heading {
         align-items: flex-end;
     }
@@ -945,4 +945,4 @@
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
-}
+</style>

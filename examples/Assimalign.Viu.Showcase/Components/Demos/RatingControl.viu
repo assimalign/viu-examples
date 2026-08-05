@@ -1,4 +1,4 @@
-@template {
+<template>
     <div class="rating-control" role="radiogroup" :aria-label="Label">
         <button
             v-for="rating in RatingOptions"
@@ -13,7 +13,7 @@
         </button>
         <span class="rating-control__summary">{{ SelectionSummary }}</span>
     </div>
-}
+</template>
 
 @script {
     using System;
@@ -83,7 +83,7 @@
     }
 }
 
-@style scoped {
+<style scoped>
     .rating-control {
         display: flex;
         flex-wrap: wrap;
@@ -133,4 +133,4 @@
         font-weight: 800;
         letter-spacing: 0.04em;
     }
-}
+</style>

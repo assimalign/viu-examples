@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Assimalign.Viu;
+using Assimalign.Viu.Components;
+using Assimalign.Viu.Examples.Showcase.Components;
 using Assimalign.Viu.Examples.Showcase.Components.Views;
 using Assimalign.Viu.Examples.Showcase.Runtime;
 using Assimalign.Viu.Router;
-using Assimalign.Viu.Components;
-using Assimalign.Viu.Examples.Showcase.Components;
 
 namespace Assimalign.Viu.Examples.Showcase.Routing;
 
@@ -64,6 +64,11 @@ public static class ShowcaseRoutes
                         "platform",
                         "Platform",
                         ComponentTree.Template<PlatformView>()),
+                    CreateRoute(
+                        "utilities",
+                        "utilities",
+                        "Viu Utilities",
+                        ComponentTree.Template<UtilitiesView>()),
                     new RouteRecord(
                         ":pathMatch(.*)*",
                         name: "not-found",

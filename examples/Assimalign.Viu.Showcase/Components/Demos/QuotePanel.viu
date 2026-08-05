@@ -1,4 +1,4 @@
-@template {
+<template>
     <figure class="quote-panel">
         <div class="quote-panel__mark" aria-hidden="true">
             <slot name="mark">“</slot>
@@ -21,7 +21,7 @@
             </div>
         </figcaption>
     </figure>
-}
+</template>
 
 @script {
     using System;
@@ -64,7 +64,7 @@
     }
 }
 
-@style scoped {
+<style scoped>
     .quote-panel {
         position: relative;
         display: grid;
@@ -148,4 +148,4 @@
         font-weight: 800;
         text-align: right;
     }
-}
+</style>

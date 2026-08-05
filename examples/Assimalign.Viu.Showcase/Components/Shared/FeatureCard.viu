@@ -1,4 +1,4 @@
-@template {
+<template>
     <article class="feature-card">
         <header class="feature-card__header">
             <div>
@@ -7,6 +7,7 @@
                 </slot>
                 <slot name="title">
                     <h2>{{ Title }}</h2>
+                    <h1></h1>
                 </slot>
             </div>
             <slot name="badge" />
@@ -20,27 +21,24 @@
             <slot name="footer" />
         </footer>
     </article>
-}
+</template>
 
 @script {
     using System.Collections.Generic;
-
     using Assimalign.Viu.Components;
+    using System.IO;
+    using System;
 
-    public IReadOnlyList<IComponentParameter> Parameters { get; } =
-    [
-        new ComponentParameter("title", isRequired: true),
-        new ComponentParameter("eyebrow", defaultFactory: static () => "Feature"),
-    ];
+    [Parameter(IsRequired = true)]
+    public string Title { get; set; }
 
-    public string Title => Context.Arguments.Get<string>("title") ?? "Untitled";
-
-    public string Eyebrow => Context.Arguments.Get<string>("eyebrow") ?? "Feature";
+    [Parameter(IsRequired = true)]
+    public string Eyebrow { get; set; }
 
     public bool HasFooter => Context.Slots.ContainsKey("footer");
 }
 
-@style scoped {
+<style scoped>
     .feature-card {
         display: grid;
         min-width: 0;
@@ -88,4 +86,4 @@
         margin: 0;
         color: var(--text-muted);
     }
-}
+</style>

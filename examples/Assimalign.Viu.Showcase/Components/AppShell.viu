@@ -1,4 +1,4 @@
-@template {
+<template>
     <div :class="ShellClass">
         <aside class="app-sidebar">
             <div class="brand-lockup">
@@ -8,18 +8,14 @@
                     </svg>
                 </div>
                 <div>
-                    <span class="brand-name">Viu</span>
+                    <span class="brand-name ">Viu</span>
                     <span class="brand-caption">SDK showcase</span>
                 </div>
             </div>
 
             <nav class="primary-navigation" aria-label="Showcase sections">
-                <div
-                    v-for="navigation in NavigationItems"
-                    :key="navigation.Path"
-                    :class="NavigationClass(navigation.Path)">
-                    <RouterLink
-                        :to="navigation.Path"
+                <div v-for="navigation in NavigationItems" :key="navigation.Path" :class="NavigationClass(navigation.Path)">
+                    <RouterLink :to="navigation.Path"
                         activeClass="router-link-active"
                         exactActiveClass="router-link-exact-active">
                         <span class="navigation-glyph" aria-hidden="true">{{ navigation.Glyph }}</span>
@@ -68,7 +64,7 @@
             </footer>
         </div>
     </div>
-}
+</template>
 
 @script {
     using System;
@@ -87,6 +83,7 @@
         new("/forms", "Forms", "DOM directives", "04"),
         new("/motion", "Motion", "Transitions", "05"),
         new("/platform", "Platform", "Runtime internals", "06"),
+        new("/utilities", "Utilities", "CSS-first styling", "07"),
     ];
 
     private ViuRouter Router { get; set; } = null!;

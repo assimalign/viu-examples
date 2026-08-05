@@ -1,4 +1,4 @@
-@template {
+<template>
     <div class="reactivity-view">
         <section class="laboratory-hero">
             <div>
@@ -310,7 +310,7 @@
             <button type="button" class="text-button" @click="ResetLaboratory">Reset laboratory</button>
         </section>
     </div>
-}
+</template>
 
 @script {
     using System;
@@ -800,7 +800,7 @@
         CounterDictionary[key] = CounterDictionary[key] + 1;
 }
 
-@style scoped {
+<style scoped>
     .reactivity-view {
         display: grid;
         gap: 1.25rem;
@@ -1302,4 +1302,4 @@
             grid-template-columns: 1fr;
         }
     }
-}
+</style>

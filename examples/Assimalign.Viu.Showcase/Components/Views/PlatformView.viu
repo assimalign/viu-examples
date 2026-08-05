@@ -1,4 +1,4 @@
-@template {
+<template>
     <div class="view-stack">
         <section class="page-introduction">
             <div>
@@ -112,7 +112,7 @@
             </div>
         </section>
     </div>
-}
+</template>
 
 @script {
     using System;
@@ -208,7 +208,7 @@
     }
 }
 
-@style module scoped {
+<style module scoped>
     .diagnosticPanel {
         padding: clamp(1.25rem, 3vw, 2rem);
         border: 1px solid v-bind(AccentColor);
@@ -223,9 +223,9 @@
             0 1.2rem 3rem
             color-mix(in srgb, v-bind(AccentColor) 10%, transparent);
     }
-}
+</style>
 
-@style scoped {
+<style scoped>
     .runtime-callout {
         display: grid;
         gap: 0.75rem;
@@ -290,4 +290,4 @@
             grid-template-columns: 1fr;
         }
     }
-}
+</style>

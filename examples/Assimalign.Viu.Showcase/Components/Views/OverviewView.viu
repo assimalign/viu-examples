@@ -1,4 +1,4 @@
-@template {
+<template>
     <div class="view-stack">
         <section class="hero-panel">
             <div class="hero-copy">
@@ -30,7 +30,7 @@
         <section class="metric-grid" aria-label="Showcase metrics">
             <div class="metric-card">
                 <span>Compiled views</span>
-                <strong>6</strong>
+                <strong>7</strong>
                 <small>plus reusable components</small>
             </div>
             <div class="metric-card">
@@ -90,7 +90,7 @@
             </template>
         </FeatureCard>
     </div>
-}
+</template>
 
 @script {
     using System;
@@ -152,7 +152,7 @@
     }
 }
 
-@style scoped {
+<style scoped>
     .hero-panel {
         position: relative;
         display: grid;
@@ -386,4 +386,4 @@
             grid-template-columns: 1fr;
         }
     }
-}
+</style>
