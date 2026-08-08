@@ -23,21 +23,18 @@
 </template>
 
 @script {
-    using System.Collections.Generic;
     using Assimalign.Viu.Components;
-    using System.IO;
-    using System;
 
     [Parameter(IsRequired = true)]
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
 
     [Parameter(IsRequired = true)]
-    public string Eyebrow { get; set; }
+    public string Eyebrow { get; set; } = string.Empty;
 
-    public bool HasFooter => Context.Slots.ContainsKey("footer");
+    public bool HasFooter => Context!.Bindings.Slots.ContainsKey("footer");
 }
 
-<style scoped>
+<style>
     .feature-card {
         display: grid;
         min-width: 0;
@@ -64,7 +61,7 @@
         text-transform: uppercase;
     }
 
-    h2 {
+    .feature-card__header h2 {
         margin: 0.35rem 0 0;
         color: var(--text-strong);
         font-size: 1.12rem;
@@ -81,7 +78,7 @@
         background: var(--surface-muted);
     }
 
-    .muted-copy {
+    .feature-card .muted-copy {
         margin: 0;
         color: var(--text-muted);
     }

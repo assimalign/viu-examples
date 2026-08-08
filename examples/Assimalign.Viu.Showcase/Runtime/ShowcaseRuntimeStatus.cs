@@ -8,19 +8,19 @@ public sealed class ShowcaseRuntimeStatus
 {
     private int DiagnosticSequence { get; set; }
 
-    public Reference<bool> PluginInstalled { get; } =
+    public Reference<bool> MiddlewareActive { get; } =
         Reactive.Reference(false);
 
-    public Reference<string> PluginMessage { get; } =
+    public Reference<string> MiddlewareMessage { get; } =
         Reactive.Reference("Waiting for application initialization");
 
     public ReactiveList<string> Diagnostics { get; } = new();
 
-    public void RecordPluginInstallation()
+    public void RecordMiddlewareEntry()
     {
-        PluginMessage.Value = "Application plugin installed before the first render";
-        PluginInstalled.Value = true;
-        AddDiagnostic("Plugin installation completed");
+        MiddlewareMessage.Value = "Application middleware entered before the first render";
+        MiddlewareActive.Value = true;
+        AddDiagnostic("Application middleware entered");
     }
 
     public void RecordWarning(string message)

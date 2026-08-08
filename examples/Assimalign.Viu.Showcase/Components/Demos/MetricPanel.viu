@@ -16,34 +16,24 @@
 </template>
 
 @script {
-    using System.Collections.Generic;
-
     using Assimalign.Viu.Components;
 
-    public IReadOnlyList<IComponentParameter> Parameters { get; } =
-    [
-        new ComponentParameter("label", defaultFactory: static () => "Metric"),
-        new ComponentParameter("value", defaultFactory: static () => "—"),
-        new ComponentParameter("detail", defaultFactory: static () => "Live value"),
-        new ComponentParameter("tone", defaultFactory: static () => "accent"),
-    ];
+    [Parameter]
+    public string Label { get; set; } = "Metric";
 
-    public string Label => Context.Arguments.Get<string>("label") ?? "Metric";
+    [Parameter]
+    public string Value { get; set; } = "—";
 
-    public string Value => Context.Arguments.Get<string>("value") ?? "—";
+    [Parameter]
+    public string Detail { get; set; } = "Live value";
 
-    public string Detail =>
-        Context.Arguments.Get<string>("detail")
-        ?? "Live value";
-
-    public string Tone =>
-        Context.Arguments.Get<string>("tone")
-        ?? "accent";
+    [Parameter]
+    public string Tone { get; set; } = "accent";
 
     public string PanelClass => $"metric-panel metric-panel--{Tone}";
 }
 
-<style scoped>
+<style>
     .metric-panel {
         position: relative;
         display: grid;

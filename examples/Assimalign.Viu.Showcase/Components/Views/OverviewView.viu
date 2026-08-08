@@ -1,5 +1,5 @@
 <template>
-    <div class="view-stack">
+    <div class="view-stack overview-view">
         <section class="hero-panel">
             <div class="hero-copy">
                 <span class="section-kicker">One SDK · one shared framework</span>
@@ -74,7 +74,7 @@
                 The project file uses <code>Assimalign.Viu.Sdk</code>. Components, reactivity,
                 state, browser rendering, source generators, CSS bundling, and the JavaScript
                 bridge arrive through the shared framework automatically. The official Router
-                and Router.Browser packages are installed from the same local feed.
+                and Browser.Router packages are installed from the same local feed.
             </p>
             <pre class="code-window"><code>&lt;Project Sdk="Assimalign.Viu.Sdk"&gt;
   &lt;PropertyGroup&gt;
@@ -82,7 +82,7 @@
   &lt;/PropertyGroup&gt;
   &lt;ItemGroup&gt;
     &lt;PackageReference Include="Assimalign.Viu.Router" Version="10.0.1-preview.2" /&gt;
-    &lt;PackageReference Include="Assimalign.Viu.Router.Browser" Version="10.0.1-preview.2" /&gt;
+    &lt;PackageReference Include="Assimalign.Viu.Browser.Router" Version="10.0.1-preview.2" /&gt;
   &lt;/ItemGroup&gt;
 &lt;/Project&gt;</code></pre>
             <template #footer>
@@ -104,7 +104,7 @@
 
     private static readonly IReadOnlyList<CapabilityItem> Items =
     [
-        new("Single-file components", "Templates, scripts, scoped styles, CSS modules, and reactive CSS variables.", "01"),
+        new("Single-file components", "Templates, scripts, component-prefixed styles, CSS modules, and CSS custom properties.", "01"),
         new("Reactive engine", "References, computed values, effects, watchers, batching, generated objects, and collections.", "02"),
         new("Component runtime", "Explicit activation, arguments, emitted events, slots, lifecycle, dynamic and async components.", "03"),
         new("Browser renderer", "Typed DOM events, v-model, v-show, transitions, teleport, and command-buffered mutations.", "04"),
@@ -122,9 +122,9 @@
 
     partial void OnSetup()
     {
-        Router = (ViuRouter?)Context.Services.GetService(typeof(ViuRouter))
+        Router = (ViuRouter?)Context!.Services?.GetService(typeof(ViuRouter))
             ?? throw new InvalidOperationException("The Viu router service is unavailable.");
-        Store = ShowcaseState.Definition.Use(Context);
+        Store = ShowcaseState.Definition.Use(Context!);
     }
 
     private void OpenReactivity()
@@ -143,7 +143,7 @@
     {
         try
         {
-            await Router.Push(path);
+            await Router.PushAsync(path);
         }
         catch (Exception exception)
         {
@@ -152,8 +152,8 @@
     }
 }
 
-<style scoped>
-    .hero-panel {
+<style>
+    .overview-view .hero-panel {
         position: relative;
         display: grid;
         grid-template-columns: minmax(0, 1.25fr) minmax(16rem, 0.75fr);
@@ -170,14 +170,14 @@
         box-shadow: 0 2rem 5rem rgba(4, 15, 28, 0.22);
     }
 
-    .hero-copy {
+    .overview-view .hero-copy {
         position: relative;
         z-index: 2;
         align-self: center;
         max-width: 45rem;
     }
 
-    .hero-copy h2 {
+    .overview-view .hero-copy h2 {
         max-width: 14ch;
         margin: 0.65rem 0 1rem;
         font-size: clamp(2.35rem, 5vw, 4.8rem);
@@ -186,7 +186,7 @@
         line-height: 0.98;
     }
 
-    .hero-copy p {
+    .overview-view .hero-copy p {
         max-width: 40rem;
         margin: 0;
         color: #b8c9da;
@@ -194,46 +194,46 @@
         line-height: 1.75;
     }
 
-    .hero-actions {
+    .overview-view .hero-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 0.8rem;
         margin-top: 1.6rem;
     }
 
-    .hero-orbit {
+    .overview-view .hero-orbit {
         position: relative;
         min-height: 18rem;
         align-self: center;
     }
 
-    .orbit,
-    .hero-core,
-    .orbit-label {
+    .overview-view .orbit,
+    .overview-view .hero-core,
+    .overview-view .orbit-label {
         position: absolute;
         inset: 50% auto auto 50%;
         transform: translate(-50%, -50%);
     }
 
-    .orbit {
+    .overview-view .orbit {
         border: 1px solid rgba(184, 216, 239, 0.22);
         border-radius: 50%;
     }
 
-    .orbit--outer {
+    .overview-view .orbit--outer {
         width: 18rem;
         height: 18rem;
         animation: slow-spin 24s linear infinite;
     }
 
-    .orbit--inner {
+    .overview-view .orbit--inner {
         width: 11rem;
         height: 11rem;
         border-style: dashed;
         animation: slow-spin 18s linear infinite reverse;
     }
 
-    .hero-core {
+    .overview-view .hero-core {
         display: grid;
         width: 6rem;
         height: 6rem;
@@ -247,7 +247,7 @@
         font-weight: 900;
     }
 
-    .orbit-label {
+    .overview-view .orbit-label {
         display: grid;
         min-width: 3.2rem;
         height: 2rem;
@@ -262,25 +262,25 @@
         backdrop-filter: blur(10px);
     }
 
-    .orbit-label--one {
+    .overview-view .orbit-label--one {
         transform: translate(5rem, -8rem);
     }
 
-    .orbit-label--two {
+    .overview-view .orbit-label--two {
         transform: translate(-10rem, 3rem);
     }
 
-    .orbit-label--three {
+    .overview-view .orbit-label--three {
         transform: translate(4rem, 6rem);
     }
 
-    .metric-grid {
+    .overview-view .metric-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 1rem;
     }
 
-    .metric-card {
+    .overview-view .metric-card {
         display: grid;
         gap: 0.25rem;
         padding: 1.2rem;
@@ -290,37 +290,37 @@
         box-shadow: var(--shadow-soft);
     }
 
-    .metric-card span,
-    .metric-card small {
+    .overview-view .metric-card span,
+    .overview-view .metric-card small {
         color: var(--text-muted);
         font-size: 0.76rem;
     }
 
-    .metric-card strong {
+    .overview-view .metric-card strong {
         color: var(--text-strong);
         font-size: 2rem;
         letter-spacing: -0.05em;
     }
 
-    .metric-card--accent {
+    .overview-view .metric-card--accent {
         border-color: transparent;
         color: white;
         background: linear-gradient(135deg, var(--accent), #f14d70);
     }
 
-    .metric-card--accent span,
-    .metric-card--accent small,
-    .metric-card--accent strong {
+    .overview-view .metric-card--accent span,
+    .overview-view .metric-card--accent small,
+    .overview-view .metric-card--accent strong {
         color: white;
     }
 
-    .capability-grid {
+    .overview-view .capability-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 0.85rem;
     }
 
-    .capability-row {
+    .overview-view .capability-row {
         display: grid;
         grid-template-columns: auto 1fr;
         gap: 1rem;
@@ -330,7 +330,7 @@
         background: var(--surface);
     }
 
-    .capability-index {
+    .overview-view .capability-index {
         display: grid;
         width: 2.4rem;
         height: 2.4rem;
@@ -342,20 +342,20 @@
         font-weight: 900;
     }
 
-    .capability-row h3 {
+    .overview-view .capability-row h3 {
         margin: 0 0 0.25rem;
         color: var(--text-strong);
         font-size: 0.95rem;
     }
 
-    .capability-row p {
+    .overview-view .capability-row p {
         margin: 0;
         color: var(--text-muted);
         font-size: 0.84rem;
         line-height: 1.55;
     }
 
-    .footer-note {
+    .overview-view .footer-note {
         color: var(--text-muted);
         font-size: 0.82rem;
     }
@@ -367,22 +367,22 @@
     }
 
     @media (max-width: 900px) {
-        .hero-panel {
+        .overview-view .hero-panel {
             grid-template-columns: 1fr;
         }
 
-        .hero-orbit {
+        .overview-view .hero-orbit {
             display: none;
         }
 
-        .metric-grid {
+        .overview-view .metric-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
 
     @media (max-width: 620px) {
-        .metric-grid,
-        .capability-grid {
+        .overview-view .metric-grid,
+        .overview-view .capability-grid {
             grid-template-columns: 1fr;
         }
     }

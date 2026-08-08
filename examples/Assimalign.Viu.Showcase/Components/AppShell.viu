@@ -120,9 +120,9 @@
 
     partial void OnSetup()
     {
-        Router = (ViuRouter?)Context.Services.GetService(typeof(ViuRouter))
+        Router = (ViuRouter?)Context!.Services?.GetService(typeof(ViuRouter))
             ?? throw new InvalidOperationException("The Viu router service is unavailable.");
-        Store = ShowcaseState.Definition.Use(Context);
+        Store = ShowcaseState.Definition.Use(Context!);
     }
 
     private string NavigationClass(string path) =>

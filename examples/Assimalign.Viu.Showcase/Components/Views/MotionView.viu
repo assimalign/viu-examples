@@ -321,7 +321,7 @@
 
     partial void OnSetup()
     {
-        Store = ShowcaseState.Definition.Use(Context);
+        Store = ShowcaseState.Definition.Use(Context!);
     }
 
     private void ToggleTransitionCard()
@@ -456,13 +456,13 @@
             : "panel-tab";
 }
 
-<style scoped>
+<style>
     .motion-view {
         --motion-blue: #2497e3;
         --motion-violet: #7b61ff;
     }
 
-    .motion-introduction,
+    .motion-view .motion-introduction,
     .teleport-callout {
         display: flex;
         align-items: center;
@@ -474,14 +474,14 @@
         border-radius: 1.5rem;
     }
 
-    .motion-introduction {
+    .motion-view .motion-introduction {
         background:
             radial-gradient(circle at 88% 20%, rgba(123, 97, 255, 0.18), transparent 20rem),
             var(--surface);
         box-shadow: var(--shadow-soft);
     }
 
-    .motion-introduction h2,
+    .motion-view .motion-introduction h2,
     .teleport-callout h2 {
         max-width: 18ch;
         margin: 0.45rem 0 0.75rem;
@@ -491,7 +491,7 @@
         line-height: 1.05;
     }
 
-    .motion-introduction p,
+    .motion-view .motion-introduction p,
     .teleport-callout p {
         max-width: 48rem;
         margin: 0;
@@ -499,14 +499,14 @@
         line-height: 1.7;
     }
 
-    .runtime-legend {
+    .motion-view .runtime-legend {
         display: grid;
         grid-template-columns: repeat(2, minmax(7.2rem, 1fr));
         flex: 0 0 auto;
         gap: 0.55rem;
     }
 
-    .runtime-legend span {
+    .motion-view .runtime-legend span {
         padding: 0.72rem 0.9rem;
         border: 1px solid color-mix(in srgb, var(--motion-violet) 24%, var(--border));
         border-radius: 0.8rem;
@@ -517,24 +517,25 @@
         font-weight: 700;
     }
 
-    .motion-grid {
+    .motion-view .motion-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1rem;
         align-items: stretch;
     }
 
-    .control-row,
-    .asynchronous-header,
-    .panel-tabs {
+    .motion-view .control-row,
+    .motion-view .asynchronous-header,
+    .motion-view .panel-tabs {
         display: flex;
         align-items: center;
         flex-wrap: wrap;
         gap: 0.6rem;
     }
 
-    .motion-button,
-    .panel-tab {
+    .motion-view .motion-button,
+    .teleport-dialog .motion-button,
+    .motion-view .panel-tab {
         min-height: 2.35rem;
         padding: 0.55rem 0.85rem;
         border: 1px solid var(--border);
@@ -552,26 +553,28 @@
             transform 160ms ease;
     }
 
-    .motion-button:hover,
-    .panel-tab:hover {
+    .motion-view .motion-button:hover,
+    .teleport-dialog .motion-button:hover,
+    .motion-view .panel-tab:hover {
         border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
         transform: translateY(-1px);
     }
 
-    .motion-button--primary,
-    .panel-tab--active {
+    .motion-view .motion-button--primary,
+    .teleport-dialog .motion-button--primary,
+    .motion-view .panel-tab--active {
         border-color: transparent;
         color: white;
         background: linear-gradient(135deg, var(--accent), #f14d70);
     }
 
-    .motion-button--light {
+    .motion-view .motion-button--light {
         border-color: rgba(255, 255, 255, 0.22);
         color: white;
         background: rgba(255, 255, 255, 0.1);
     }
 
-    .transition-stage {
+    .motion-view .transition-stage {
         display: grid;
         min-height: 10rem;
         margin-top: 1rem;
@@ -582,7 +585,7 @@
         background: var(--surface-muted);
     }
 
-    .transition-card {
+    .motion-view .transition-card {
         display: grid;
         grid-template-columns: auto 1fr;
         gap: 0.9rem;
@@ -593,15 +596,15 @@
         box-shadow: 0 1.2rem 2.6rem rgba(12, 30, 55, 0.2);
     }
 
-    .transition-card--warm {
+    .motion-view .transition-card--warm {
         background: linear-gradient(135deg, #ff6b35, #ee4266);
     }
 
-    .transition-card--cool {
+    .motion-view .transition-card--cool {
         background: linear-gradient(135deg, var(--motion-blue), var(--motion-violet));
     }
 
-    .transition-card__index {
+    .motion-view .transition-card__index {
         display: grid;
         width: 2.6rem;
         height: 2.6rem;
@@ -614,36 +617,36 @@
         font-weight: 900;
     }
 
-    .transition-card strong {
+    .motion-view .transition-card strong {
         display: block;
         margin-bottom: 0.3rem;
     }
 
-    .transition-card p {
+    .motion-view .transition-card p {
         margin: 0;
         color: rgba(255, 255, 255, 0.82);
         font-size: 0.82rem;
         line-height: 1.5;
     }
 
-    .stage-card-enter-active,
-    .stage-card-leave-active {
+    .motion-view .stage-card-enter-active,
+    .motion-view .stage-card-leave-active {
         transition:
             opacity 260ms ease,
             transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .stage-card-enter-from {
+    .motion-view .stage-card-enter-from {
         opacity: 0;
         transform: translateY(1rem) scale(0.96);
     }
 
-    .stage-card-leave-to {
+    .motion-view .stage-card-leave-to {
         opacity: 0;
         transform: translateY(-0.75rem) scale(0.98);
     }
 
-    .motion-list {
+    .motion-view .motion-list {
         position: relative;
         display: grid;
         gap: 0.55rem;
@@ -651,7 +654,7 @@
         margin-top: 1rem;
     }
 
-    .motion-list__item {
+    .motion-view .motion-list__item {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -666,7 +669,7 @@
         font-weight: 700;
     }
 
-    .motion-list__item::before {
+    .motion-view .motion-list__item::before {
         width: 0.5rem;
         height: 0.5rem;
         margin-right: 0.15rem;
@@ -675,11 +678,11 @@
         content: "";
     }
 
-    .motion-list__item > span {
+    .motion-view .motion-list__item > span {
         flex: 1;
     }
 
-    .motion-list__remove {
+    .motion-view .motion-list__remove {
         display: grid;
         width: 1.8rem;
         height: 1.8rem;
@@ -692,41 +695,41 @@
         cursor: pointer;
     }
 
-    .motion-list__remove:disabled {
+    .motion-view .motion-list__remove:disabled {
         opacity: 0.35;
         cursor: not-allowed;
     }
 
-    .motion-item-enter-active,
-    .motion-item-leave-active,
-    .motion-item-move {
+    .motion-view .motion-item-enter-active,
+    .motion-view .motion-item-leave-active,
+    .motion-view .motion-item-move {
         transition: all 360ms cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .motion-item-enter-from,
-    .motion-item-leave-to {
+    .motion-view .motion-item-enter-from,
+    .motion-view .motion-item-leave-to {
         opacity: 0;
         transform: translateX(1.25rem);
     }
 
-    .motion-item-leave-active {
+    .motion-view .motion-item-leave-active {
         position: absolute;
     }
 
-    .panel-tabs {
+    .motion-view .panel-tabs {
         padding: 0.25rem;
         border-radius: 0.85rem;
         background: var(--surface-muted);
     }
 
-    .panel-tab {
+    .motion-view .panel-tab {
         flex: 1 1 6rem;
         border-color: transparent;
         background: transparent;
     }
 
-    .dynamic-stage,
-    .asynchronous-stage {
+    .motion-view .dynamic-stage,
+    .motion-view .asynchronous-stage {
         min-height: 13.5rem;
         margin-top: 1rem;
         overflow: hidden;
@@ -735,11 +738,11 @@
         background: var(--surface-muted);
     }
 
-    .dynamic-stage {
+    .motion-view .dynamic-stage {
         padding: 1rem;
     }
 
-    .implementation-strip {
+    .motion-view .implementation-strip {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -749,38 +752,38 @@
         font-size: 0.7rem;
     }
 
-    .implementation-strip code {
+    .motion-view .implementation-strip code {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
-    .asynchronous-header {
+    .motion-view .asynchronous-header {
         justify-content: space-between;
     }
 
-    .asynchronous-header div {
+    .motion-view .asynchronous-header div {
         display: grid;
         gap: 0.15rem;
     }
 
-    .asynchronous-header strong {
+    .motion-view .asynchronous-header strong {
         color: var(--text-strong);
         font-size: 0.86rem;
     }
 
-    .asynchronous-header span {
+    .motion-view .asynchronous-header span {
         color: var(--text-muted);
         font-size: 0.72rem;
     }
 
-    .asynchronous-stage {
+    .motion-view .asynchronous-stage {
         display: grid;
         place-items: stretch;
     }
 
-    .asynchronous-empty,
-    .asynchronous-fallback {
+    .motion-view .asynchronous-empty,
+    .motion-view .asynchronous-fallback {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -790,26 +793,26 @@
         text-align: left;
     }
 
-    .asynchronous-empty {
+    .motion-view .asynchronous-empty {
         flex-direction: column;
         color: var(--text-muted);
         text-align: center;
     }
 
-    .asynchronous-empty strong,
-    .asynchronous-fallback strong {
+    .motion-view .asynchronous-empty strong,
+    .motion-view .asynchronous-fallback strong {
         color: var(--text-strong);
     }
 
-    .asynchronous-empty p,
-    .asynchronous-fallback p {
+    .motion-view .asynchronous-empty p,
+    .motion-view .asynchronous-fallback p {
         margin: 0.25rem 0 0;
         color: var(--text-muted);
         font-size: 0.8rem;
         line-height: 1.55;
     }
 
-    .empty-symbol {
+    .motion-view .empty-symbol {
         display: grid;
         width: 3rem;
         height: 3rem;
@@ -820,7 +823,7 @@
         font-size: 1.25rem;
     }
 
-    .loading-orbit {
+    .motion-view .loading-orbit {
         width: 2.6rem;
         height: 2.6rem;
         flex: 0 0 auto;
@@ -830,7 +833,7 @@
         animation: loading-spin 760ms linear infinite;
     }
 
-    .feature-note {
+    .motion-view .feature-note {
         color: var(--text-muted);
         font-size: 0.76rem;
         line-height: 1.5;
@@ -853,6 +856,8 @@
     }
 
     .teleport-backdrop {
+        --motion-blue: #2497e3;
+        --motion-violet: #7b61ff;
         position: fixed;
         z-index: 1000;
         inset: 0;
@@ -946,27 +951,27 @@
     }
 
     @media (max-width: 900px) {
-        .motion-introduction,
+        .motion-view .motion-introduction,
         .teleport-callout {
             align-items: flex-start;
             flex-direction: column;
         }
 
-        .motion-grid {
+        .motion-view .motion-grid {
             grid-template-columns: 1fr;
         }
 
-        .runtime-legend {
+        .motion-view .runtime-legend {
             width: 100%;
         }
     }
 
     @media (prefers-reduced-motion: reduce) {
-        .stage-card-enter-active,
-        .stage-card-leave-active,
-        .motion-item-enter-active,
-        .motion-item-leave-active,
-        .motion-item-move,
+        .motion-view .stage-card-enter-active,
+        .motion-view .stage-card-leave-active,
+        .motion-view .motion-item-enter-active,
+        .motion-view .motion-item-leave-active,
+        .motion-view .motion-item-move,
         .teleport-dialog-enter-active,
         .teleport-dialog-leave-active,
         .teleport-dialog-enter-active .teleport-dialog,
@@ -974,7 +979,7 @@
             transition-duration: 1ms;
         }
 
-        .loading-orbit {
+        .motion-view .loading-orbit {
             animation-duration: 2s;
         }
     }

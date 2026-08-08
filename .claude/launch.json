@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "showcase",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": [
+        "run",
+        "--project",
+        "examples/Assimalign.Viu.Showcase/Assimalign.Viu.Showcase.csproj",
+        "--configuration",
+        "Release",
+        "--no-launch-profile"
+      ],
+      "port": 8080
+    }
+  ]
+}

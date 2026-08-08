@@ -28,33 +28,25 @@
 </template>
 
 @script {
-    using System.Collections.Generic;
-
     using Assimalign.Viu.Components;
     using Assimalign.Viu.Reactivity;
 
     private int _beforeUpdateCount;
 
-    public IReadOnlyList<IComponentParameter> Parameters { get; } =
-    [
-        new ComponentParameter("label", defaultFactory: static () => "Lifecycle probe"),
-    ];
+    [Parameter]
+    public string Label { get; set; } = "Lifecycle probe";
 
-    public IReadOnlyList<IComponentEvent> Events { get; } =
-    [
-        new ComponentEvent("mounted"),
-        new ComponentEvent("unmounted"),
-    ];
+    [Event]
+    public partial void Mounted(string label);
+
+    [Event]
+    public partial void Unmounted(string label);
 
     public Reference<string> Phase { get; } =
         Reactive.Reference("setup");
 
     public Reference<int> PulseCount { get; } =
         Reactive.Reference(0);
-
-    public string Label =>
-        Context.Arguments.Get<string>("label")
-        ?? "Lifecycle probe";
 
     public int BeforeUpdateCount => _beforeUpdateCount;
 
@@ -65,22 +57,23 @@
 
     partial void OnSetup()
     {
-        Context.Lifecycle.OnBeforeMount(
+        var context = Context!;
+        context.Lifecycle.OnBeforeMount(
             () => Phase.Value = "before mount");
-        Context.Lifecycle.OnMounted(
+        context.Lifecycle.OnMounted(
             () =>
             {
                 Phase.Value = "mounted";
-                Context.Emit("mounted", Label);
+                Mounted(Label);
             });
-        Context.Lifecycle.OnBeforeUpdate(
+        context.Lifecycle.OnBeforeUpdate(
             () => _beforeUpdateCount++);
-        Context.Lifecycle.OnActivated(
+        context.Lifecycle.OnActivated(
             () => Phase.Value = "activated");
-        Context.Lifecycle.OnDeactivated(
+        context.Lifecycle.OnDeactivated(
             () => Phase.Value = "deactivated");
-        Context.Lifecycle.OnUnmounted(
-            () => Context.Emit("unmounted", Label));
+        context.Lifecycle.OnUnmounted(
+            () => Unmounted(Label));
     }
 
     private void Pulse()
@@ -89,7 +82,7 @@
     }
 }
 
-<style scoped>
+<style>
     .lifecycle-probe {
         display: grid;
         gap: 1.15rem;
@@ -119,7 +112,7 @@
         text-transform: uppercase;
     }
 
-    h3 {
+    .lifecycle-probe__header h3 {
         margin: 0.32rem 0 0;
         color: var(--text-strong);
         font-size: 1rem;

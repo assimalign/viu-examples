@@ -8,8 +8,8 @@ references back into the framework repository.
 
 - A responsive nested-route application shell with hash routing, active links, route metadata,
   route arguments, guards, browser back/forward support, and seven views.
-- Compiled `.viu` and tag-based `.vue` templates, interpolation, bindings, conditionals, keyed
-  loops, slots, declared component parameters, emitted events, and explicit C# script setup.
+- Compiled `.viu` templates, interpolation, bindings, conditionals, keyed loops, slots, declared
+  component parameters, emitted events, and explicit C# script setup.
 - Standalone Viu Utilities with CSS-first theme configuration, responsive and custom variants,
   custom utilities, and generated utility CSS without Tailwind, Node, or PostCSS dependencies.
 - References, computed values, effects, watchers, batching, reactive collections, and a
@@ -20,12 +20,16 @@ references back into the framework repository.
 - DOM event, key, `.prevent`, `.stop`, `.self`, and `.once` modifiers.
 - `v-show`, `<Transition>`, keyed `<TransitionGroup>`, `<Teleport>`, `<KeepAlive>`, `<Suspense>`,
   and an asynchronous component.
-- Global, scoped, CSS-module, and reactive `v-bind()` styles compiled into the SDK-managed CSS
-  bundle, whose stylesheet link is injected automatically.
-- Component lifecycle hooks, an application plugin, command-buffered DOM rendering, and browser
-  handle diagnostics.
+- Global, component-prefixed, and CSS-module styles compiled into the SDK-managed CSS bundle,
+  whose stylesheet link is injected automatically. Scoped-style isolation and style `v-bind()`
+  are deferred; this showcase uses explicit classes and CSS custom properties instead.
+- Component lifecycle hooks, full-lifetime application middleware, command-buffered DOM rendering,
+  and browser handle diagnostics.
+- Generated `.viu` registrations alongside a code-first `ComponentRegistration.Define` component
+  with reactive state; the reactivity view separately demonstrates component-owned
+  `ComponentContext.Watch` cleanup.
 
-`Assimalign.Viu.Router` and `Assimalign.Viu.Router.Browser` are opt-in packages rather than members
+`Assimalign.Viu.Router` and `Assimalign.Viu.Browser.Router` are opt-in packages rather than members
 of the current `Assimalign.Viu.App` shared framework. The showcase installs both from the same local
 NuGet feed as the SDK, uses `RouterHistory.CreateWebHash()`, and renders the layout and views through
 nested `RouterView` components. There is no application-local routing implementation.
@@ -39,17 +43,12 @@ Prerequisites are the .NET SDK version selected by `global.json` and the `wasm-t
 (`dotnet workload install wasm-tools`). Clone `viu` and `viu-examples` as sibling directories,
 then pack the current SDK.
 
-`Install-Local.ps1` produces the SDK plus the App reference/runtime packs. The following
-`PackViuProjects=true` command also places opt-in library packages such as
-`Assimalign.Viu.Router` and `Assimalign.Viu.Router.Browser` in the same feed:
+`Install-Local.ps1` produces the complete package inventory: the SDK, App reference/runtime packs,
+and opt-in libraries such as `Assimalign.Viu.Router` and `Assimalign.Viu.Browser.Router`:
 
 ```powershell
 Set-Location ..\viu
-.\scripts\Install-Local.ps1
-dotnet pack .\sdks\Assimalign.Viu.Sdk\Tasks\Assimalign.Viu.Sdk.Tasks.csproj `
-  --configuration Release `
-  -p:PackViuProjects=true `
-  -p:PackageOutputPath="$PWD\_out\packages"
+pwsh -NoProfile -File .\scripts\Install-Local.ps1
 
 Set-Location ..\viu-examples
 dotnet build Assimalign.Viu.Examples.slnx
@@ -83,7 +82,7 @@ Open the URL printed by `dotnet run`. The starting route is `#/`; deep links suc
 refreshed safely because routing stays behind the document hash.
 
 For the focused hot-reload probe, run the project with `dotnet watch`, open `#/utilities`, and
-increment the displayed interaction count. A template-only edit to `UtilitiesView.vue` should
+increment the displayed interaction count. A template-only edit to `UtilitiesView.viu` should
 update the mounted view without resetting that count; edits to `Styles/Utilities.css` should update
 the generated utility stylesheet without remounting the application.
 
@@ -91,11 +90,11 @@ the generated utility stylesheet without remounting the application.
 
 ```text
 examples/Assimalign.Viu.Showcase/
-  Components/       .viu/.vue application shell, views, shared UI, and demos
+  Components/       .viu application shell, views, shared UI, and demos
   Models/           source-generated reactive and display models
   Routing/          official Viu Router route records, metadata, arguments, and guards
   State/            application-scoped Viu state-store definition
-  Runtime/          service provider, plugin, component catalog, async definition
+  Runtime/          service provider, middleware, component catalog, async definition
   Styles/           global component CSS and CSS-first Viu Utilities entries
   wwwroot/          host page and JavaScript boot modules
 ```
