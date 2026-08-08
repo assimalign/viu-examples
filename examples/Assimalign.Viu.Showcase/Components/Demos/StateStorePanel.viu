@@ -149,10 +149,11 @@
 
     partial void OnSetup()
     {
+        var context = Context!;
         DemonstrationStore =
-            ShowcaseState.StateStoreDemonstrationDefinition.Use(Context);
+            ShowcaseState.StateStoreDemonstrationDefinition.Use(context);
         StateStoreDemonstrationStore secondResolution =
-            ShowcaseState.StateStoreDemonstrationDefinition.Use(Context);
+            ShowcaseState.StateStoreDemonstrationDefinition.Use(context);
         RegistryReturnedSharedInstance =
             ReferenceEquals(DemonstrationStore, secondResolution);
 
@@ -177,7 +178,7 @@
                         $"OnAction · error {context.Name} · {exception.Message}"));
             });
 
-        Context.Lifecycle.OnUnmounted(
+        context.Lifecycle.OnUnmounted(
             () =>
             {
                 MutationSubscription.Stop();
@@ -228,7 +229,7 @@
     }
 }
 
-<style scoped>
+<style>
     .state-store-panel {
         overflow: hidden;
         border: 1px solid var(--border);

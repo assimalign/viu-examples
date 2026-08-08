@@ -1,32 +1,24 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Assimalign.Viu;
 using Assimalign.Viu.Browser;
+using Assimalign.Viu.Browser.Router;
 using Assimalign.Viu.Components;
-using Assimalign.Viu.Examples.Showcase.Components;
 using Assimalign.Viu.Examples.Showcase.Routing;
 using Assimalign.Viu.Examples.Showcase.Runtime;
-using Assimalign.Viu.Examples.Showcase.State;
-using Assimalign.Viu.Reactivity;
 using Assimalign.Viu.Router;
-using Assimalign.Viu.Router.Browser;
 using Assimalign.Viu.State;
 
 using ViuRouter = Assimalign.Viu.Router.Router;
 
-IComponentFactory components = ShowcaseComponentCatalog.CreateFactory();
 ShowcaseRuntimeStatus runtimeStatus = new();
-await RouterHistory.InitializeAsync();
-IRouterHistory history = RouterHistory.CreateWebHash();
-ViuRouter router = new(history, ShowcaseRoutes.Create(runtimeStatus));
+ComponentFactory components = ShowcaseComponentCatalog.CreateFactory();
+using IRouterHistory history = RouterHistory.CreateWebHash();
+using ViuRouter router = new(history, ShowcaseRoutes.Create(runtimeStatus));
 ShowcaseServiceProvider services = new(router, runtimeStatus);
-
-using StateStoreRegistry state = StateStores.CreateRegistry(
-    components,
+using IStateStoreRegistry state = StateStores.CreateRegistry(
     services,
-    new ReactiveEffectScopeFactory(),
     new ApplicationWatchScheduler());
 
 router.BeforeEach(
@@ -40,35 +32,26 @@ router.AfterEach(
         runtimeStatus.RecordNavigation(
             to.Path,
             failure is null ? "completed" : failure.Type.ToString()));
-await router.ReadyAsync();
+await using BrowserApplication application = new BrowserApplicationBuilder()
+    .ConfigureApplication(
+        options =>
+        {
+            options.RootComponent = new ComponentNode(
+                RouterView.Registration.Reference);
+            options.Components = components;
+            options.Services = services;
+            options.State = state;
+            options.WarnHandler = message =>
+                runtimeStatus.RecordWarning(message);
+            options.ErrorHandler = (exception, _, source) =>
+                runtimeStatus.RecordError(source, exception);
+        })
+    .ConfigureBrowser(
+        options => options.MountTargetSelector = "#app")
+    .Build();
 
-BrowserApplicationBuilder builder = BrowserApplication.CreateBuilder(
-    ComponentTree.Template<RouterView>(),
-    useCommandBuffer: true);
-builder.UseComponentFactory(components);
-builder.UseServiceProvider(services);
-builder.UseStateRegistry(state);
-builder.Use(new ShowcasePlugin(runtimeStatus));
-builder.ConfigureApplication(
-    context =>
-    {
-        context.Performance = true;
-        context.WarnHandler = message =>
-            runtimeStatus.RecordWarning(message);
-        context.ErrorHandler = (exception, _, source) =>
-            runtimeStatus.RecordError(source, exception);
-    });
-
-try
-{
-    RouterLinkDomBridge.Install();
-    await using BrowserApplication application = builder.Build();
-    await application.MountAsync("#app");
-    await Task.Delay(Timeout.Infinite);
-}
-finally
-{
-    RouterLinkDomBridge.Uninstall();
-    router.Dispose();
-    history.Destroy();
-}
+var showcaseMiddleware = new ShowcaseMiddleware(runtimeStatus);
+await application
+    .Use(showcaseMiddleware.InvokeAsync)
+    .UseRouter(router)
+    .RunAsync();

@@ -67,6 +67,8 @@
             </MetricPanel>
         </section>
 
+        <CodeFirstPanel />
+
         <section class="component-demo-grid">
             <FeatureCard title="Custom v-model and emitted events" eyebrow="Two-way contract">
                 <div class="interactive-stack">
@@ -204,12 +206,8 @@
 
     private ShowcaseStore Store { get; set; } = null!;
 
-    public IReadOnlyList<IComponentParameter> Parameters { get; } =
-    [
-        new ComponentParameter(
-            "focus",
-            defaultFactory: static () => "all"),
-    ];
+    [Parameter]
+    public string Focus { get; set; } = "all";
 
     public Reference<object?> Rating { get; } =
         Reactive.Reference<object?>(4);
@@ -221,8 +219,7 @@
 
     public IReadOnlyList<string> ComponentFeatures => Features;
 
-    public string FocusArgument =>
-        Context.Arguments.Get<string>("focus") ?? "all";
+    public string FocusArgument => Focus;
 
     public bool HasEvents => EventLog.Count > 0;
 
@@ -255,7 +252,7 @@
 
     partial void OnSetup()
     {
-        Store = ShowcaseState.Definition.Use(Context);
+        Store = ShowcaseState.Definition.Use(Context!);
 
     }
 
@@ -304,19 +301,19 @@
     }
 }
 
-<style scoped>
+<style>
     .components-view .section-heading {
         align-items: flex-end;
     }
 
-    .section-heading p {
+    .components-view .section-heading p {
         max-width: 48rem;
         margin: 0.7rem 0 0;
         color: var(--text-muted);
         line-height: 1.65;
     }
 
-    .route-argument-panel {
+    .components-view .route-argument-panel {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         align-items: center;
@@ -332,13 +329,13 @@
         box-shadow: var(--shadow-soft);
     }
 
-    .route-argument-panel h3 {
+    .components-view .route-argument-panel h3 {
         margin: 0.32rem 0 0;
         color: var(--text-strong);
         font-size: 1rem;
     }
 
-    .route-argument-panel p {
+    .components-view .route-argument-panel p {
         max-width: 48rem;
         margin: 0.5rem 0 0;
         color: var(--text-muted);
@@ -346,7 +343,7 @@
         line-height: 1.6;
     }
 
-    .route-argument-result {
+    .components-view .route-argument-result {
         display: grid;
         gap: 0.22rem;
         min-width: 9rem;
@@ -356,7 +353,7 @@
         background: var(--surface-muted);
     }
 
-    .route-argument-result span {
+    .components-view .route-argument-result span {
         color: var(--text-muted);
         font-size: 0.66rem;
         font-weight: 800;
@@ -364,20 +361,20 @@
         text-transform: uppercase;
     }
 
-    .route-argument-result strong {
+    .components-view .route-argument-result strong {
         color: var(--accent);
         font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
         font-size: 0.88rem;
     }
 
-    .route-focus-links {
+    .components-view .route-focus-links {
         display: flex;
         flex-wrap: wrap;
         grid-column: 1 / -1;
         gap: 0.5rem;
     }
 
-    .route-focus-links a {
+    .components-view .route-focus-links a {
         padding: 0.46rem 0.68rem;
         border: 1px solid var(--border);
         border-radius: 0.7rem;
@@ -388,26 +385,26 @@
         text-decoration: none;
     }
 
-    .route-focus-links a:hover,
-    .route-focus-links .route-focus-link--active {
+    .components-view .route-focus-links a:hover,
+    .components-view .route-focus-links .route-focus-link--active {
         border-color: color-mix(in srgb, var(--accent) 52%, var(--border));
         color: var(--accent);
         background: color-mix(in srgb, var(--accent) 8%, var(--surface));
     }
 
-    .component-metric-grid {
+    .components-view .component-metric-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 1rem;
     }
 
-    .fallthrough-highlight {
+    .components-view .fallthrough-highlight {
         outline: 3px solid color-mix(in srgb, var(--accent) 10%, transparent);
         outline-offset: 3px;
     }
 
-    .custom-slot-badge,
-    .count-badge {
+    .components-view .custom-slot-badge,
+    .components-view .count-badge {
         padding: 0.28rem 0.52rem;
         border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
         border-radius: 999px;
@@ -418,27 +415,27 @@
         letter-spacing: 0.05em;
     }
 
-    .component-demo-grid,
-    .component-bottom-grid {
+    .components-view .component-demo-grid,
+    .components-view .component-bottom-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1rem;
     }
 
-    .interactive-stack {
+    .components-view .interactive-stack {
         display: grid;
         gap: 1.15rem;
     }
 
-    .supporting-copy,
-    .lifecycle-laboratory__copy p {
+    .components-view .supporting-copy,
+    .components-view .lifecycle-laboratory__copy p {
         margin: 0;
         color: var(--text-muted);
         font-size: 0.86rem;
         line-height: 1.65;
     }
 
-    .selection-readout {
+    .components-view .selection-readout {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -451,24 +448,24 @@
         font-size: 0.78rem;
     }
 
-    .selection-readout strong {
+    .components-view .selection-readout strong {
         color: var(--text-strong);
         font-size: 0.92rem;
     }
 
-    .footer-note {
+    .components-view .footer-note {
         color: var(--text-muted);
         font-size: 0.78rem;
     }
 
-    .lifecycle-laboratory {
+    .components-view .lifecycle-laboratory {
         display: grid;
         grid-template-columns: minmax(13rem, 0.55fr) minmax(0, 1.45fr);
         align-items: stretch;
         gap: 1rem;
     }
 
-    .lifecycle-laboratory__copy {
+    .components-view .lifecycle-laboratory__copy {
         display: flex;
         align-items: flex-start;
         flex-direction: column;
@@ -479,7 +476,7 @@
         background: var(--surface-muted);
     }
 
-    .unmounted-placeholder {
+    .components-view .unmounted-placeholder {
         display: grid;
         min-height: 10rem;
         place-items: center;
@@ -492,20 +489,20 @@
         text-align: center;
     }
 
-    .unmounted-placeholder > span {
+    .components-view .unmounted-placeholder > span {
         color: var(--accent);
         font-size: 1.8rem;
     }
 
-    .unmounted-placeholder strong {
+    .components-view .unmounted-placeholder strong {
         color: var(--text-strong);
     }
 
-    .unmounted-placeholder small {
+    .components-view .unmounted-placeholder small {
         font-size: 0.76rem;
     }
 
-    .surface-panel {
+    .components-view .surface-panel {
         display: grid;
         align-content: start;
         gap: 1.1rem;
@@ -517,26 +514,26 @@
         box-shadow: var(--shadow-soft);
     }
 
-    .surface-panel header {
+    .components-view .surface-panel header {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
         gap: 1rem;
     }
 
-    .surface-panel h3 {
+    .components-view .surface-panel h3 {
         margin: 0.32rem 0 0;
         color: var(--text-strong);
         font-size: 1rem;
     }
 
-    .feature-token-list {
+    .components-view .feature-token-list {
         display: flex;
         flex-wrap: wrap;
         gap: 0.55rem;
     }
 
-    .feature-token {
+    .components-view .feature-token {
         display: inline-flex;
         align-items: center;
         gap: 0.42rem;
@@ -549,14 +546,14 @@
         font-weight: 720;
     }
 
-    .feature-token i {
+    .components-view .feature-token i {
         width: 0.35rem;
         height: 0.35rem;
         border-radius: 50%;
         background: var(--success);
     }
 
-    .event-stream ul {
+    .components-view .event-stream ul {
         display: grid;
         gap: 0.5rem;
         margin: 0;
@@ -564,7 +561,7 @@
         list-style: none;
     }
 
-    .event-stream li {
+    .components-view .event-stream li {
         display: grid;
         grid-template-columns: auto 1fr;
         gap: 0.55rem;
@@ -576,11 +573,11 @@
         font-size: 0.7rem;
     }
 
-    .event-stream li span {
+    .components-view .event-stream li span {
         color: var(--accent);
     }
 
-    .text-button {
+    .components-view .text-button {
         padding: 0;
         border: 0;
         color: var(--accent);
@@ -591,7 +588,7 @@
         font-weight: 800;
     }
 
-    .empty-state {
+    .components-view .empty-state {
         margin: 0;
         padding: 1.2rem;
         border: 1px dashed var(--border);
@@ -602,21 +599,21 @@
     }
 
     @media (max-width: 900px) {
-        .component-metric-grid {
+        .components-view .component-metric-grid {
             grid-template-columns: 1fr;
         }
 
-        .component-demo-grid,
-        .component-bottom-grid,
-        .lifecycle-laboratory {
+        .components-view .component-demo-grid,
+        .components-view .component-bottom-grid,
+        .components-view .lifecycle-laboratory {
             grid-template-columns: 1fr;
         }
 
-        .route-argument-panel {
+        .components-view .route-argument-panel {
             grid-template-columns: 1fr;
         }
 
-        .route-argument-result {
+        .components-view .route-argument-result {
             min-width: 0;
         }
     }

@@ -5,14 +5,14 @@
                 <span class="section-kicker">Application and browser runtime</span>
                 <h2>See the seams that make a Viu application production-ready.</h2>
                 <p>
-                    The host enables command buffering, performance instrumentation, shared
-                    services, a state registry, application hooks, generated CSS, and the
+                    The host enables command buffering, shared services, a state registry,
+                    application hooks, generated CSS, and the
                     integer-handle browser bridge.
                 </p>
             </div>
             <StatusPill
-                :label="PluginLabel"
-                :tone="PluginTone" />
+                :label="MiddlewareLabel"
+                :tone="MiddlewareTone" />
         </section>
 
         <section class="metric-grid">
@@ -55,10 +55,10 @@
                 </template>
             </FeatureCard>
 
-            <FeatureCard title="Plugin and application hooks" eyebrow="Runtime">
+            <FeatureCard title="Middleware and application hooks" eyebrow="Runtime">
                 <div class="runtime-callout">
-                    <StatusPill :label="PluginLabel" :tone="PluginTone" />
-                    <p>{{ PluginMessage }}</p>
+                    <StatusPill :label="MiddlewareLabel" :tone="MiddlewareTone" />
+                    <p>{{ MiddlewareMessage }}</p>
                 </div>
                 <p class="muted-copy">
                     The host also installs warning and terminal error handlers. Router guards and
@@ -74,11 +74,11 @@
 
         <StateStorePanel />
 
-        <section :class="$style.diagnosticPanel">
+        <section :class="$style.diagnosticPanel" :style="AccentStyle">
             <div class="section-heading">
                 <div>
                     <span class="section-kicker">CSS pipeline + live telemetry</span>
-                    <h2>Global, scoped, module, and reactive styles compose.</h2>
+                    <h2>Global, plain, module, and bound custom-property styles compose.</h2>
                 </div>
                 <button type="button" class="button button--ghost" @click="CycleAccent">
                     Change reactive accent
@@ -87,14 +87,13 @@
             <div class="diagnostic-layout">
                 <div>
                     <p class="muted-copy">
-                        This panel’s class is emitted by a CSS Module, scoped to this component,
-                        and its border/glow color is driven by a reactive <code>v-bind()</code>
-                        custom property.
+                        This panel’s class is emitted by a CSS Module, while its border/glow
+                        color is driven by a reactive inline custom property.
                     </p>
                     <div class="pipeline-row">
                         <span>global tokens</span>
                         <b>→</b>
-                        <span>scoped rules</span>
+                        <span>plain component rules</span>
                         <b>→</b>
                         <span>hashed module</span>
                         <b>→</b>
@@ -153,43 +152,40 @@
 
     public int DotnetListenerCount => DotnetListeners.Value;
 
-    public bool IsPluginInstalled => RuntimeStatus.PluginInstalled.Value;
+    public bool IsMiddlewareActive => RuntimeStatus.MiddlewareActive.Value;
 
-    public string PluginLabel =>
-        IsPluginInstalled ? "Plugin installed" : "Plugin pending";
+    public string MiddlewareLabel =>
+        IsMiddlewareActive ? "Middleware active" : "Middleware pending";
 
-    public string PluginTone =>
-        IsPluginInstalled ? "success" : "neutral";
+    public string MiddlewareTone =>
+        IsMiddlewareActive ? "success" : "neutral";
 
-    public string PluginMessage => RuntimeStatus.PluginMessage.Value;
+    public string MiddlewareMessage => RuntimeStatus.MiddlewareMessage.Value;
+
+    public string AccentStyle => $"--platform-accent: {AccentColor.Value}";
 
     public ReactiveList<string> DiagnosticEntries => RuntimeStatus.Diagnostics;
 
     partial void OnSetup()
     {
         RuntimeStatus =
-            (ShowcaseRuntimeStatus?)Context.Services.GetService(
+            (ShowcaseRuntimeStatus?)Context!.Services?.GetService(
                 typeof(ShowcaseRuntimeStatus))
             ?? throw new InvalidOperationException(
                 "The runtime-status service is unavailable.");
-        Store = ShowcaseState.Definition.Use(Context);
-        Context.Lifecycle.OnMounted(RefreshDiagnostics);
+        Store = ShowcaseState.Definition.Use(Context!);
+        Context!.Lifecycle.OnMounted(RefreshDiagnostics);
     }
 
     private void RefreshDiagnostics()
     {
         (int nodes, int maps, int listeners) =
             BrowserRuntime.GetRegistryDiagnostics();
-        Reactive.StartBatch();
-        try
+        using (Reactive.Batch())
         {
             JavaScriptNodes.Value = nodes;
             JavaScriptListenerMaps.Value = maps;
             DotnetListeners.Value = listeners;
-        }
-        finally
-        {
-            Reactive.EndBatch();
         }
         Store.Track("Browser handle diagnostics refreshed");
     }
@@ -208,24 +204,24 @@
     }
 }
 
-<style module scoped>
+<style module>
     .diagnosticPanel {
         padding: clamp(1.25rem, 3vw, 2rem);
-        border: 1px solid v-bind(AccentColor);
+        border: 1px solid var(--platform-accent);
         border-radius: 1.35rem;
         background:
             radial-gradient(
                 circle at 100% 0,
-                color-mix(in srgb, v-bind(AccentColor) 14%, transparent),
+                color-mix(in srgb, var(--platform-accent) 14%, transparent),
                 transparent 22rem),
             var(--surface);
         box-shadow:
             0 1.2rem 3rem
-            color-mix(in srgb, v-bind(AccentColor) 10%, transparent);
+            color-mix(in srgb, var(--platform-accent) 10%, transparent);
     }
 </style>
 
-<style scoped>
+<style>
     .runtime-callout {
         display: grid;
         gap: 0.75rem;

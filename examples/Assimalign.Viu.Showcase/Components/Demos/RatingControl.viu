@@ -23,46 +23,28 @@
 
     private static readonly IReadOnlyList<int> Options = [1, 2, 3, 4, 5];
 
-    public IReadOnlyList<IComponentParameter> Parameters { get; } =
-    [
-        new ComponentParameter("modelValue", defaultFactory: static () => 3),
-        new ComponentParameter("label", defaultFactory: static () => "Interactive rating"),
-    ];
-
-    public IReadOnlyList<IComponentEvent> Events { get; } =
-    [
-        new ComponentEvent(
-            "update:modelValue",
-            static arguments =>
-                arguments.Count == 1
-                && arguments[0] is int),
-        new ComponentEvent(
-            "changed",
-            static arguments =>
-                arguments.Count == 1
-                && arguments[0] is int),
-    ];
-
     public IReadOnlyList<int> RatingOptions => Options;
 
-    public string Label =>
-        Context.Arguments.Get<string>("label")
-        ?? "Interactive rating";
+    [Parameter]
+    public string Label { get; set; } = "Interactive rating";
 
-    public int SelectedRating
-    {
-        get
+    [Parameter]
+    public object ModelValue { get; set; } = 3;
+
+    [Event("update:modelValue")]
+    public partial void UpdateModelValue(int rating);
+
+    [Event]
+    public partial void Changed(int rating);
+
+    public int SelectedRating =>
+        ModelValue switch
         {
-            object? value = Context.Arguments.Get<object?>("modelValue");
-            return value switch
-            {
-                int rating => Math.Clamp(rating, 1, 5),
-                long rating => Math.Clamp((int)rating, 1, 5),
-                double rating => Math.Clamp((int)rating, 1, 5),
-                _ => 3,
-            };
-        }
-    }
+            int rating => Math.Clamp(rating, 1, 5),
+            long rating => Math.Clamp((int)rating, 1, 5),
+            double rating => Math.Clamp((int)rating, 1, 5),
+            _ => 3,
+        };
 
     public string SelectionSummary => $"{SelectedRating} of 5";
 
@@ -78,12 +60,12 @@
 
     private void SelectRating(int rating)
     {
-        Context.Emit("update:modelValue", rating);
-        Context.Emit("changed", rating);
+        UpdateModelValue(rating);
+        Changed(rating);
     }
 }
 
-<style scoped>
+<style>
     .rating-control {
         display: flex;
         flex-wrap: wrap;

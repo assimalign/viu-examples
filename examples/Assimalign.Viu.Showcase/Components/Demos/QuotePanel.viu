@@ -25,23 +25,14 @@
 
 @script {
     using System;
-    using System.Collections.Generic;
 
     using Assimalign.Viu.Components;
 
-    public IReadOnlyList<IComponentParameter> Parameters { get; } =
-    [
-        new ComponentParameter("author", defaultFactory: static () => "Viu team"),
-        new ComponentParameter("role", defaultFactory: static () => "SDK sample"),
-    ];
+    [Parameter]
+    public string Author { get; set; } = "Viu team";
 
-    public string Author =>
-        Context.Arguments.Get<string>("author")
-        ?? "Viu team";
-
-    public string Role =>
-        Context.Arguments.Get<string>("role")
-        ?? "SDK sample";
+    [Parameter]
+    public string Role { get; set; } = "SDK sample";
 
     public string Initials
     {
@@ -64,7 +55,7 @@
     }
 }
 
-<style scoped>
+<style>
     .quote-panel {
         position: relative;
         display: grid;

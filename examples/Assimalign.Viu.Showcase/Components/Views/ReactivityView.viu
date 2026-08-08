@@ -364,8 +364,6 @@
 
     private ReactiveEffect DemonstrationEffect { get; set; } = null!;
 
-    private WatchHandle ProfileWatch { get; set; } = null!;
-
     private ReactiveEffect ShallowObserverEffect { get; set; } = null!;
 
     private CustomReference<string> DeferredCustomReference { get; set; } = null!;
@@ -473,7 +471,8 @@
 
     partial void OnSetup()
     {
-        Store = ShowcaseState.Definition.Use(Context);
+        var context = Context!;
+        Store = ShowcaseState.Definition.Use(context);
         DeferredCustomReference = Reactive.CustomReference<string>((track, trigger) =>
         {
             TriggerCustomReferenceAction = trigger;
@@ -499,18 +498,11 @@
             EffectRunReference.Value = EffectRunTotal;
         });
 
-        ProfileWatch = Reactive.Watch(
+        string initialProfile = $"{Profile.Name}|{Profile.Score}";
+        RecordProfileWatch(initialProfile, initialProfile);
+        context.Watch(
             () => $"{Profile.Name}|{Profile.Score}",
-            (current, previous, _) =>
-            {
-                WatchRunTotal++;
-                WatchSummaryReference.Value =
-                    WatchRunTotal == 1
-                        ? $"{Profile.Name} entered at {Profile.Score}"
-                        : $"{previous.Replace("|", " · ", StringComparison.Ordinal)} → {current.Replace("|", " · ", StringComparison.Ordinal)}";
-                WatchRunReference.Value = WatchRunTotal;
-            },
-            new WatchOptions { Immediate = true });
+            RecordProfileWatch);
 
         ShallowObserverEffect = Reactive.Effect(() =>
         {
@@ -519,13 +511,22 @@
 
         CreateAdvancedScope();
 
-        Context.Lifecycle.OnUnmounted(() =>
+        context.Lifecycle.OnUnmounted(() =>
         {
             AdvancedEffectScope?.Stop();
             ShallowObserverEffect.Stop();
             DemonstrationEffect.Stop();
-            ProfileWatch.Stop();
         });
+    }
+
+    private void RecordProfileWatch(string current, string previous)
+    {
+        WatchRunTotal++;
+        WatchSummaryReference.Value =
+            WatchRunTotal == 1
+                ? $"{Profile.Name} entered at {Profile.Score}"
+                : $"{previous.Replace("|", " · ", StringComparison.Ordinal)} → {current.Replace("|", " · ", StringComparison.Ordinal)}";
+        WatchRunReference.Value = WatchRunTotal;
     }
 
     private void IncrementCount()
@@ -555,8 +556,7 @@
     private void RunBatch()
     {
         int runsBeforeBatch = EffectRunTotal;
-        Reactive.StartBatch();
-        try
+        using (Reactive.Batch())
         {
             CountReference.Value += 2;
             MultiplierReference.Value =
@@ -565,10 +565,6 @@
                     : MultiplierReference.Value + 1;
             CounterDictionary["reference writes"] += 2;
             CounterDictionary["batched writes"] += 2;
-        }
-        finally
-        {
-            Reactive.EndBatch();
         }
 
         int deliveredRuns = EffectRunTotal - runsBeforeBatch;
@@ -582,15 +578,10 @@
         string[] names = ["Ada", "Grace", "Lin", "Margaret"];
         ProfileVersion = (ProfileVersion + 1) % names.Length;
 
-        Reactive.StartBatch();
-        try
+        using (Reactive.Batch())
         {
             Profile.Name = names[ProfileVersion];
             Profile.Score += 7;
-        }
-        finally
-        {
-            Reactive.EndBatch();
         }
 
         Store.Track("Updated a source-generated reactive object");
@@ -752,8 +743,7 @@
     {
         AdvancedEffectScope?.Stop();
 
-        Reactive.StartBatch();
-        try
+        using (Reactive.Batch())
         {
             CountReference.Value = 4;
             MultiplierReference.Value = 3;
@@ -774,10 +764,6 @@
                 "Mutate first, then notify on your own terms.";
             AdvancedPulseReference.Value = 0;
             ScopeActiveReference.Value = false;
-        }
-        finally
-        {
-            Reactive.EndBatch();
         }
 
         StagedCustomValue = "signal:alpha";
@@ -800,13 +786,13 @@
         CounterDictionary[key] = CounterDictionary[key] + 1;
 }
 
-<style scoped>
+<style>
     .reactivity-view {
         display: grid;
         gap: 1.25rem;
     }
 
-    .laboratory-hero {
+    .reactivity-view .laboratory-hero {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         gap: 2rem;
@@ -821,7 +807,7 @@
         box-shadow: var(--shadow-soft);
     }
 
-    .laboratory-hero h2 {
+    .reactivity-view .laboratory-hero h2 {
         max-width: 18ch;
         margin: 0.45rem 0 0.7rem;
         color: var(--text-strong);
@@ -830,18 +816,18 @@
         line-height: 1.05;
     }
 
-    .laboratory-hero p,
-    .card-copy {
+    .reactivity-view .laboratory-hero p,
+    .reactivity-view .card-copy {
         margin: 0;
         color: var(--text-muted);
         line-height: 1.65;
     }
 
-    .laboratory-hero p {
+    .reactivity-view .laboratory-hero p {
         max-width: 47rem;
     }
 
-    .hero-equation {
+    .reactivity-view .hero-equation {
         display: flex;
         align-items: center;
         gap: 0.65rem;
@@ -853,8 +839,8 @@
         font-variant-numeric: tabular-nums;
     }
 
-    .hero-equation span,
-    .hero-equation strong {
+    .reactivity-view .hero-equation span,
+    .reactivity-view .hero-equation strong {
         display: grid;
         min-width: 2.6rem;
         height: 2.6rem;
@@ -865,32 +851,32 @@
         font-size: 1.1rem;
     }
 
-    .hero-equation strong {
+    .reactivity-view .hero-equation strong {
         min-width: 3.5rem;
         color: white;
         background: linear-gradient(135deg, var(--accent), #f14d70);
     }
 
-    .hero-equation i {
+    .reactivity-view .hero-equation i {
         color: var(--text-muted);
         font-style: normal;
     }
 
-    .reactivity-grid {
+    .reactivity-view .reactivity-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1rem;
         align-items: stretch;
     }
 
-    .equation-workbench {
+    .reactivity-view .equation-workbench {
         display: grid;
         grid-template-columns: 1fr auto 1fr auto 1fr;
         gap: 0.55rem;
         align-items: center;
     }
 
-    .value-control {
+    .reactivity-view .value-control {
         display: grid;
         min-height: 8.7rem;
         align-content: center;
@@ -902,44 +888,44 @@
         text-align: center;
     }
 
-    .value-control--result {
+    .reactivity-view .value-control--result {
         border-color: color-mix(in srgb, var(--accent) 32%, var(--border));
         background: color-mix(in srgb, var(--accent) 7%, var(--surface));
     }
 
-    .value-control__label,
-    .value-control small,
-    .effect-readout span,
-    .effect-readout small,
-    .watch-readout span,
-    .watch-readout small,
-    .profile-card span,
-    .profile-card small {
+    .reactivity-view .value-control__label,
+    .reactivity-view .value-control small,
+    .reactivity-view .effect-readout span,
+    .reactivity-view .effect-readout small,
+    .reactivity-view .watch-readout span,
+    .reactivity-view .watch-readout small,
+    .reactivity-view .profile-card span,
+    .reactivity-view .profile-card small {
         color: var(--text-muted);
         font-size: 0.72rem;
     }
 
-    .value-control strong {
+    .reactivity-view .value-control strong {
         color: var(--text-strong);
         font-size: 1.65rem;
         font-variant-numeric: tabular-nums;
     }
 
-    .dependency-arrow {
+    .reactivity-view .dependency-arrow {
         color: var(--text-muted);
     }
 
-    .button-row {
+    .reactivity-view .button-row {
         display: flex;
         flex-wrap: wrap;
         gap: 0.55rem;
     }
 
-    .value-control .button-row {
+    .reactivity-view .value-control .button-row {
         justify-content: center;
     }
 
-    .mini-button {
+    .reactivity-view .mini-button {
         display: grid;
         width: 2rem;
         height: 2rem;
@@ -953,13 +939,13 @@
         font-weight: 800;
     }
 
-    .mini-button--accent {
+    .reactivity-view .mini-button--accent {
         border-color: transparent;
         color: white;
         background: var(--accent);
     }
 
-    .text-button {
+    .reactivity-view .text-button {
         padding: 0;
         border: 0;
         color: var(--accent);
@@ -970,8 +956,8 @@
         font-weight: 800;
     }
 
-    .effect-readout,
-    .watch-readout {
+    .reactivity-view .effect-readout,
+    .reactivity-view .watch-readout {
         display: grid;
         gap: 0.25rem;
         margin-top: 1rem;
@@ -981,17 +967,17 @@
         background: var(--surface-muted);
     }
 
-    .effect-readout code,
-    .watch-readout strong {
+    .reactivity-view .effect-readout code,
+    .reactivity-view .watch-readout strong {
         color: var(--text-strong);
         font-size: 0.86rem;
     }
 
-    .watch-readout {
+    .reactivity-view .watch-readout {
         border-left-color: var(--accent);
     }
 
-    .profile-card {
+    .reactivity-view .profile-card {
         display: flex;
         gap: 0.9rem;
         align-items: center;
@@ -1002,17 +988,17 @@
         background: var(--surface-muted);
     }
 
-    .profile-card > div:last-child {
+    .reactivity-view .profile-card > div:last-child {
         display: grid;
         gap: 0.15rem;
     }
 
-    .profile-card strong {
+    .reactivity-view .profile-card strong {
         color: var(--text-strong);
         font-size: 1rem;
     }
 
-    .profile-avatar {
+    .reactivity-view .profile-avatar {
         display: grid;
         width: 3.25rem;
         height: 3.25rem;
@@ -1025,7 +1011,7 @@
         font-weight: 900;
     }
 
-    .signal-list {
+    .reactivity-view .signal-list {
         display: grid;
         gap: 0.55rem;
         margin: 1rem 0 0;
@@ -1033,7 +1019,7 @@
         list-style: none;
     }
 
-    .signal-list li {
+    .reactivity-view .signal-list li {
         display: flex;
         align-items: center;
         gap: 0.65rem;
@@ -1044,7 +1030,7 @@
         background: var(--surface-muted);
     }
 
-    .signal-dot {
+    .reactivity-view .signal-dot {
         width: 0.5rem;
         height: 0.5rem;
         border-radius: 50%;
@@ -1052,13 +1038,13 @@
         box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--success) 13%, transparent);
     }
 
-    .dictionary-table {
+    .reactivity-view .dictionary-table {
         display: grid;
         gap: 0.5rem;
         margin-top: 1rem;
     }
 
-    .dictionary-row {
+    .reactivity-view .dictionary-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -1067,12 +1053,12 @@
         border-bottom: 1px solid var(--border);
     }
 
-    .dictionary-row code {
+    .reactivity-view .dictionary-row code {
         color: var(--text-muted);
         font-size: 0.78rem;
     }
 
-    .dictionary-row strong {
+    .reactivity-view .dictionary-row strong {
         display: grid;
         min-width: 2.25rem;
         height: 2.25rem;
@@ -1083,19 +1069,19 @@
         font-variant-numeric: tabular-nums;
     }
 
-    .footer-message {
+    .reactivity-view .footer-message {
         align-self: center;
         color: var(--text-muted);
         font-size: 0.78rem;
     }
 
-    .advanced-reactivity {
+    .reactivity-view .advanced-reactivity {
         display: grid;
         gap: 1rem;
         padding-top: 0.25rem;
     }
 
-    .advanced-reactivity__header {
+    .reactivity-view .advanced-reactivity__header {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.75fr);
         gap: 1.5rem;
@@ -1103,7 +1089,7 @@
         padding: 0.25rem 0.25rem 0;
     }
 
-    .advanced-reactivity__header h3 {
+    .reactivity-view .advanced-reactivity__header h3 {
         max-width: 28ch;
         margin: 0.35rem 0 0;
         color: var(--text-strong);
@@ -1111,28 +1097,28 @@
         letter-spacing: -0.025em;
     }
 
-    .advanced-reactivity__header p {
+    .reactivity-view .advanced-reactivity__header p {
         margin: 0;
         color: var(--text-muted);
         font-size: 0.88rem;
         line-height: 1.6;
     }
 
-    .advanced-reactivity__grid {
+    .reactivity-view .advanced-reactivity__grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 1rem;
         align-items: stretch;
     }
 
-    .token-cloud {
+    .reactivity-view .token-cloud {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
         margin-top: 1rem;
     }
 
-    .token-cloud code {
+    .reactivity-view .token-cloud code {
         padding: 0.45rem 0.65rem;
         border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
         border-radius: 999px;
@@ -1141,7 +1127,7 @@
         font-size: 0.75rem;
     }
 
-    .advanced-readout {
+    .reactivity-view .advanced-readout {
         display: grid;
         gap: 0.25rem;
         margin-top: 1rem;
@@ -1150,30 +1136,30 @@
         background: var(--surface-muted);
     }
 
-    .advanced-readout span,
-    .reference-row small,
-    .scope-metrics span {
+    .reactivity-view .advanced-readout span,
+    .reactivity-view .reference-row small,
+    .reactivity-view .scope-metrics span {
         color: var(--text-muted);
         font-size: 0.7rem;
     }
 
-    .advanced-readout strong {
+    .reactivity-view .advanced-readout strong {
         color: var(--text-strong);
         font-size: 0.78rem;
         line-height: 1.45;
     }
 
-    .advanced-readout--scope {
+    .reactivity-view .advanced-readout--scope {
         border-left: 3px solid var(--success);
         border-radius: 0.25rem 0.8rem 0.8rem 0.25rem;
     }
 
-    .reference-stack {
+    .reactivity-view .reference-stack {
         display: grid;
         gap: 0.65rem;
     }
 
-    .reference-row {
+    .reactivity-view .reference-row {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         gap: 0.75rem;
@@ -1184,46 +1170,46 @@
         background: var(--surface-muted);
     }
 
-    .reference-row > div {
+    .reactivity-view .reference-row > div {
         display: grid;
         gap: 0.2rem;
         min-width: 0;
     }
 
-    .reference-row code {
+    .reactivity-view .reference-row code {
         overflow: hidden;
         color: var(--text-strong);
         font-size: 0.72rem;
         text-overflow: ellipsis;
     }
 
-    .reference-row strong {
+    .reactivity-view .reference-row strong {
         color: var(--accent);
         font-size: 0.78rem;
         white-space: nowrap;
     }
 
-    .reference-note {
+    .reactivity-view .reference-note {
         margin: 0.8rem 0 0;
         color: var(--text-muted);
         font-size: 0.76rem;
         line-height: 1.5;
     }
 
-    .reference-actions {
+    .reactivity-view .reference-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 0.65rem 1rem;
     }
 
-    .scope-metrics {
+    .reactivity-view .scope-metrics {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 0.6rem;
         margin-top: 1rem;
     }
 
-    .scope-metrics > div {
+    .reactivity-view .scope-metrics > div {
         display: grid;
         gap: 0.2rem;
         padding: 0.75rem;
@@ -1233,13 +1219,13 @@
         text-align: center;
     }
 
-    .scope-metrics strong {
+    .reactivity-view .scope-metrics strong {
         color: var(--text-strong);
         font-size: 1.15rem;
         font-variant-numeric: tabular-nums;
     }
 
-    .implementation-strip {
+    .reactivity-view .implementation-strip {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto auto;
         gap: 1rem;
@@ -1250,55 +1236,55 @@
         background: var(--surface);
     }
 
-    .implementation-strip h3 {
+    .reactivity-view .implementation-strip h3 {
         margin: 0.25rem 0 0;
         color: var(--text-strong);
         font-size: 1rem;
     }
 
-    .implementation-strip > code {
+    .reactivity-view .implementation-strip > code {
         color: var(--text-muted);
         font-size: 0.72rem;
     }
 
-    button:disabled {
+    .reactivity-view button:disabled {
         cursor: not-allowed;
         opacity: 0.45;
     }
 
     @media (max-width: 1120px) {
-        .reactivity-grid {
+        .reactivity-view .reactivity-grid {
             grid-template-columns: 1fr;
         }
 
-        .advanced-reactivity__grid {
+        .reactivity-view .advanced-reactivity__grid {
             grid-template-columns: 1fr;
         }
     }
 
     @media (max-width: 760px) {
-        .laboratory-hero {
+        .reactivity-view .laboratory-hero {
             grid-template-columns: 1fr;
         }
 
-        .hero-equation {
+        .reactivity-view .hero-equation {
             width: fit-content;
         }
 
-        .equation-workbench {
+        .reactivity-view .equation-workbench {
             grid-template-columns: 1fr;
         }
 
-        .dependency-arrow {
+        .reactivity-view .dependency-arrow {
             rotate: 90deg;
             text-align: center;
         }
 
-        .advanced-reactivity__header {
+        .reactivity-view .advanced-reactivity__header {
             grid-template-columns: 1fr;
         }
 
-        .implementation-strip {
+        .reactivity-view .implementation-strip {
             grid-template-columns: 1fr;
         }
     }

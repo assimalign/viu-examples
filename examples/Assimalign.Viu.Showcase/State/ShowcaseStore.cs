@@ -31,8 +31,7 @@ public sealed class ShowcaseStore
     public void Track(string message)
     {
         ArgumentException.ThrowIfNullOrEmpty(message);
-        Reactive.StartBatch();
-        try
+        using (Reactive.Batch())
         {
             TotalInteractions.Value++;
             RecentActivity.Insert(
@@ -42,10 +41,6 @@ public sealed class ShowcaseStore
             {
                 RecentActivity.RemoveAt(RecentActivity.Count - 1);
             }
-        }
-        finally
-        {
-            Reactive.EndBatch();
         }
     }
 }

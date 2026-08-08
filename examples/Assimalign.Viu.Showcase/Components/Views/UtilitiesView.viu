@@ -10,7 +10,7 @@
                     </h2>
                 </div>
                 <p class="text-sm text-gray-500 theme-dark:text-gray-300">
-                    This tag-based .vue component uses the Viu-owned v4-compatible utility
+                    This <code>.viu</code> single-file component uses the Viu-owned v4-compatible utility
                     catalog, CSS-first theme tokens, responsive variants, and a custom variant.
                     No Tailwind package, CLI, or runtime is present.
                 </p>

@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="Assimalign.Viu.Router" Version="10.0.1-preview.2" />
-    <PackageReference Include="Assimalign.Viu.Router.Browser" Version="10.0.1-preview.2" />
+    <PackageReference Include="Assimalign.Viu.Browser.Router" Version="10.0.1-preview.2" />
   </ItemGroup>
 
   <ItemGroup>

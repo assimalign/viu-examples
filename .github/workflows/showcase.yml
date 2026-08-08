@@ -1,5 +1,5 @@
 # The showcase is an external consumer of Viu's packaged SDK and framework. CI
-# checks both repositories out as siblings, packs the current Viu main branch into
+# checks both repositories out as siblings, packs the paired Viu feature branch into
 # viu/_out/packages, and then restores through this repository's nuget.config.
 name: showcase
 
@@ -38,6 +38,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: assimalign/viu
+          ref: feature/V01.01.15-component-model
           path: viu
 
       - name: Set up .NET
@@ -52,24 +53,7 @@ jobs:
       - name: Pack local SDK, libraries, and framework
         shell: pwsh
         working-directory: ./viu
-        run: |
-          $feed = Join-Path $PWD '_out/packages'
-          dotnet pack ./sdks/Assimalign.Viu.Sdk/Tasks/Assimalign.Viu.Sdk.Tasks.csproj `
-            --configuration Release `
-            -p:PackViuProjects=true `
-            "-p:PackageOutputPath=$feed"
-          if ($LASTEXITCODE -ne 0) { throw 'SDK and library pack failed.' }
-
-          dotnet pack ./frameworks/Assimalign.Viu.App.Runtime/src/Assimalign.Viu.App.Runtime.csproj `
-            --configuration Release `
-            -p:RuntimeIdentifier=browser-wasm `
-            "-p:PackageOutputPath=$feed"
-          if ($LASTEXITCODE -ne 0) { throw 'Runtime pack failed.' }
-
-          dotnet pack ./frameworks/Assimalign.Viu.App.Refs/src/Assimalign.Viu.App.Refs.csproj `
-            --configuration Release `
-            "-p:PackageOutputPath=$feed"
-          if ($LASTEXITCODE -ne 0) { throw 'Reference pack failed.' }
+        run: pwsh -NoProfile -File ./scripts/Install-Local.ps1
 
       - name: Restore from the local package feed
         working-directory: ./viu-examples

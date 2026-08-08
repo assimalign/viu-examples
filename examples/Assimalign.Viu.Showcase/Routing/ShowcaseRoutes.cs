@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 
 using Assimalign.Viu;
 using Assimalign.Viu.Components;
-using Assimalign.Viu.Examples.Showcase.Components;
-using Assimalign.Viu.Examples.Showcase.Components.Views;
 using Assimalign.Viu.Examples.Showcase.Runtime;
 using Assimalign.Viu.Router;
 
@@ -24,35 +22,35 @@ public static class ShowcaseRoutes
                 {
                     ["application"] = "Viu SDK Showcase",
                 },
-                component: ComponentTree.Template<AppShell>(),
+                component: Component("AppShell"),
                 children:
                 [
                     CreateRoute(
                         "",
                         "overview",
                         "Overview",
-                        ComponentTree.Template<OverviewView>()),
+                        Component("OverviewView")),
                     CreateRoute(
                         "reactivity",
                         "reactivity",
                         "Reactivity",
-                        ComponentTree.Template<ReactivityView>()),
+                        Component("ReactivityView")),
                     new RouteRecord(
                         "components/:focus?",
                         name: "components",
                         meta: CreateMetadata("Components"),
-                        component: ComponentTree.Template<ComponentsView>(),
+                        component: Component("ComponentsView"),
                         argumentsResolver: RouteComponentArguments.FromParameters()),
                     CreateRoute(
                         "forms",
                         "forms",
                         "Forms",
-                        ComponentTree.Template<FormsView>()),
+                        Component("FormsView")),
                     new RouteRecord(
                         "motion",
                         name: "motion",
                         meta: CreateMetadata("Motion"),
-                        component: ComponentTree.Template<MotionView>(),
+                        component: Component("MotionView"),
                         beforeEnter: (to, _, _) =>
                         {
                             runtimeStatus.AddDiagnostic(
@@ -63,17 +61,17 @@ public static class ShowcaseRoutes
                         "platform",
                         "platform",
                         "Platform",
-                        ComponentTree.Template<PlatformView>()),
+                        Component("PlatformView")),
                     CreateRoute(
                         "utilities",
                         "utilities",
                         "Viu Utilities",
-                        ComponentTree.Template<UtilitiesView>()),
+                        Component("UtilitiesView")),
                     new RouteRecord(
                         ":pathMatch(.*)*",
                         name: "not-found",
                         meta: CreateMetadata("Page not found"),
-                        component: ComponentTree.Template<NotFoundView>(),
+                        component: Component("NotFoundView"),
                         argumentsResolver: RouteComponentArguments.FromParameters()),
                 ]),
         ];
@@ -83,12 +81,15 @@ public static class ShowcaseRoutes
         string path,
         string name,
         string title,
-        IComponent component)
+        VirtualNode component)
         => new(
             path,
             name: name,
             meta: CreateMetadata(title),
             component: component);
+
+    private static ComponentNode Component(string name)
+        => new(ComponentReference.ForName(name));
 
     private static IReadOnlyDictionary<string, object?> CreateMetadata(
         string title)

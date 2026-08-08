@@ -54,7 +54,7 @@
 
     partial void OnSetup()
     {
-        Context.Lifecycle.OnMounted(
+        Context!.Lifecycle.OnMounted(
             () => loadedAt.Value = DateTime.Now.ToString("HH:mm:ss"));
     }
 
@@ -64,7 +64,7 @@
     }
 }
 
-<style scoped>
+<style>
     .loaded-insight {
         display: grid;
         min-height: 13.5rem;
@@ -109,7 +109,7 @@
         text-transform: uppercase;
     }
 
-    h3 {
+    .loaded-insight__header h3 {
         margin: 0.2rem 0 0;
         color: white;
         font-size: 1.05rem;
@@ -149,13 +149,13 @@
         background: rgba(255, 255, 255, 0.05);
     }
 
-    dt {
+    .loaded-insight__metrics dt {
         margin-bottom: 0.2rem;
         color: #91aab8;
         font-size: 0.62rem;
     }
 
-    dd {
+    .loaded-insight__metrics dd {
         overflow: hidden;
         margin: 0;
         color: white;
