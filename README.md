@@ -32,7 +32,8 @@ the framework repository.
 
 `Assimalign.Viu.Router` and `Assimalign.Viu.Browser.Router` are opt-in packages rather than members
 of the `Assimalign.Viu.App`/`Assimalign.Viu.App.Browser` shared-framework segments. The showcase installs both from the same local
-NuGet feed as the SDK, uses `RouterHistory.CreateWebHash()`, and renders the layout and views through
+NuGet feed as the SDK, uses `BrowserRouterHistory.CreateWebHash()` (the browser history integration
+lives in `Assimalign.Viu.Browser.Router`), and renders the layout and views through
 nested `RouterView` components. There is no application-local routing implementation.
 
 When Viu's package version changes, update the `Assimalign.Viu.Sdk` and `Assimalign.Viu.Sdk.Browser`

@@ -151,7 +151,9 @@
                     </div>
                     <Suspense v-else :key="AsynchronousBoundaryKey">
                         <template #default>
-                            <AsyncInsight />
+                            <!-- AsyncInsight is a runtime-registered asynchronous definition, so
+                                 the runtime-selected component form resolves it by name. -->
+                            <component :is="AsyncInsightTarget"></component>
                         </template>
                         <template #fallback>
                             <div class="asynchronous-fallback">
@@ -227,6 +229,9 @@
     using Assimalign.Viu.Examples.Showcase.Models;
     using Assimalign.Viu.Examples.Showcase.State;
     using Assimalign.Viu.Reactivity;
+
+    public object AsyncInsightTarget =>
+        DynamicComponents.Named("AsyncInsight");
 
     private readonly Reference<bool> transitionCardVisible =
         Reactive.Reference(true);

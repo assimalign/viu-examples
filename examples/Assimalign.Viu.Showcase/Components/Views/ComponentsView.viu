@@ -67,7 +67,9 @@
             </MetricPanel>
         </section>
 
-        <CodeFirstPanel />
+        <!-- CodeFirstPanel is a code-first ComponentRegistration.Define component registered at
+             runtime, so the runtime-selected component form resolves it by name. -->
+        <component :is="CodeFirstPanelTarget"></component>
 
         <section class="component-demo-grid">
             <FeatureCard title="Custom v-model and emitted events" eyebrow="Two-way contract">
@@ -189,6 +191,9 @@
     using Assimalign.Viu.Components;
     using Assimalign.Viu.Examples.Showcase.State;
     using Assimalign.Viu.Reactivity;
+
+    public object CodeFirstPanelTarget =>
+        global::Assimalign.Viu.DynamicComponents.Named("CodeFirstPanel");
 
     private static readonly IReadOnlyList<string> Features =
     [

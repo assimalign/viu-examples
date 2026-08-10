@@ -14,7 +14,7 @@ using ViuRouter = Assimalign.Viu.Router.Router;
 
 ShowcaseRuntimeStatus runtimeStatus = new();
 ComponentFactory components = ShowcaseComponentCatalog.CreateFactory();
-using IRouterHistory history = RouterHistory.CreateWebHash();
+using IRouterHistory history = BrowserRouterHistory.CreateWebHash();
 using ViuRouter router = new(history, ShowcaseRoutes.Create(runtimeStatus));
 ShowcaseServiceProvider services = new(router, runtimeStatus);
 using IStateStoreRegistry state = StateStores.CreateRegistry(
