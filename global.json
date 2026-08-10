@@ -4,6 +4,7 @@
     // "version": "11.0.100-preview.1.26104.118"
   },
   "msbuild-sdks": {
-    "Assimalign.Viu.Sdk": "10.0.1-preview.2"
+    "Assimalign.Viu.Sdk": "10.0.0-alpha.1",
+    "Assimalign.Viu.Sdk.Browser": "10.0.0-alpha.1"
   }
 }

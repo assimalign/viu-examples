@@ -41,8 +41,8 @@
         <div class="two-column-grid">
             <FeatureCard title="Application composition" eyebrow="Host">
                 <ul class="check-list">
-                    <li><span>✓</span> Assimalign.Viu.Sdk consumer project</li>
-                    <li><span>✓</span> Assimalign.Viu.App shared framework</li>
+                    <li><span>✓</span> Assimalign.Viu.Sdk.Browser consumer project</li>
+                    <li><span>✓</span> Assimalign.Viu.App.Browser shared framework</li>
                     <li><span>✓</span> Explicit component factory</li>
                     <li><span>✓</span> Application-scoped state registry</li>
                     <li><span>✓</span> Official Router and browser click bridge</li>
