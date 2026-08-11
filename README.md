@@ -1,8 +1,9 @@
 # Viu SDK showcase
 
-A complete browser application built through `Assimalign.Viu.Sdk`. The app is a real external
-consumer: it uses the SDK and shared-framework packages from a local NuGet feed and has no project
-references back into the framework repository.
+A complete browser application built through `Assimalign.Viu.Sdk.Browser`, the browser segment
+layered on the host-neutral `Assimalign.Viu.Sdk`. The app is a real external consumer: it uses the
+SDK and shared-framework packages from a local NuGet feed and has no project references back into
+the framework repository.
 
 ## What it demonstrates
 
@@ -30,12 +31,14 @@ references back into the framework repository.
   `ComponentContext.Watch` cleanup.
 
 `Assimalign.Viu.Router` and `Assimalign.Viu.Browser.Router` are opt-in packages rather than members
-of the current `Assimalign.Viu.App` shared framework. The showcase installs both from the same local
-NuGet feed as the SDK, uses `RouterHistory.CreateWebHash()`, and renders the layout and views through
+of the `Assimalign.Viu.App`/`Assimalign.Viu.App.Browser` shared-framework segments. The showcase installs both from the same local
+NuGet feed as the SDK, uses `BrowserRouterHistory.CreateWebHash()` (the browser history integration
+lives in `Assimalign.Viu.Browser.Router`), and renders the layout and views through
 nested `RouterView` components. There is no application-local routing implementation.
 
-When Viu's package version changes, update the `Assimalign.Viu.Sdk` entry in `global.json` and both
-Router package references in the showcase project together.
+When Viu's package version changes, update the `Assimalign.Viu.Sdk` and `Assimalign.Viu.Sdk.Browser`
+entries in `global.json` and both Router package references in the showcase project together — the
+Browser SDK pins its base SDK at the exact same version.
 
 ## Run locally
 

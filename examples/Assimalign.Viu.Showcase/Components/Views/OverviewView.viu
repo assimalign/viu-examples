@@ -71,18 +71,19 @@
 
         <FeatureCard title="The consumer boundary is the feature" eyebrow="Packaging">
             <p>
-                The project file uses <code>Assimalign.Viu.Sdk</code>. Components, reactivity,
-                state, browser rendering, source generators, CSS bundling, and the JavaScript
-                bridge arrive through the shared framework automatically. The official Router
-                and Browser.Router packages are installed from the same local feed.
+                The project file uses <code>Assimalign.Viu.Sdk.Browser</code>, the browser
+                segment layered on the host-neutral <code>Assimalign.Viu.Sdk</code>. Components,
+                reactivity, state, browser rendering, source generators, CSS bundling, and the
+                JavaScript bridge arrive through the shared framework automatically. The official
+                Router and Browser.Router packages are installed from the same local feed.
             </p>
-            <pre class="code-window"><code>&lt;Project Sdk="Assimalign.Viu.Sdk"&gt;
+            <pre class="code-window"><code>&lt;Project Sdk="Assimalign.Viu.Sdk.Browser"&gt;
   &lt;PropertyGroup&gt;
     &lt;TargetFramework&gt;net10.0&lt;/TargetFramework&gt;
   &lt;/PropertyGroup&gt;
   &lt;ItemGroup&gt;
-    &lt;PackageReference Include="Assimalign.Viu.Router" Version="10.0.1-preview.2" /&gt;
-    &lt;PackageReference Include="Assimalign.Viu.Browser.Router" Version="10.0.1-preview.2" /&gt;
+    &lt;PackageReference Include="Assimalign.Viu.Router" Version="10.0.0-alpha.1" /&gt;
+    &lt;PackageReference Include="Assimalign.Viu.Browser.Router" Version="10.0.0-alpha.1" /&gt;
   &lt;/ItemGroup&gt;
 &lt;/Project&gt;</code></pre>
             <template #footer>
