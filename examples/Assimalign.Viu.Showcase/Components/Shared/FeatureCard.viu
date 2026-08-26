@@ -16,6 +16,7 @@
                 <p class="muted-copy">No content was supplied for this card.</p>
             </slot>
         </div>
+
         <footer v-if="HasFooter" class="feature-card__footer">
             <slot name="footer" />
         </footer>
@@ -25,13 +26,24 @@
 @script {
     using Assimalign.Viu.Components;
 
+    
     [Parameter(IsRequired = true)]
     public string Title { get; set; } = string.Empty;
 
+    
+    /// <summary>
+    /// The parameter is an eyebrow
+    /// </summary>
     [Parameter(IsRequired = true)]
     public string Eyebrow { get; set; } = string.Empty;
 
+    /// <summary>
+    /// test description
+    /// </summary>
     public bool HasFooter => Context!.Bindings.Slots.ContainsKey("footer");
+
+    [Event]
+    public partial void MyEvent();
 }
 
 <style>

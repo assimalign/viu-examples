@@ -8,6 +8,9 @@
 @script {
     using Assimalign.Viu.Components;
 
+    /// <summary>
+    /// test
+    /// </summary>
     [Parameter(IsRequired = true)]
     public string Label { get; set; } = "Unknown";
 

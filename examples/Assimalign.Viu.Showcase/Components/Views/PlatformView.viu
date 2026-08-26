@@ -10,9 +10,7 @@
                     integer-handle browser bridge.
                 </p>
             </div>
-            <StatusPill
-                :label="MiddlewareLabel"
-                :tone="MiddlewareTone" />
+            <StatusPill :label="MiddlewareLabel" :tone="MiddlewareTone" />
         </section>
 
         <section class="metric-grid">

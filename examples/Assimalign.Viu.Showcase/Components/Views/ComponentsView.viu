@@ -192,6 +192,9 @@
     using Assimalign.Viu.Examples.Showcase.State;
     using Assimalign.Viu.Reactivity;
 
+    /// <summary>
+    /// This is a test description
+    /// </summary>
     public object CodeFirstPanelTarget =>
         global::Assimalign.Viu.DynamicComponents.Named("CodeFirstPanel");
 
@@ -214,11 +217,9 @@
     [Parameter]
     public string Focus { get; set; } = "all";
 
-    public Reference<object?> Rating { get; } =
-        Reactive.Reference<object?>(4);
+    public Reference<object?> Rating { get; } =        Reactive.Reference<object?>(4);
 
-    public Reference<bool> ShowLifecycleProbe { get; } =
-        Reactive.Reference(true);
+    public Reference<bool> ShowLifecycleProbe { get; } = Reactive.Reference(true);
 
     public ReactiveList<string> EventLog { get; } = new();
 

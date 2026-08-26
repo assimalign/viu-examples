@@ -121,6 +121,9 @@
 
     public int InteractionCount => Store.TotalInteractions.Value;
 
+    /// <summary>
+    /// test
+    /// </summary>
     partial void OnSetup()
     {
         Router = (ViuRouter?)Context!.Services?.GetService(typeof(ViuRouter))

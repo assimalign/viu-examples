@@ -3,6 +3,7 @@ using System;
 using Assimalign.Viu.Components;
 using Assimalign.Viu.Reactivity;
 using Assimalign.Viu.Router;
+using Assimalign.Viu.Showcase;
 
 namespace Assimalign.Viu.Examples.Showcase.Runtime;
 

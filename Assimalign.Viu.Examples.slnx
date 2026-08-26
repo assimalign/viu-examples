@@ -1,5 +1,29 @@
 <Solution>
-  <Folder Name="/examples/">
-    <Project Path="examples/Assimalign.Viu.Showcase/Assimalign.Viu.Showcase.csproj" />
-  </Folder>
+	<Configurations>
+		<Platform Name="Any CPU" />
+		<Platform Name="x64" />
+		<Platform Name="x86" />
+	</Configurations>
+	<Folder Name="/viu-examples/">
+		<File Path=".gitignore" />
+		<File Path="Directory.Build.props" />
+		<File Path="Directory.Build.targets" />
+		<File Path="global.json" />
+		<File Path="nuget.config" />
+		<File Path="README.md" />
+	</Folder>
+	<Folder Name="/viu-examples/.claude/">
+		<File Path=".claude/launch.json" />
+	</Folder>
+	<Folder Name="/viu-examples/.github/" />
+	<Folder Name="/viu-examples/.github/workflows/">
+		<File Path=".github/workflows/showcase.yml" />
+	</Folder>
+	<Folder Name="/viu-examples/examples/" />
+	<Folder Name="/viu-examples/examples/Assimalign.Viu.Showcase/">
+		<Project Path="examples/Assimalign.Viu.Showcase/Assimalign.Viu.Showcase.csproj" />
+	</Folder>
+	<Folder Name="/viu-examples/examples/Assimalign.Viu.Showcase.Components/">
+		<Project Path="examples/Assimalign.Viu.Showcase.Components/Assimalign.Viu.Showcase.Components.csproj" />
+	</Folder>
 </Solution>

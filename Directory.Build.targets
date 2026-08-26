@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <ViuVersion>10.0.0-beta.10</ViuVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Update="Assimalign.Viu.Router" Version="$(ViuVersion)" />
+    <PackageReference Update="Assimalign.Viu.Browser.Router" Version="$(ViuVersion)" />
+    <PackageReference Update="Assimalign.Viu.UtilityCss.Build" Version="$(ViuVersion)" />
+  </ItemGroup>
+</Project>
