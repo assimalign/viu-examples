@@ -1,0 +1,29 @@
+<Project Sdk="Assimalign.Viu.Sdk.Browser">
+  <!--
+    A single-page WebAssembly application served by the SDK's default development server:
+    `dotnet run` builds the app and hosts wwwroot with the WebAssembly dev host. No server project.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Assimalign.Viu.Showcase.StandAlone</RootNamespace>
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>full</TrimMode>
+    <!-- Resolve the importmap and fingerprinted main.js placeholders in wwwroot/index.html. -->
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <ViuRunAotCompilation Condition="'$(ViuRunAotCompilation)' == ''">false</ViuRunAotCompilation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <StaticWebAssetFingerprintPattern Include="JS" Pattern="*.js" Expression="#[.{fingerprint}]!" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The router is an opt-in package; Browser.Router adds the browser history integration. -->
+    <PackageReference Include="Assimalign.Viu.Router" />
+    <PackageReference Include="Assimalign.Viu.Browser.Router" />
+    <ProjectReference Include="..\..\1-ComponentLib\Assimalign.Viu.Showcase.Components\Assimalign.Viu.Showcase.Components.csproj" />
+  </ItemGroup>
+
+  <!-- Flows the library's component CSS into wwwroot/_content, as its package would. -->
+  <Import Project="..\..\1-ComponentLib\Assimalign.Viu.Showcase.Components\build\Assimalign.Viu.Showcase.Components.ProjectReference.targets" />
+</Project>

@@ -19,11 +19,15 @@
 	<Folder Name="/viu-examples/.github/workflows/">
 		<File Path=".github/workflows/showcase.yml" />
 	</Folder>
-	<Folder Name="/viu-examples/examples/" />
-	<Folder Name="/viu-examples/examples/Assimalign.Viu.Showcase/">
-		<Project Path="examples/Assimalign.Viu.Showcase/Assimalign.Viu.Showcase.csproj" />
+	<Folder Name="/1-ComponentLib/">
+		<Project Path="examples/1-ComponentLib/Assimalign.Viu.Showcase.Components/Assimalign.Viu.Showcase.Components.csproj" />
 	</Folder>
-	<Folder Name="/viu-examples/examples/Assimalign.Viu.Showcase.Components/">
-		<Project Path="examples/Assimalign.Viu.Showcase.Components/Assimalign.Viu.Showcase.Components.csproj" />
+	<Folder Name="/2-StandAlone/">
+		<Project Path="examples/2-StandAlone/Assimalign.Viu.Showcase.StandAlone/Assimalign.Viu.Showcase.StandAlone.csproj" />
+	</Folder>
+	<Folder Name="/3-Cohesion/">
+		<Project Path="examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Shared/Assimalign.Viu.Showcase.Cohesion.Shared.csproj" />
+		<Project Path="examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Client/Assimalign.Viu.Showcase.Cohesion.Client.csproj" />
+		<Project Path="examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Server/Assimalign.Viu.Showcase.Cohesion.Server.csproj" />
 	</Folder>
 </Solution>

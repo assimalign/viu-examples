@@ -1,7 +1,7 @@
-# The showcase is an external consumer of Viu's packaged SDK and framework. CI
-# checks both repositories out as siblings, packs the paired Viu feature branch into
-# viu/_out/packages, and then restores through this repository's nuget.config.
-name: showcase
+# The examples are external consumers of Viu's packaged SDKs and libraries. Everything restores from
+# the assimalign GitHub Packages feed at the CI builds pinned in global.json and
+# Directory.Build.props; the workflow token reads organization packages.
+name: examples
 
 on:
   push:
@@ -9,6 +9,7 @@ on:
     paths:
       - 'examples/**'
       - 'Assimalign.Viu.Examples.slnx'
+      - 'Directory.Build.*'
       - 'global.json'
       - 'nuget.config'
       - '.github/workflows/showcase.yml'
@@ -17,76 +18,51 @@ on:
     paths:
       - 'examples/**'
       - 'Assimalign.Viu.Examples.slnx'
+      - 'Directory.Build.*'
       - 'global.json'
       - 'nuget.config'
       - '.github/workflows/showcase.yml'
 
 permissions:
   contents: read
+  packages: read
 
 jobs:
-  packaged-consumer:
-    name: packaged-consumer publish
+  build:
+    name: build and publish
     runs-on: ubuntu-24.04
+    env:
+      # Read by NuGet for the 'assimalign' source in nuget.config, including project-SDK resolution.
+      NuGetPackageSourceCredentials_assimalign: Username=${{ github.actor }};Password=${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Checkout showcase
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: viu-examples
-
-      - name: Checkout Viu
-        uses: actions/checkout@v4
-        with:
-          repository: assimalign/viu
-          ref: feature/V01.01.15-component-model
-          path: viu
 
       - name: Set up .NET
         # actions/setup-dotnet v4
         uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
         with:
-          global-json-file: viu/global.json
+          global-json-file: global.json
 
       - name: Install wasm-tools
         run: dotnet workload install wasm-tools --skip-manifest-update
 
-      - name: Pack local SDK, libraries, and framework
-        shell: pwsh
-        working-directory: ./viu
-        run: pwsh -NoProfile -File ./scripts/Install-Local.ps1
+      - name: Restore
+        run: dotnet restore Assimalign.Viu.Examples.slnx
 
-      - name: Restore from the local package feed
-        working-directory: ./viu-examples
-        run: >-
-          dotnet restore
-          ./examples/Assimalign.Viu.Showcase/Assimalign.Viu.Showcase.csproj
-          --configfile ./nuget.config
-          --force
-          --no-cache
+      - name: Build
+        run: dotnet build Assimalign.Viu.Examples.slnx --no-restore -warnaserror
 
-      - name: Publish trimmed showcase
-        working-directory: ./viu-examples
+      - name: Publish trimmed StandAlone app
         run: >-
-          dotnet publish
-          ./examples/Assimalign.Viu.Showcase/Assimalign.Viu.Showcase.csproj
+          dotnet publish examples/2-StandAlone/Assimalign.Viu.Showcase.StandAlone
           --configuration Release
-          --no-restore
           -warnaserror
-          --output ./_out/showcase
+          --output ./_out/standalone
 
-      - name: Verify packaged Router browser module
+      - name: Verify the library stylesheet was published
         shell: pwsh
-        working-directory: ./viu-examples
         run: |
-          $routerAssetDirectory = './_out/showcase/wwwroot/_content/Assimalign.Viu.Router'
-          $historyModules = @(
-            Get-ChildItem -LiteralPath $routerAssetDirectory -File -Filter 'viu-history*.js'
-          )
-          if ($historyModules.Count -ne 1) {
-            throw "Expected one published Router history module; found $($historyModules.Count)."
-          }
-
-          $hostPage = Get-Content -Raw -LiteralPath './_out/showcase/wwwroot/index.html'
-          if (-not $hostPage.Contains('./_content/Assimalign.Viu.Router/viu-history.js')) {
-            throw 'The host-page import map does not expose the stable Router history module URL.'
-          }
+          $css = './_out/standalone/wwwroot/_content/Assimalign.Viu.Showcase.Components/Assimalign.Viu.Showcase.Components.viu.css'
+          if (-not (Test-Path -LiteralPath $css)) { throw "Missing $css" }
+          if (-not (Get-Content -Raw -LiteralPath $css).Contains('.card')) { throw "$css does not contain the library styles." }

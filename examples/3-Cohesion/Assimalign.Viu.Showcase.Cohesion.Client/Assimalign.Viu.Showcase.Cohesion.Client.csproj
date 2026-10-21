@@ -1,0 +1,31 @@
+<Project Sdk="Assimalign.Viu.Sdk.Browser">
+  <!--
+    The browser client, composed through the Cohesion hosting model (ViuApplication.CreateBuilder):
+    Cohesion dependency injection, configuration, and host lifetime around the Viu runtime.
+    Run the Server project; it builds this client and serves it.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Assimalign.Viu.Showcase.Cohesion.Client</RootNamespace>
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>full</TrimMode>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <ViuRunAotCompilation Condition="'$(ViuRunAotCompilation)' == ''">false</ViuRunAotCompilation>
+    <!-- Cohesion assemblies are marked [RequiresPreviewFeatures] (CA2252). -->
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
+    <GenerateRequiresPreviewFeaturesAttribute>true</GenerateRequiresPreviewFeaturesAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <StaticWebAssetFingerprintPattern Include="JS" Pattern="*.js" Expression="#[.{fingerprint}]!" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Assimalign.Cohesion.Viu.Hosting" />
+    <PackageReference Include="Assimalign.Cohesion.Viu.Hosting.Browser" />
+    <PackageReference Include="Assimalign.Cohesion.Viu.Routing" />
+    <ProjectReference Include="..\Assimalign.Viu.Showcase.Cohesion.Shared\Assimalign.Viu.Showcase.Cohesion.Shared.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\1-ComponentLib\Assimalign.Viu.Showcase.Components\build\Assimalign.Viu.Showcase.Components.ProjectReference.targets" />
+</Project>

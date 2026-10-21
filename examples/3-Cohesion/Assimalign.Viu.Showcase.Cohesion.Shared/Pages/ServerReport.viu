@@ -1,0 +1,62 @@
+<!--
+    A server-rendered page (GET /report on the Server project). It is an ordinary .viu component:
+    the server renders it to HTML per request, so the browser receives finished markup with no
+    WebAssembly download. It reuses the component library, which was built with ViuServerRendering.
+-->
+<template>
+    <main class="report">
+        <header class="report__header">
+            <h1>Task report</h1>
+            <Pill label="server-rendered" tone="accent" />
+        </header>
+
+        <Card title="Progress">
+            <ProgressBar :value="CompletedCount" :maximum="Tasks.Count" />
+        </Card>
+
+        <Card title="All tasks">
+            <ul v-if="Tasks.Count > 0" class="report__list">
+                <li v-for="task in Tasks" :key="task.Id">
+                    <span>{{ task.Title }}</span>
+                    <Pill :label="StatusLabel(task)" :tone="StatusTone(task)" />
+                </li>
+            </ul>
+            <template #footer>
+                <span>Rendered at {{ RenderedAt }} UTC · <a href="/">Open the interactive client</a></span>
+            </template>
+        </Card>
+    </main>
+</template>
+
+@script {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    public IReadOnlyList<TaskSummary> Tasks { get; private set; } = [];
+
+    public int CompletedCount => Tasks.Count(task => task.IsDone);
+
+    public string RenderedAt { get; } = DateTimeOffset.UtcNow.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+
+    partial void OnSetup()
+    {
+        // The server awaits OnServerPrefetch callbacks before it serializes this component, so the
+        // HTML already contains the loaded data. ITaskCatalog comes from the server's DI container.
+        OnServerPrefetch(LoadAsync);
+    }
+
+    private async Task LoadAsync(CancellationToken cancellationToken)
+    {
+        ITaskCatalog catalog = (ITaskCatalog?)Context!.Services?.GetService(typeof(ITaskCatalog))
+            ?? throw new InvalidOperationException("ITaskCatalog is not registered.");
+        Tasks = await catalog.GetTasksAsync(cancellationToken);
+    }
+
+    private string StatusLabel(TaskSummary task) => task.IsDone ? "done" : "open";
+
+    private string StatusTone(TaskSummary task) => task.IsDone ? "success" : "warning";
+}

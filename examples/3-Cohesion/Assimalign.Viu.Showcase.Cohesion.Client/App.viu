@@ -1,0 +1,96 @@
+<template>
+    <div class="app">
+        <header class="app__header">
+            <strong>Viu · Cohesion</strong>
+            <nav class="app__nav" aria-label="Primary">
+                <RouterLink to="/">Home</RouterLink>
+                <RouterLink to="/tasks">Tasks</RouterLink>
+                <!-- A full page load: this page is rendered by the server, not the client. -->
+                <a href="/report">Server report ↗</a>
+            </nav>
+        </header>
+
+        <main class="app__main">
+            <h1>{{ PageTitle }}</h1>
+            <RouterView />
+        </main>
+    </div>
+</template>
+
+@script {
+    using System;
+    using System.Collections.Generic;
+
+    using ViuRouter = Assimalign.Viu.Router.Router;
+
+    private ViuRouter Router { get; set; } = null!;
+
+    public string PageTitle
+    {
+        get
+        {
+            IReadOnlyDictionary<string, object?> meta = Router.CurrentRoute.Value.Meta;
+            return meta.TryGetValue("title", out object? title) && title is string text ? text : "Viu";
+        }
+    }
+
+    partial void OnSetup()
+    {
+        // AddRouting registered the router as a singleton in the Cohesion container.
+        Router = (ViuRouter?)Context!.Services?.GetService(typeof(ViuRouter))
+            ?? throw new InvalidOperationException("Routing is not registered.");
+    }
+}
+
+<style>
+    :root {
+        --viu-accent: #0d9488;
+        --viu-border: #e2e8f0;
+        --viu-surface: #ffffff;
+        --viu-surface-muted: #f8fafc;
+        --viu-text-muted: #64748b;
+        color: #0f172a;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    body {
+        margin: 0;
+        background: #f1f5f9;
+    }
+
+    .app__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1.5rem;
+        background: var(--viu-surface);
+        border-bottom: 1px solid var(--viu-border);
+    }
+
+    .app__nav {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .app__nav a {
+        color: var(--viu-text-muted);
+        text-decoration: none;
+    }
+
+    .app__nav a.router-link-exact-active {
+        color: var(--viu-accent);
+        font-weight: 600;
+    }
+
+    .app__main {
+        display: grid;
+        gap: 1rem;
+        max-width: 48rem;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+
+    .app__main h1 {
+        margin: 0;
+    }
+</style>

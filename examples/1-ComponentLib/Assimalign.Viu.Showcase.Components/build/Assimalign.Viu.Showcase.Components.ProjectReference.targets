@@ -1,0 +1,29 @@
+<Project>
+  <!--
+    The ProjectReference equivalent of the packaged library's buildTransitive style registration.
+    A Browser app imports this file beside its ProjectReference; the library stylesheet is then
+    copied to wwwroot/_content/Assimalign.Viu.Showcase.Components/Assimalign.Viu.Showcase.Components.viu.css
+    exactly as it would be from the package. The host page links that file.
+  -->
+  <PropertyGroup>
+    <_ShowcaseComponentsProjectPath>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)', '..', 'Assimalign.Viu.Showcase.Components.csproj'))</_ShowcaseComponentsProjectPath>
+  </PropertyGroup>
+
+  <!-- Declared in the project body, so it runs before the SDK's ViuFlowComponentLibraryStyles. -->
+  <Target Name="_ShowcaseResolveComponentLibraryStyle"
+          BeforeTargets="ResolveProjectStaticWebAssets;AssignTargetPaths"
+          Condition="'$(UsingMicrosoftNETSdkWebAssembly)' == 'true'">
+    <MSBuild Projects="$(_ShowcaseComponentsProjectPath)"
+             Targets="GetViuComponentLibraryStyle"
+             Properties="Configuration=$(Configuration)">
+      <Output TaskParameter="TargetOutputs" ItemName="_ShowcaseComponentLibraryStyleOutput" />
+    </MSBuild>
+    <!-- Keep only PackageId: MSBuild task outputs also carry OriginalItemSpec/MSBuildSourceProjectFile
+         (the library .csproj), which static-web-asset compression would otherwise follow and
+         gzip the project file in place of the stylesheet. -->
+    <ItemGroup>
+      <ViuComponentLibraryStyle Include="@(_ShowcaseComponentLibraryStyleOutput)" KeepMetadata="PackageId" />
+      <_ShowcaseComponentLibraryStyleOutput Remove="@(_ShowcaseComponentLibraryStyleOutput)" />
+    </ItemGroup>
+  </Target>
+</Project>

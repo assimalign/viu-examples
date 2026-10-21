@@ -1,0 +1,35 @@
+<Project Sdk="Assimalign.Viu.Sdk">
+  <!--
+    A host-neutral component library: the base Viu SDK compiles every .viu file, emits the
+    GeneratedViuComponents catalog, and extracts component <style> CSS into one library stylesheet.
+    It never references the Browser SDK, so the same assembly serves a WebAssembly client and a
+    server host.
+
+    ViuServerRendering also emits a direct server-markup body for each component plus the
+    GeneratedViuServerRenders catalog, so 3-Cohesion can render these components on the server.
+  -->
+  <PropertyGroup>
+    <RootNamespace>Assimalign.Viu.Showcase.Components</RootNamespace>
+    <PackageId>Assimalign.Viu.Showcase.Components</PackageId>
+    <IsAotCompatible>true</IsAotCompatible>
+    <ViuServerRendering>true</ViuServerRendering>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="build\**" />
+  </ItemGroup>
+
+  <!--
+    Returns the extracted library stylesheet with the PackageId metadata the Browser SDK's
+    ViuComponentLibraryStyle flow expects. When packed, the SDK registers the same file through the
+    package's buildTransitive props; build\*.ProjectReference.targets calls this target so a
+    ProjectReference consumer gets the identical result.
+  -->
+  <Target Name="GetViuComponentLibraryStyle"
+          DependsOnTargets="_ViuExtractComponentLibraryStyles"
+          Returns="@(_ShowcaseComponentLibraryStyle)">
+    <ItemGroup Condition="'$(_ViuComponentStyleExists)' == 'true'">
+      <_ShowcaseComponentLibraryStyle Include="$(_ViuComponentStylePath)" PackageId="$(PackageId)" />
+    </ItemGroup>
+  </Target>
+</Project>

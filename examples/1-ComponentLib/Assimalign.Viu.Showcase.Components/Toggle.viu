@@ -1,0 +1,81 @@
+<!--
+    An on/off switch that supports component v-model:
+        <Toggle v-model="IsEnabled" label="Notifications" />
+    v-model on a component binds the modelValue parameter and listens for update:modelValue.
+    The library stays host-neutral because it never touches a native form control.
+-->
+<template>
+    <button
+        type="button"
+        role="switch"
+        :class="CssClass"
+        :aria-checked="AriaChecked"
+        @click="Flip">
+        <span class="toggle__track" aria-hidden="true"><span class="toggle__thumb"></span></span>
+        <span>{{ Label }}</span>
+    </button>
+</template>
+
+@script {
+    using Assimalign.Viu.Components;
+
+    [Parameter(IsRequired = true)]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool ModelValue { get; set; }
+
+    /// <summary>The v-model update event.</summary>
+    [Event("update:modelValue")]
+    public partial void UpdateModelValue(bool value);
+
+    public string CssClass => ModelValue ? "toggle toggle--on" : "toggle";
+
+    // ARIA state attributes take the strings "true"/"false"; a bound bool would render as a
+    // presence-only attribute instead.
+    public string AriaChecked => ModelValue ? "true" : "false";
+
+    private void Flip() => UpdateModelValue(!ModelValue);
+}
+
+<style>
+    .toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+    }
+
+    .toggle__track {
+        position: relative;
+        width: 2.25rem;
+        height: 1.25rem;
+        border-radius: 999px;
+        background: var(--viu-border, #cbd5e1);
+        transition: background 150ms ease;
+    }
+
+    .toggle__thumb {
+        position: absolute;
+        top: 0.15rem;
+        left: 0.15rem;
+        width: 0.95rem;
+        height: 0.95rem;
+        border-radius: 50%;
+        background: #ffffff;
+        transition: transform 150ms ease;
+    }
+
+    .toggle--on .toggle__track {
+        background: var(--viu-accent, #4f46e5);
+    }
+
+    .toggle--on .toggle__thumb {
+        transform: translateX(1rem);
+    }
+</style>

@@ -1,0 +1,115 @@
+<template>
+    <div class="app">
+        <header class="app__header">
+            <strong class="app__brand">Viu · StandAlone</strong>
+            <nav class="app__nav" aria-label="Primary">
+                <RouterLink to="/">Home</RouterLink>
+                <RouterLink to="/tasks">
+                    Tasks <Pill :label="RemainingLabel" tone="accent" />
+                </RouterLink>
+            </nav>
+        </header>
+
+        <main class="app__main">
+            <h1>{{ PageTitle }}</h1>
+            <!-- The matched route's component renders here. -->
+            <RouterView />
+        </main>
+    </div>
+</template>
+
+@script {
+    using System;
+    using System.Collections.Generic;
+
+    using Assimalign.Viu.Showcase.StandAlone.State;
+
+    using ViuRouter = Assimalign.Viu.Router.Router;
+
+    private ViuRouter Router { get; set; } = null!;
+
+    private TaskStore Tasks { get; set; } = null!;
+
+    // Reads CurrentRoute.Value, so the heading re-renders on every navigation.
+    public string PageTitle
+    {
+        get
+        {
+            IReadOnlyDictionary<string, object?> meta = Router.CurrentRoute.Value.Meta;
+            return meta.TryGetValue("title", out object? title) && title is string text ? text : "Viu";
+        }
+    }
+
+    public string RemainingLabel => $"{Tasks.Remaining.Value} open";
+
+    partial void OnSetup()
+    {
+        // Services come from ApplicationOptions.Services; state comes from the app's registry.
+        Router = (ViuRouter?)Context!.Services?.GetService(typeof(ViuRouter))
+            ?? throw new InvalidOperationException("The router service is not registered.");
+        Tasks = TaskStore.Definition.Use(Context!);
+    }
+}
+
+<style>
+    :root {
+        --viu-accent: #4f46e5;
+        --viu-border: #e2e8f0;
+        --viu-surface: #ffffff;
+        --viu-surface-muted: #f8fafc;
+        --viu-text-muted: #64748b;
+        color: #0f172a;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    body {
+        margin: 0;
+        background: #f1f5f9;
+    }
+
+    .app__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1.5rem;
+        background: var(--viu-surface);
+        border-bottom: 1px solid var(--viu-border);
+    }
+
+    .app__nav {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .app__nav a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: var(--viu-text-muted);
+        text-decoration: none;
+    }
+
+    /* RouterLink applies these classes to the active link. */
+    .app__nav a.router-link-exact-active {
+        color: var(--viu-accent);
+        font-weight: 600;
+    }
+
+    .app__main {
+        display: grid;
+        gap: 1rem;
+        max-width: 48rem;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+
+    .app__main h1 {
+        margin: 0;
+    }
+
+    .footnote {
+        margin: 0;
+        color: var(--viu-text-muted);
+        font-size: 0.8rem;
+    }
+</style>
