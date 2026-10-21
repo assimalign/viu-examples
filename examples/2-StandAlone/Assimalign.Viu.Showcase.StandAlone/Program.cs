@@ -11,7 +11,6 @@ using Assimalign.Viu.Showcase.StandAlone.Routing;
 using Assimalign.Viu.Showcase.StandAlone.Services;
 using Assimalign.Viu.State;
 
-using LibraryComponents = Assimalign.Viu.Showcase.Components.GeneratedViuComponents;
 using ViuRouter = Assimalign.Viu.Router.Router;
 
 // 1. Services: a plain IServiceProvider the components read through Context.Services.
@@ -26,22 +25,18 @@ services.Router = router;
 using IStateStoreRegistry state = StateStores.CreateRegistry(services, new ApplicationWatchScheduler());
 services.State = state;
 
-// 4. Components: compiled .viu files from this app and the library, the router's components
-//    (templates reference them by tag name), and one code-first component.
-ComponentFactory components = new();
-GeneratedViuComponents.Register(components);
-LibraryComponents.Register(components);
-components.Register(new ComponentRegistration(
-    ComponentReference.ForName("RouterView"), RouterView.Registration.Contract, RouterView.Registration.Activator));
-components.Register(new ComponentRegistration(
-    ComponentReference.ForName("RouterLink"), RouterLink.Registration.Contract, RouterLink.Registration.Activator));
-components.Register(CodeFirstComponents.Footnote);
-
+// 4. The default factory receives generated catalogs. Add router and code-first registrations
+//    to that same factory so the generated application and library components remain available.
 await using BrowserApplication application = new BrowserApplicationBuilder()
     .ConfigureApplication(options =>
     {
-        options.RootComponent = new ComponentNode(ComponentReference.ForName("App"));
-        options.Components = components;
+        options.RootComponent = ComponentNode.For<App>();
+        ComponentFactory components = (ComponentFactory)options.Components!;
+        components.Register(new ComponentRegistration(
+            ComponentReference.ForName("RouterView"), RouterView.Registration.Contract, RouterView.Registration.Activator));
+        components.Register(new ComponentRegistration(
+            ComponentReference.ForName("RouterLink"), RouterLink.Registration.Contract, RouterLink.Registration.Activator));
+        components.Register(CodeFirstComponents.Footnote);
         options.Services = services;
         options.State = state;
         options.WarnHandler = Console.Error.WriteLine;

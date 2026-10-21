@@ -21,9 +21,7 @@
     using System;
     using System.Collections.Generic;
 
-    using ViuRouter = Assimalign.Viu.Router.Router;
-
-    private ViuRouter Router { get; set; } = null!;
+    private Assimalign.Viu.Router.Router Router { get; set; } = null!;
 
     public string PageTitle
     {
@@ -37,7 +35,7 @@
     partial void OnSetup()
     {
         // AddRouting registered the router as a singleton in the Cohesion container.
-        Router = (ViuRouter?)Context!.Services?.GetService(typeof(ViuRouter))
+        Router = (Assimalign.Viu.Router.Router?)Context!.Services?.GetService(typeof(Assimalign.Viu.Router.Router))
             ?? throw new InvalidOperationException("Routing is not registered.");
     }
 }

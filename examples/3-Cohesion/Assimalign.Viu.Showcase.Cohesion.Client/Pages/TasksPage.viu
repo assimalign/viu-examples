@@ -1,15 +1,14 @@
 <!-- Async data through an injected service: load on mount, post on submit. -->
 <template>
-    <!-- Outside a Card slot and without @submit.prevent on purpose: see README "Known issues". -->
-    <div class="task-form">
-        <input v-model.trim="NewTitle" @keydown="OnKeyDownAsync" placeholder="Sent to POST /api/tasks" aria-label="Task title" />
-        <button type="button" :disabled="!CanAdd" @click="AddAsync">Add task</button>
-    </div>
-
     <Card title="Tasks from the server">
         <template #badge>
             <Pill :label="Status" />
         </template>
+
+        <form class="task-form" @submit.prevent="AddAsync">
+            <input v-model.trim="NewTitle" @keydown.enter.prevent="AddAsync" placeholder="Sent to POST /api/tasks" aria-label="Task title" />
+            <button type="submit" :disabled="!CanAdd">Add task</button>
+        </form>
 
         <p v-if="IsLoading">Loading…</p>
         <p v-else-if="Error.Length > 0" class="error">{{ Error }}</p>
@@ -53,12 +52,9 @@
 
     public string Status => $"{Tasks.Count} tasks";
 
-    // A native v-model target holds object? (the write-back is untyped); NewTitleText reads it typed.
-    public Reference<object?> NewTitle { get; } = Reactive.Reference<object?>(string.Empty);
+    public Reference<string> NewTitle { get; } = Reactive.Reference(string.Empty);
 
-    public string NewTitleText => NewTitle.Value as string ?? string.Empty;
-
-    public bool CanAdd => NewTitleText.Length > 0;
+    public bool CanAdd => NewTitle.Value.Length > 0;
 
     partial void OnSetup()
     {
@@ -92,7 +88,7 @@
 
     private async Task AddAsync()
     {
-        string title = NewTitleText;
+        string title = NewTitle.Value;
         if (title.Length == 0)
         {
             return;
@@ -103,23 +99,16 @@
         await LoadAsync(Context!.Lifecycle.CancellationToken);
     }
 
-    // Task-returning handlers are awaited and observed by the runtime; async void is rejected.
-    private Task OnKeyDownAsync(IElementEvent domEvent) =>
-        domEvent.Key == "Enter" ? AddAsync() : Task.CompletedTask;
+    private static string StatusLabel(TaskSummary task) => task.IsDone ? "done" : "open";
 
-    private string StatusLabel(TaskSummary task) => task.IsDone ? "done" : "open";
-
-    private string StatusTone(TaskSummary task) => task.IsDone ? "success" : "warning";
+    private static string StatusTone(TaskSummary task) => task.IsDone ? "success" : "warning";
 }
 
 <style>
     .task-form {
         display: flex;
         gap: 0.5rem;
-        padding: 1rem 1.25rem;
-        border: 1px solid var(--viu-border);
-        border-radius: 0.75rem;
-        background: var(--viu-surface);
+        margin-bottom: 1rem;
     }
 
     .task-form input {

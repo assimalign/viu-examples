@@ -9,7 +9,7 @@
         type="button"
         role="switch"
         :class="CssClass"
-        :aria-checked="AriaChecked"
+        :aria-checked="ModelValue"
         @click="Flip">
         <span class="toggle__track" aria-hidden="true"><span class="toggle__thumb"></span></span>
         <span>{{ Label }}</span>
@@ -30,10 +30,6 @@
     public partial void UpdateModelValue(bool value);
 
     public string CssClass => ModelValue ? "toggle toggle--on" : "toggle";
-
-    // ARIA state attributes take the strings "true"/"false"; a bound bool would render as a
-    // presence-only attribute instead.
-    public string AriaChecked => ModelValue ? "true" : "false";
 
     private void Flip() => UpdateModelValue(!ModelValue);
 }

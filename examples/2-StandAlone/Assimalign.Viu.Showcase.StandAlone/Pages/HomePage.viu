@@ -14,7 +14,7 @@
             <!-- v-model on a component: binds modelValue and handles update:modelValue. -->
             <Toggle v-model="ShowProgress" label="Show task progress" />
         </div>
-        <ProgressBar v-if="IsProgressVisible" :value="Tasks.Completed.Value" :maximum="Tasks.Items.Count" />
+        <ProgressBar v-if="ShowProgress" :value="Tasks.Completed.Value" :maximum="Tasks.Items.Count" />
         <template #footer>
             <component :is="FootnoteComponent" text="The toggle and progress bar come from the component library." />
         </template>
@@ -27,12 +27,14 @@
     using Assimalign.Viu.Showcase.StandAlone.State;
 
     private readonly Reference<string> _lastChange = Reactive.Reference("no clicks yet");
+    private readonly Reference<bool> _showProgress = Reactive.Reference(true);
 
-    // A v-model target. The template unwraps references, and v-model writes the emitted value
-    // back untyped, so the target reference holds object?; IsProgressVisible reads it typed.
-    public Reference<object?> ShowProgress { get; } = Reactive.Reference<object?>(true);
-
-    public bool IsProgressVisible => ShowProgress.Value is true;
+    // Typed model assignment writes the property; the reference tracks renders that read it.
+    public bool ShowProgress
+    {
+        get => _showProgress.Value;
+        set => _showProgress.Value = value;
+    }
 
     public string LastChange => _lastChange.Value;
 
@@ -46,8 +48,7 @@
         Tasks = TaskStore.Definition.Use(Context!);
     }
 
-    // Event listeners receive the first emitted argument as object?.
-    private void OnCounterChanged(object? count) => _lastChange.Value = $"last value {count}";
+    private void OnCounterChanged(int count) => _lastChange.Value = $"last value {count}";
 }
 
 <style>

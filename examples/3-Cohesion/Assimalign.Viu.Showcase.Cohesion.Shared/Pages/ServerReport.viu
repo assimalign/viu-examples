@@ -56,7 +56,7 @@
         Tasks = await catalog.GetTasksAsync(cancellationToken);
     }
 
-    private string StatusLabel(TaskSummary task) => task.IsDone ? "done" : "open";
+    private static string StatusLabel(TaskSummary task) => task.IsDone ? "done" : "open";
 
-    private string StatusTone(TaskSummary task) => task.IsDone ? "success" : "warning";
+    private static string StatusTone(TaskSummary task) => task.IsDone ? "success" : "warning";
 }

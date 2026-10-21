@@ -36,11 +36,11 @@
 
     public string StatusTone => Task?.IsDone == true ? "success" : "warning";
 
-    private void SetDone(object? value)
+    private void SetDone(bool value)
     {
         if (Task is { } task)
         {
-            task.IsDone = value is true;
+            task.IsDone = value;
         }
     }
 

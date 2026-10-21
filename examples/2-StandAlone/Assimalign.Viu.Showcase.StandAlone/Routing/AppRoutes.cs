@@ -1,33 +1,22 @@
 using System.Collections.Generic;
 
-using Assimalign.Viu.Components;
 using Assimalign.Viu.Router;
+using Assimalign.Viu.Showcase.StandAlone.Pages;
 
 namespace Assimalign.Viu.Showcase.StandAlone.Routing;
 
-/// <summary>The route table. Each record maps a path to a registered component by name.</summary>
+/// <summary>The route table, using registered names and typed component definitions.</summary>
 public static class AppRoutes
 {
-    public static IReadOnlyList<RouteRecord> Create() =>
-    [
-        Page("/", "home", "HomePage", "Home"),
-        Page("/tasks", "tasks", "TasksPage", "Tasks"),
-        // ":id" becomes a route parameter; FromParameters passes it to the page's Id parameter.
-        new RouteRecord(
-            "/tasks/:id",
-            name: "task",
-            meta: Title("Task"),
-            component: new ComponentNode(ComponentReference.ForName("TaskDetailPage")),
-            argumentsResolver: RouteComponentArguments.FromParameters()),
-        Page("/:pathMatch(.*)*", "not-found", "NotFoundPage", "Not found"),
-    ];
-
-    private static RouteRecord Page(string path, string name, string component, string title) =>
-        new(
-            path,
-            name: name,
-            meta: Title(title),
-            component: new ComponentNode(ComponentReference.ForName(component)));
-
-    private static Dictionary<string, object?> Title(string title) => new() { ["title"] = title };
+    public static IReadOnlyList<RouteRecord> Create()
+    {
+        List<RouteRecord> routes = [];
+        routes.Add("/", "HomePage", "Home");
+        routes.Add("/tasks", "TasksPage", "Tasks");
+        // ":id" becomes the page's Id parameter.
+        routes.Add<TaskDetailPage>("/tasks/:id", "Task",
+            argumentsResolver: RouteComponentArguments.FromParameters());
+        routes.Add("/:pathMatch(.*)*", "NotFoundPage", "Not found");
+        return routes;
+    }
 }

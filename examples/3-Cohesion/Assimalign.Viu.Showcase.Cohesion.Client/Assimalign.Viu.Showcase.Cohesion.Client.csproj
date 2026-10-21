@@ -26,6 +26,4 @@
     <PackageReference Include="Assimalign.Cohesion.Viu.Routing" />
     <ProjectReference Include="..\Assimalign.Viu.Showcase.Cohesion.Shared\Assimalign.Viu.Showcase.Cohesion.Shared.csproj" />
   </ItemGroup>
-
-  <Import Project="..\..\1-ComponentLib\Assimalign.Viu.Showcase.Components\build\Assimalign.Viu.Showcase.Components.ProjectReference.targets" />
 </Project>

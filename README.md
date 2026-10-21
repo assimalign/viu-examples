@@ -39,9 +39,9 @@ All pins are CI builds from the GitHub Packages feed and must move together:
 
 | Pin | Where | Value |
 | --- | --- | --- |
-| Viu SDK and packages | `global.json` → `Assimalign.Viu.Sdk[.Browser]` | `10.0.0-preview.0.ci.4` (viu `main` @ `07facbc5`) |
+| Viu SDK and packages | `global.json` → `Assimalign.Viu.Sdk[.Browser]` | `10.0.0-preview.0.pr.379.6` (Viu PR #379, build 5) |
 | Cohesion SDK | `global.json` → `Assimalign.Cohesion.Sdk[.Web]` | `10.0.0-preview.0.ci.21` |
-| Cohesion.Viu hosting | `Directory.Build.props` → `CohesionViuVersion` | `10.0.0-preview.0.ci.7` (viu-platforms `main` @ `9f0f7dd`) |
+| Cohesion.Viu hosting | `Directory.Build.props` → `CohesionViuVersion` | `10.0.0-preview.0.pr.4.8` (viu-platforms PR #4, build 8) |
 
 `ViuVersion` is read back from `global.json`, so the SDK and every Viu package reference always agree.
 Projects reference packages by id only; versions are applied centrally in `Directory.Build.targets`.
@@ -64,14 +64,13 @@ the same assembly works in a WebAssembly client and on a server.
 
 Consuming the library:
 
-- **Components**: each Viu assembly generates a `GeneratedViuComponents` catalog in its root namespace;
-  the app registers it (`LibraryComponents.Register(factory)`), after which templates use the tags
-  (`<Card>`, `<Pill>`, …) directly.
-- **Styles**: component `<style>` blocks are extracted into one library stylesheet. A *packaged*
-  library registers it through its `buildTransitive` props; for a *ProjectReference*, apps import
-  [`build/Assimalign.Viu.Showcase.Components.ProjectReference.targets`](examples/1-ComponentLib/Assimalign.Viu.Showcase.Components/build/Assimalign.Viu.Showcase.Components.ProjectReference.targets),
-  which feeds the SDK the same file. Either way the host page links
-  `_content/Assimalign.Viu.Showcase.Components/Assimalign.Viu.Showcase.Components.viu.css`.
+- **Components**: generated catalogs include the app and referenced Viu libraries by default, so
+  templates use `<Card>`, `<Pill>`, … directly. Typed definitions select roots with
+  `ComponentNode.For<App>()`; no catalog registration boilerplate is needed.
+- **Styles**: component `<style>` blocks are extracted into one library stylesheet. The Browser SDK
+  flows both package and project-reference styles into `_content/PackageId/PackageId.viu.css` and
+  injects their links before the application's bundle. No custom targets or SPA host-page links
+  are needed. A custom server-rendered document shell still links the styles it uses.
 - **Theming**: components read CSS custom properties (`--viu-accent`, `--viu-border`, …) with
   fallbacks; each app sets its own palette in `App.viu`.
 
@@ -81,12 +80,13 @@ A browser-only app (`Assimalign.Viu.Sdk.Browser`). `dotnet run` builds it and se
 SDK's default WebAssembly dev host — no server project.
 
 - **Composition** ([`Program.cs`](examples/2-StandAlone/Assimalign.Viu.Showcase.StandAlone/Program.cs)):
-  `BrowserApplicationBuilder`, a component factory (app + library + router components + one
-  code-first component), and `UseRouter`.
+  `BrowserApplicationBuilder`, a typed root, default generated catalogs with extra router and
+  code-first registrations, and `UseRouter`.
 - **Services without a container**: [`AppServices`](examples/2-StandAlone/Assimalign.Viu.Showcase.StandAlone/Services/AppServices.cs)
   is a plain `IServiceProvider`; components resolve services through `Context.Services`.
 - **Routing**: hash history, route meta (page titles), a parameterized `/tasks/:id` route passed to the
-  page through `RouteComponentArguments.FromParameters()`, and a catch-all not-found route.
+  page through `RouteComponentArguments.FromParameters()`, and a catch-all not-found route. The
+  table uses `routes.Add("/", "HomePage", "Home")` and `routes.Add<TaskDetailPage>(...)`.
 - **State**: [`TaskStore`](examples/2-StandAlone/Assimalign.Viu.Showcase.StandAlone/State/TaskStore.cs) is a
   `StateStoreDefinition<T>` shared by every page, with a `ReactiveList<T>`, computed counts, and
   `Reactive.Batch()`. [`TaskItem`](examples/2-StandAlone/Assimalign.Viu.Showcase.StandAlone/Models/TaskItem.cs)
@@ -94,6 +94,10 @@ SDK's default WebAssembly dev host — no server project.
 - **Templates**: keyed `v-for`, `v-if`/`v-else`, native `v-model.trim`, component `v-model`, the
   explicit `:model-value` + `@update:model-value` form, `<component :is>`, and a code-first component
   ([`CodeFirstComponents`](examples/2-StandAlone/Assimalign.Viu.Showcase.StandAlone/Components/CodeFirstComponents.cs)).
+  Model targets are typed properties or references; forms in Card slots use `@submit.prevent` and
+  `@keydown.enter.prevent`. The key handler prevents native Enter submission so a task is added once.
+  Typed event listeners, static template helpers, compound interpolations, and boolean ARIA bindings
+  work directly.
 
 ## 3 — Cohesion client + server
 
@@ -105,7 +109,9 @@ Three projects:
 | `…Cohesion.Client` | `Assimalign.Viu.Sdk.Browser` | The WebAssembly app, composed with the Cohesion hosting model |
 | `…Cohesion.Server` | `Assimalign.Cohesion.Sdk.Web` | Serves the client, a JSON API, and server-rendered pages |
 
-Run the **Server**; its `ViuClientReference` builds the client and `UseClientOutput` serves it.
+Run the **Server**; its `<ProjectReference ... ViuClient="true" />` restores and builds the client.
+`builder.Services.AddViuClient()` infers that client and serves its output. Publishing the server
+also publishes the trimmed Release client and bundles its complete `wwwroot`.
 
 ### Dependency injection — client
 
@@ -115,33 +121,33 @@ through `ViuApplication.CreateBuilder()` (Cohesion DI, configuration, and host l
 - `builder.Services.AddSingleton(...)` registers an `HttpClient`, `ITaskCatalog` → `HttpTaskCatalog`,
   a `GreetingService`, and the `IStateStoreRegistry` — instances and factories only (WebAssembly is
   trimmed and AOT-compiled, so nothing is activated by reflection).
-- `builder.Services.AddComponents(...)` contributes the client and library component catalogs.
+- `builder.Services.AddComponents()` includes the generated client and referenced-library catalogs;
+  `builder.UseRootComponent<App>()` selects the typed root.
 - `builder.Services.AddRouting(...)` registers the router, browser path history, `RouterView`, and
-  `RouterLink`; `application.UseRouter()` installs it.
+  `RouterLink`; `routing.Routes.Add(...)` defines routes and `application.UseRouter()` installs them.
 - `builder.AddClientConfiguration(http)` loads the server's `/_cohesion/client.json` before startup.
 - Components resolve all of it through `Context.Services` (see `HomePage.viu` and `TasksPage.viu`).
 
 ### Dependency injection — server
 
-[`Server/Program.cs`](examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Server/Program.cs) has two
-containers, deliberately sharing one `InMemoryTaskCatalog` instance:
-
-- the **server-side Viu application** (`ViuApplication.CreateBuilder().ConfigureServerRendering()`),
-  whose services server-rendered components see through `Context.Services`; and
-- the **Cohesion web host** (`WebApplication.CreateBuilder`), which also registers routing and
-  source-generated JSON serialization for the API.
+[`Server/Program.cs`](examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Server/Program.cs) composes
+everything through `WebApplication.CreateBuilder(args).Services`: the singleton `ITaskCatalog`,
+routing, source-generated JSON serialization, `AddViuServerRendering(...)`, and `AddViuClient()`.
+Server-rendered components resolve the Web container's services through `Context.Services`.
+Each render owns a DI scope; the Web host owns startup, shutdown, and disposal.
 
 ### Server rendering
 
 - `ServerReport.viu` is an ordinary component. `OnServerPrefetch` loads data from the injected
   `ITaskCatalog`; the server awaits it before serializing, so the HTML already contains the data.
-- The server registers the generated server renders explicitly (`GeneratedViuServerRenders` from the
-  Shared and library assemblies) and calls
-  `UseViuServerRenderer(viuApplication, serverRenders, documentShell, shouldRender)` for `GET /report`.
+- `AddViuServerRendering` selects `ComponentNode.For<ServerReport>()` and the document shell.
+  Generated component and server-render catalogs include Shared and the library automatically,
+  including when the Web executable only uses the Cohesion SDK. The pipeline calls
+  `UseViuServerRenderer(context => context.Request.Path.Value == "/report")`.
 - [`ReportDocumentShell`](examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Server/Rendering/ReportDocumentShell.cs)
   writes the HTML around the rendered component. The page ships no JavaScript.
 - A task added in the browser (`POST /api/tasks`) appears in the server-rendered report, because both
-  containers share the catalog.
+  the API and server-rendered components resolve the same singleton catalog.
 
 ### Pipeline order
 
@@ -153,26 +159,25 @@ Cohesion runs a matched endpoint at the end of the pipeline, and `UseViuApplicat
 unmatched `GET` with `index.html` (the SPA fallback). The non-rejoining `Map("/api")` branch ends `/api`
 requests at the endpoint before the fallback can see them.
 
-## Known issues (Viu ci.4)
+## End-to-end validation
 
-The examples work around these framework issues; each workaround is commented where it applies.
+These examples are the end-to-end test for Viu and viu-platforms pull-request packages. Start fresh
+instances of both apps (StandAlone on 5180, the Cohesion server on 5181; the server keeps tasks in
+memory), then:
 
-1. **Native `v-model` writes back untyped.** The generated write-back assigns `object`, so a native or
-   component `v-model` target must be a `Reference<object?>` (templates unwrap references). Typed
-   alternatives: an explicit `:checked`/`@change` pair, or `:model-value` + `@update:model-value`.
-2. **Native `v-model` inside slot content does not update its model.** An `<input v-model>` placed in
-   a `<Card>` slot never commits; the same input in the page's own template works. Inputs therefore sit
-   outside slots.
-3. **Modifier- and key-wrapped handlers do not run.** `@submit.prevent` and `@keydown.enter` are never
-   invoked (a form then submits natively and reloads). Use a plain `@keydown` handler that checks
-   `IElementEvent.Key`, and a button `@click` instead of form submission.
-4. **Server-render codegen crash.** With `ViuServerRendering` on, an element whose only child is a
-   compound interpolation (`{{ A }} / {{ B }}`) crashes the generator (`InvalidCastException`,
-   `CompoundExpressionNode`). Use one interpolation of a computed string.
-5. **Template helpers must be instance members.** Generated code calls them as `component.Helper(...)`,
-   so `static` helpers fail with CS0176.
-6. **Typed method groups don't bind as event listeners.** `@changed="OnChanged"` needs
-   `OnChanged(object? value)`; `OnChanged(int value)` fails overload resolution.
+```powershell
+npm install --prefix _out/validation playwright
+node scripts/validate-browser.mjs local
+./scripts/Verify-LibraryStyles.ps1 -WebRoot ./_out/standalone/wwwroot
+```
+
+The browser script drives both apps in Chrome (set `CHROME_PATH` elsewhere), checks counters,
+component and native `v-model`, forms with `@submit.prevent` and Enter, routing, library styles,
+the JSON API, and the server-rendered `/report`, and fails on any console warning or error other
+than the missing favicon. `Verify-LibraryStyles.ps1` checks that a published library stylesheet and
+its compressed variants contain CSS.
+
+The former Viu ci.4 workarounds have all been removed; no known issues remain on the pinned builds.
 
 ## Development notes
 

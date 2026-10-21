@@ -12,6 +12,7 @@ on:
       - 'Directory.Build.*'
       - 'global.json'
       - 'nuget.config'
+      - 'scripts/Verify-LibraryStyles.ps1'
       - '.github/workflows/showcase.yml'
   pull_request:
     branches: [main]
@@ -21,6 +22,7 @@ on:
       - 'Directory.Build.*'
       - 'global.json'
       - 'nuget.config'
+      - 'scripts/Verify-LibraryStyles.ps1'
       - '.github/workflows/showcase.yml'
 
 permissions:
@@ -62,7 +64,16 @@ jobs:
 
       - name: Verify the library stylesheet was published
         shell: pwsh
-        run: |
-          $css = './_out/standalone/wwwroot/_content/Assimalign.Viu.Showcase.Components/Assimalign.Viu.Showcase.Components.viu.css'
-          if (-not (Test-Path -LiteralPath $css)) { throw "Missing $css" }
-          if (-not (Get-Content -Raw -LiteralPath $css).Contains('.card')) { throw "$css does not contain the library styles." }
+        run: ./scripts/Verify-LibraryStyles.ps1 -WebRoot ./_out/standalone/wwwroot
+
+      # The marked ProjectReference participates in restore; no separate client restore is needed.
+      - name: Publish Cohesion server and bundled client
+        run: >-
+          dotnet publish examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Server
+          --configuration Release
+          -warnaserror
+          --output ./_out/cohesion
+
+      - name: Verify bundled client styles
+        shell: pwsh
+        run: ./scripts/Verify-LibraryStyles.ps1 -WebRoot ./_out/cohesion/wwwroot

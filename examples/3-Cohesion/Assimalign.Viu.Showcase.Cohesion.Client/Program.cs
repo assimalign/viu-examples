@@ -7,15 +7,11 @@ using Assimalign.Cohesion.Viu.Hosting;
 using Assimalign.Cohesion.Viu.Hosting.Browser;
 using Assimalign.Cohesion.Viu.Routing;
 using Assimalign.Viu;
-using Assimalign.Viu.Components;
 using Assimalign.Viu.Router;
+using Assimalign.Viu.Showcase.Cohesion.Client;
 using Assimalign.Viu.Showcase.Cohesion.Client.Services;
 using Assimalign.Viu.Showcase.Cohesion.Shared;
 using Assimalign.Viu.State;
-
-// Every Viu assembly generates its own GeneratedViuComponents catalog in its root namespace.
-using ClientComponents = Assimalign.Viu.Showcase.Cohesion.Client.GeneratedViuComponents;
-using LibraryComponents = Assimalign.Viu.Showcase.Components.GeneratedViuComponents;
 
 ViuApplicationBuilder builder = ViuApplication.CreateBuilder();
 
@@ -36,16 +32,15 @@ builder.Services.AddSingleton<IStateStoreRegistry>(services =>
     StateStores.CreateRegistry(services, new ApplicationWatchScheduler()));
 
 // Components: this app's .viu files and the component library's.
-builder.Services.AddComponents(ClientComponents.Register);
-builder.Services.AddComponents(LibraryComponents.Register);
+builder.Services.AddComponents();
 
 // Routing: registers the router, browser (path) history, RouterView, and RouterLink. Deep links
 // work because the server answers unknown paths with index.html.
 builder.Services.AddRouting(routing =>
 {
-    routing.Routes.Add(Page("/", "HomePage", "Home"));
-    routing.Routes.Add(Page("/tasks", "TasksPage", "Tasks"));
-    routing.Routes.Add(Page("/:pathMatch(.*)*", "NotFoundPage", "Not found"));
+    routing.Routes.Add("/", "HomePage", "Home");
+    routing.Routes.Add("/tasks", "TasksPage", "Tasks");
+    routing.Routes.Add("/:pathMatch(.*)*", "NotFoundPage", "Not found");
 });
 
 // ---------------------------------------------------------------------------------------------
@@ -54,19 +49,11 @@ builder.Services.AddRouting(routing =>
 // Loads the server's public /_cohesion/client.json into IConfiguration before components start.
 builder.AddClientConfiguration(http);
 
-builder.ConfigureApplication(options =>
-    options.RootComponent = new ComponentNode(ComponentReference.ForName("App")));
+builder.UseRootComponent<App>();
 builder.ConfigureBrowser(options => options.MountTargetSelector = "#app");
 
 await using ViuApplication application = builder.Build();
 await application.UseRouter().RunAsync();
-
-static RouteRecord Page(string path, string component, string title) =>
-    new(
-        path,
-        name: component,
-        meta: new System.Collections.Generic.Dictionary<string, object?> { ["title"] = title },
-        component: new ComponentNode(ComponentReference.ForName(component)));
 
 static Uri ResolveBaseAddress()
 {

@@ -1,12 +1,10 @@
 <!-- Resolving application services from DI inside a component. -->
 <template>
-    <!-- Outside the Card slot on purpose: see README "Known issues" (native v-model in slot content). -->
-    <label class="field">
-        <span>Your name</span>
-        <input v-model="Name" placeholder="Ada" />
-    </label>
-
     <Card title="Dependency injection">
+        <label class="field">
+            <span>Your name</span>
+            <input v-model="Name" placeholder="Ada" />
+        </label>
         <!-- GreetingService was registered in Program.cs and resolved in OnSetup. -->
         <p>{{ Greeting }}</p>
         <template #footer>
@@ -28,10 +26,9 @@
 
     private GreetingService Greeter { get; set; } = null!;
 
-    // A native v-model target holds object? (the write-back is untyped); Greeting reads it typed.
-    public Reference<object?> Name { get; } = Reactive.Reference<object?>(string.Empty);
+    public Reference<string> Name { get; } = Reactive.Reference(string.Empty);
 
-    public string Greeting => Greeter.Greet(Name.Value as string ?? string.Empty);
+    public string Greeting => Greeter.Greet(Name.Value);
 
     public string EnvironmentLabel { get; private set; } = string.Empty;
 

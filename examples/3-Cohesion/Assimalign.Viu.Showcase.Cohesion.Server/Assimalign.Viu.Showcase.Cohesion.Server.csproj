@@ -9,10 +9,6 @@
     <!-- Cohesion assemblies are marked [RequiresPreviewFeatures] (CA2252). -->
     <EnablePreviewFeatures>true</EnablePreviewFeatures>
     <GenerateRequiresPreviewFeaturesAttribute>true</GenerateRequiresPreviewFeaturesAttribute>
-    <!-- The referenced Viu component projects carry the targeting-only Assimalign.Viu.App
-         framework reference, which a non-Viu host cannot resolve. The Viu runtime assemblies arrive
-         as ordinary packages through Assimalign.Cohesion.Viu.Server instead. -->
-    <DisableTransitiveFrameworkReferences>true</DisableTransitiveFrameworkReferences>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +16,6 @@
     <ProjectReference Include="..\Assimalign.Viu.Showcase.Cohesion.Shared\Assimalign.Viu.Showcase.Cohesion.Shared.csproj" />
     <!-- Builds the client first and records its output location (viu-client.json) beside this
          executable; publishing bundles the client's wwwroot. -->
-    <ViuClientReference Include="..\Assimalign.Viu.Showcase.Cohesion.Client\Assimalign.Viu.Showcase.Cohesion.Client.csproj" />
+    <ProjectReference Include="..\Assimalign.Viu.Showcase.Cohesion.Client\Assimalign.Viu.Showcase.Cohesion.Client.csproj" ViuClient="true" />
   </ItemGroup>
 </Project>

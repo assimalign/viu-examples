@@ -13,12 +13,12 @@
   <PropertyGroup>
     <!-- One pin per family, all restored from the assimalign GitHub Packages feed.
          global.json selects the project SDKs; the package versions below must be builds of the
-         same train: Cohesion.Viu ci.7 (viu-platforms main) was built against Viu ci.4 and
-         Cohesion ci.21, so move all three together. ViuVersion is read back from global.json so
+         same train: platforms PR #4 build 8 uses Viu PR #379 build 5 and Cohesion ci.21.
+         ViuVersion is read back from global.json so
          the SDK and every Viu package reference can never disagree. -->
     <_ViuExamplesGlobalJson>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)global.json'))</_ViuExamplesGlobalJson>
     <ViuVersion>$([System.Text.RegularExpressions.Regex]::Replace($(_ViuExamplesGlobalJson), '(?s)^.*"Assimalign\.Viu\.Sdk"\s*:\s*"([^"]+)".*$', '$1'))</ViuVersion>
-    <CohesionViuVersion>10.0.0-preview.0.ci.7</CohesionViuVersion>
+    <CohesionViuVersion>10.0.0-preview.0.pr.4.8</CohesionViuVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(ViuRunAotCompilation)' == 'true'">

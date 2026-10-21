@@ -23,7 +23,4 @@
     <PackageReference Include="Assimalign.Viu.Browser.Router" />
     <ProjectReference Include="..\..\1-ComponentLib\Assimalign.Viu.Showcase.Components\Assimalign.Viu.Showcase.Components.csproj" />
   </ItemGroup>
-
-  <!-- Flows the library's component CSS into wwwroot/_content, as its package would. -->
-  <Import Project="..\..\1-ComponentLib\Assimalign.Viu.Showcase.Components\build\Assimalign.Viu.Showcase.Components.ProjectReference.targets" />
 </Project>

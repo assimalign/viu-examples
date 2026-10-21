@@ -2,7 +2,7 @@
 <template>
     <div class="progress" role="progressbar" :aria-valuenow="Value" aria-valuemin="0" :aria-valuemax="Maximum">
         <div class="progress__fill" :style="FillStyle"></div>
-        <span class="progress__label">{{ LabelText }}</span>
+        <span class="progress__label">{{ Value }} / {{ Maximum }}</span>
     </div>
 </template>
 
@@ -17,10 +17,6 @@
 
     [Parameter]
     public int Maximum { get; set; } = 100;
-
-    // One interpolation on purpose: `{{ Value }} / {{ Maximum }}` crashes the ci.4 server-render
-    // code generator (CompoundExpressionNode cast) when ViuServerRendering is on.
-    public string LabelText => $"{Value} / {Maximum}";
 
     public string FillStyle
     {
