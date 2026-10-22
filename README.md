@@ -39,9 +39,9 @@ All pins are CI builds from the GitHub Packages feed and must move together:
 
 | Pin | Where | Value |
 | --- | --- | --- |
-| Viu SDK and packages | `global.json` → `Assimalign.Viu.Sdk[.Browser]` | `10.0.0-preview.0.pr.379.6` (Viu PR #379, build 5) |
-| Cohesion SDK | `global.json` → `Assimalign.Cohesion.Sdk[.Web]` | `10.0.0-preview.0.ci.21` |
-| Cohesion.Viu hosting | `Directory.Build.props` → `CohesionViuVersion` | `10.0.0-preview.0.pr.4.8` (viu-platforms PR #4, build 8) |
+| Viu SDK and packages | `global.json` → `Assimalign.Viu.Sdk[.Browser]` | `10.0.0-preview.0.ci.7` |
+| Cohesion SDK | `global.json` → `Assimalign.Cohesion.Sdk[.Web]` | `10.0.0-preview.0.ci.70` |
+| Cohesion.Viu hosting | `Directory.Build.props` → `CohesionViuVersion` | `10.0.0-preview.0.ci.12` |
 
 `ViuVersion` is read back from `global.json`, so the SDK and every Viu package reference always agree.
 Projects reference packages by id only; versions are applied centrally in `Directory.Build.targets`.
@@ -155,13 +155,15 @@ Each render owns a DI scope; the Web host owns startup, shutdown, and disposal.
 UseRouting → MapGet/MapPost /api/tasks → Map("/api") → UseViuServerRenderer(/report) → UseViuApplication
 ```
 
-Cohesion runs a matched endpoint at the end of the pipeline, and `UseViuApplication` answers every
-unmatched `GET` with `index.html` (the SPA fallback). The non-rejoining `Map("/api")` branch ends `/api`
-requests at the endpoint before the fallback can see them.
+Cohesion runs a matched endpoint at the end of the pipeline. `UseViuApplication` delegates requests
+with a selected endpoint, so mapped APIs run without a separate branch. The non-rejoining
+`Map("/api")` branch additionally reserves the entire API namespace: unknown API paths end as 404
+instead of receiving the client fallback. Other unmatched extensionless GET/HEAD navigation paths
+still receive `index.html`.
 
 ## End-to-end validation
 
-These examples are the end-to-end test for Viu and viu-platforms pull-request packages. Start fresh
+These examples exercise the pinned Viu and viu-platforms builds end to end. Start fresh
 instances of both apps (StandAlone on 5180, the Cohesion server on 5181; the server keeps tasks in
 memory), then:
 
