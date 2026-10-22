@@ -9,7 +9,6 @@
     <IsAotCompatible>true</IsAotCompatible>
     <ViuServerRendering>true</ViuServerRendering>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\1-ComponentLib\Assimalign.Viu.Showcase.Components\Assimalign.Viu.Showcase.Components.csproj" />
   </ItemGroup>

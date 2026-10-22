@@ -1,0 +1,3 @@
+<template>
+    <p>A dynamically selected component.</p>
+</template>

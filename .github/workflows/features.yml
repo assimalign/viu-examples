@@ -1,0 +1,39 @@
+name: focused-features
+on:
+  workflow_dispatch:
+    inputs:
+      viu-ref:
+        description: Matching Viu branch, tag, or commit
+        type: string
+        default: main
+  push:
+    branches: [main]
+    paths: ['examples/Features/**', 'scripts/FeatureSmoke/**', 'scripts/Test-Features.ps1', '.github/workflows/features.yml']
+  pull_request:
+    paths: ['examples/Features/**', 'scripts/FeatureSmoke/**', 'scripts/Test-Features.ps1', '.github/workflows/features.yml']
+permissions: { contents: read, packages: read }
+env:
+  NuGetPackageSourceCredentials_assimalign: Username=${{ github.actor }};Password=${{ secrets.GITHUB_TOKEN }}
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { path: viu-examples, persist-credentials: false }
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: assimalign/viu
+          ref: ${{ inputs.viu-ref || github.head_ref || github.ref_name }}
+          path: viu
+          persist-credentials: false
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        with: { global-json-file: viu-examples/examples/Features/global.json }
+      - run: dotnet workload install wasm-tools --skip-manifest-update
+      - name: Pack the paired Viu checkout
+        shell: pwsh
+        working-directory: viu
+        run: ./scripts/Install-Local.ps1
+      - name: Verify independent browser and console examples
+        shell: pwsh
+        working-directory: viu-examples
+        run: ./scripts/Test-Features.ps1

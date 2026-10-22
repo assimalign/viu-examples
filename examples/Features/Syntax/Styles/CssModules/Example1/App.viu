@@ -1,0 +1,8 @@
+<template>
+    <p :class="$style.message">A CSS module</p>
+</template>
+<style module>
+    .message {
+        color: teal;
+    }
+</style>

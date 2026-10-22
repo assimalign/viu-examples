@@ -1,0 +1,7 @@
+<template>
+    <nav>
+        <RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/people/42">Person 42</RouterLink>
+    </nav>
+    <RouterView />
+</template>

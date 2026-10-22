@@ -1,0 +1,14 @@
+<template>
+    <button @click="Increment">Increment</button>
+    <output>{{ Message }}</output>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    public Reference<int> Count { get; } = Reactive.Reference(0);
+
+    private void Increment() => Count.Value++;
+    public Reference<string> Message { get; } = Reactive.Reference("No changes yet");
+
+    partial void OnSetup() => Context!.Watch(() => Count.Value, (value, previous) => Message.Value = $"{previous} → {value}");
+}

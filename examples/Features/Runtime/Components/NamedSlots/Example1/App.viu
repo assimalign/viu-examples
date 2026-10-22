@@ -1,0 +1,11 @@
+<template>
+    <Panel>
+        <template #header>
+            <h1>Title</h1>
+        </template>
+        <p>Body</p>
+        <template #footer>
+            <small>Footer</small>
+        </template>
+    </Panel>
+</template>

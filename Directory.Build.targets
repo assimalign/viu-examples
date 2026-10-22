@@ -1,6 +1,7 @@
 <Project>
   <!-- Central version pins: projects reference packages by id only. -->
   <ItemGroup>
+    <PackageReference Update="Microsoft.Playwright" Version="1.59.0" />
     <PackageReference Update="Assimalign.Viu.Router" Version="$(ViuVersion)" />
     <PackageReference Update="Assimalign.Viu.Browser.Router" Version="$(ViuVersion)" />
     <PackageReference Update="Assimalign.Cohesion.Viu.Hosting" Version="$(CohesionViuVersion)" />

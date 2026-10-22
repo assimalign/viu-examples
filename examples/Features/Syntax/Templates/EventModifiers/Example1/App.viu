@@ -1,0 +1,11 @@
+<template>
+    <button @click.once="Increment">Only the first click counts</button>
+    <output>{{ Count }}</output>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    public Reference<int> Count { get; } = Reactive.Reference(0);
+
+    private void Increment() => Count.Value++;
+}

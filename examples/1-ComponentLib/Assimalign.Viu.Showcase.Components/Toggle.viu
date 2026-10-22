@@ -11,7 +11,9 @@
         :class="CssClass"
         :aria-checked="ModelValue"
         @click="Flip">
-        <span class="toggle__track" aria-hidden="true"><span class="toggle__thumb"></span></span>
+        <span class="toggle__track" aria-hidden="true">
+            <span class="toggle__thumb"></span>
+        </span>
         <span>{{ Label }}</span>
     </button>
 </template>
@@ -28,7 +30,6 @@
     /// <summary>The v-model update event.</summary>
     [Event("update:modelValue")]
     public partial void UpdateModelValue(bool value);
-
     public string CssClass => ModelValue ? "toggle toggle--on" : "toggle";
 
     private void Flip() => UpdateModelValue(!ModelValue);
@@ -46,7 +47,6 @@
         font: inherit;
         cursor: pointer;
     }
-
     .toggle__track {
         position: relative;
         width: 2.25rem;
@@ -55,7 +55,6 @@
         background: var(--viu-border, #cbd5e1);
         transition: background 150ms ease;
     }
-
     .toggle__thumb {
         position: absolute;
         top: 0.15rem;
@@ -66,11 +65,9 @@
         background: #ffffff;
         transition: transform 150ms ease;
     }
-
     .toggle--on .toggle__track {
         background: var(--viu-accent, #4f46e5);
     }
-
     .toggle--on .toggle__thumb {
         transform: translateX(1rem);
     }

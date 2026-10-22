@@ -1,0 +1,5 @@
+<template>
+    <Receiver>
+        <p>Projected purple</p>
+    </Receiver>
+</template>

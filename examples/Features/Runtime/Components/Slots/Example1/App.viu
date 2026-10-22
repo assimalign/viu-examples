@@ -1,0 +1,5 @@
+<template>
+    <Panel>
+        <p>Content owned by the parent.</p>
+    </Panel>
+</template>

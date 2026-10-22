@@ -1,0 +1,5 @@
+<template>
+    <section>
+        <slot>Fallback content.</slot>
+    </section>
+</template>

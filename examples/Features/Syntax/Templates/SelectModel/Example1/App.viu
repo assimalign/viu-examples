@@ -1,0 +1,13 @@
+<template>
+    <select v-model="Text">
+        <option value="Hello">Hello</option>
+        <option value="Bonjour">Bonjour</option>
+    </select>
+    <output>{{ Text }}</output>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    private readonly Reference<string> text = Reactive.Reference("Hello");
+    public string Text { get => text.Value; set => text.Value = value; }
+}

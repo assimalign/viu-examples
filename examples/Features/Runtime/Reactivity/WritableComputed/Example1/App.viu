@@ -1,0 +1,12 @@
+<template>
+    <input v-model="Upper" />
+    <output>{{ Name }}</output>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    public Reference<string> Name { get; } = Reactive.Reference("Ada");
+    public Computed<string> Upper { get; private set; } = null!;
+
+    partial void OnSetup() => Upper = Reactive.Computed(() => Name.Value.ToUpperInvariant(), value => Name.Value = value);
+}

@@ -10,7 +10,6 @@
     <EnablePreviewFeatures>true</EnablePreviewFeatures>
     <GenerateRequiresPreviewFeaturesAttribute>true</GenerateRequiresPreviewFeaturesAttribute>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Assimalign.Cohesion.Viu.Server" />
     <ProjectReference Include="..\Assimalign.Viu.Showcase.Cohesion.Shared\Assimalign.Viu.Showcase.Cohesion.Shared.csproj" />

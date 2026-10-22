@@ -1,0 +1,6 @@
+<template>
+    <p>The message below is rendered outside #app.</p>
+    <Teleport to="#overlay">
+        <p>Teleported content</p>
+    </Teleport>
+</template>

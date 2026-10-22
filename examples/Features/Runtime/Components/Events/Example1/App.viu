@@ -1,0 +1,11 @@
+<template>
+    <Picker @selected="Select" />
+    <output>{{ Selected }}</output>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    public Reference<string> Selected { get; } = Reactive.Reference("Nothing selected");
+
+    private void Select(string value) => Selected.Value = value;
+}

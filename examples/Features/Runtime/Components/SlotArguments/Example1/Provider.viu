@@ -1,0 +1,3 @@
+<template>
+    <slot message="Hello from the child" />
+</template>

@@ -1,0 +1,11 @@
+<Project>
+  <Import Project="../../Directory.Build.props" />
+  <PropertyGroup>
+    <_ViuFeatureGlobalJson>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)global.json'))</_ViuFeatureGlobalJson>
+    <ViuVersion>$([System.Text.RegularExpressions.Regex]::Replace($(_ViuFeatureGlobalJson), '(?s)^.*&quot;Assimalign\.Viu\.Sdk&quot;\s*:\s*&quot;([^&quot;]+)&quot;.*$', '$1'))</ViuVersion>
+    <ViuFeaturesDirectory>$(MSBuildThisFileDirectory)</ViuFeaturesDirectory>
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
+    <RootNamespace>Assimalign.Viu.Examples</RootNamespace>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+  </PropertyGroup>
+</Project>

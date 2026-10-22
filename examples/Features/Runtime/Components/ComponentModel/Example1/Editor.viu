@@ -1,0 +1,14 @@
+<template>
+    <button @click="Change">Choose Bonjour</button>
+    <p>{{ ModelValue }}</p>
+</template>
+@script {
+    using Assimalign.Viu.Components;
+
+    [Parameter]
+    public string ModelValue { get; set; } = "";
+
+    [Event(Name = "update:modelValue")]
+    public partial void Update(string value);
+    private void Change() => Update("Bonjour");
+}

@@ -1,0 +1,457 @@
+[
+  {
+    "Area": "Runtime/Reactivity",
+    "Feature": "Reference",
+    "Summary": "A reference schedules rendering when its value changes.",
+    "Directory": "Runtime/Reactivity/Reference/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Reactivity",
+    "Feature": "Computed",
+    "Summary": "A computed value caches its getter until a dependency changes.",
+    "Directory": "Runtime/Reactivity/Computed/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Reactivity",
+    "Feature": "Watch",
+    "Summary": "A component-owned watch receives the current and previous values and stops on unmount.",
+    "Directory": "Runtime/Reactivity/Watch/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Reactivity",
+    "Feature": "ReactiveList",
+    "Summary": "Adding to a reactive collection updates a keyed list.",
+    "Directory": "Runtime/Reactivity/ReactiveList/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Reactivity",
+    "Feature": "Batch",
+    "Summary": "Several writes form one reactive batch.",
+    "Directory": "Runtime/Reactivity/Batch/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Components",
+    "Feature": "Parameters",
+    "Summary": "A parent supplies one typed child parameter.",
+    "Directory": "Runtime/Components/Parameters/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Components",
+    "Feature": "Events",
+    "Summary": "A typed child event sends one value to its parent.",
+    "Directory": "Runtime/Components/Events/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Components",
+    "Feature": "Slots",
+    "Summary": "A child renders caller content through its default slot.",
+    "Directory": "Runtime/Components/Slots/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Components",
+    "Feature": "NamedSlots",
+    "Summary": "Named and default slots fill three independent child regions.",
+    "Directory": "Runtime/Components/NamedSlots/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Components",
+    "Feature": "SlotArguments",
+    "Summary": "A child supplies arguments to caller-owned slot content.",
+    "Directory": "Runtime/Components/SlotArguments/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Components",
+    "Feature": "Lifecycle",
+    "Summary": "The mounted callback updates component-owned state.",
+    "Directory": "Runtime/Components/Lifecycle/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Components",
+    "Feature": "DynamicComponent",
+    "Summary": "A typed registration selects a component dynamically without reflection activation.",
+    "Directory": "Runtime/Components/DynamicComponent/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Templates",
+    "Feature": "Conditionals",
+    "Summary": "A conditional creates and removes its branch.",
+    "Directory": "Syntax/Templates/Conditionals/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Templates",
+    "Feature": "Show",
+    "Summary": "v-show changes display while retaining the mounted element.",
+    "Directory": "Syntax/Templates/Show/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Templates",
+    "Feature": "ClassBinding",
+    "Summary": "Class bindings follow reactive state.",
+    "Directory": "Syntax/Templates/ClassBinding/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Templates",
+    "Feature": "StyleBinding",
+    "Summary": "A style object binds a reactive CSS property.",
+    "Directory": "Syntax/Templates/StyleBinding/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Templates",
+    "Feature": "EventModifiers",
+    "Summary": "The once modifier removes the listener after its first invocation.",
+    "Directory": "Syntax/Templates/EventModifiers/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Templates",
+    "Feature": "TextModel",
+    "Summary": "Text input and component state share one writable property.",
+    "Directory": "Syntax/Templates/TextModel/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Templates",
+    "Feature": "CheckboxModel",
+    "Summary": "A checkbox updates a boolean model.",
+    "Directory": "Syntax/Templates/CheckboxModel/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Templates",
+    "Feature": "SelectModel",
+    "Summary": "Select options update a string model.",
+    "Directory": "Syntax/Templates/SelectModel/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Templates",
+    "Feature": "NumericModel",
+    "Summary": "A numeric input converts its native value to a typed numeric model.",
+    "Directory": "Syntax/Templates/NumericModel/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Templates",
+    "Feature": "Once",
+    "Summary": "v-once retains its first render while an ordinary binding keeps updating.",
+    "Directory": "Syntax/Templates/Once/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Templates",
+    "Feature": "RawHtml",
+    "Summary": "v-html inserts a known HTML string; ordinary interpolation displays the same string as text.",
+    "Directory": "Syntax/Templates/RawHtml/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Styles",
+    "Feature": "Scoped",
+    "Summary": "Identical selectors stay isolated across two components. The parent paragraph is blue and the child paragraph is red.",
+    "Directory": "Syntax/Styles/Scoped/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Styles",
+    "Feature": "Slotted",
+    "Summary": "A scoped receiver styles a projected native slot root with :slotted().",
+    "Directory": "Syntax/Styles/Slotted/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Styles",
+    "Feature": "CssModules",
+    "Summary": "A generated module accessor supplies the collision-free class name.",
+    "Directory": "Syntax/Styles/CssModules/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Styles",
+    "Feature": "GlobalStyle",
+    "Summary": "An ordinary style block emits a global stylesheet rule.",
+    "Directory": "Syntax/Styles/GlobalStyle/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Browser",
+    "Feature": "Teleport",
+    "Summary": "Teleport mounts content in a separate target element.",
+    "Directory": "Browser/Teleport/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Browser",
+    "Feature": "Transition",
+    "Summary": "Transition applies enter and leave classes around one conditional element.",
+    "Directory": "Browser/Transition/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Browser",
+    "Feature": "TransitionGroup",
+    "Summary": "TransitionGroup animates keyed children as a group.",
+    "Directory": "Browser/TransitionGroup/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Components",
+    "Feature": "KeepAlive",
+    "Summary": "KeepAlive retains one counter per key while the active key changes.",
+    "Directory": "Runtime/Components/KeepAlive/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Components",
+    "Feature": "ComponentModel",
+    "Summary": "A component model uses a typed parameter and an update event.",
+    "Directory": "Runtime/Components/ComponentModel/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax",
+    "Feature": "VueCompatibility",
+    "Summary": "The .vue compatibility container accepts explicitly C# script setup and scoped styles.",
+    "Directory": "Syntax/VueCompatibility/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Reactivity",
+    "Feature": "EffectScope",
+    "Summary": "Stopping an effect scope stops all effects created in it.",
+    "Directory": "Runtime/Reactivity/EffectScope/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "Runtime/Reactivity",
+    "Feature": "WatchEffect",
+    "Summary": "A watch effect discovers its dependencies and runs cleanup before a replacement run.",
+    "Directory": "Runtime/Reactivity/WatchEffect/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "Runtime/Reactivity",
+    "Feature": "ReactiveDictionary",
+    "Summary": "Dictionary key reads and replacements participate in dependency tracking.",
+    "Directory": "Runtime/Reactivity/ReactiveDictionary/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "Runtime/Reactivity",
+    "Feature": "ReactiveSet",
+    "Summary": "Set membership and collection size participate in dependency tracking.",
+    "Directory": "Runtime/Reactivity/ReactiveSet/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "State",
+    "Feature": "SetupStore",
+    "Summary": "A store definition resolves one instance per explicitly owned registry.",
+    "Directory": "State/SetupStore/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "Router",
+    "Feature": "MemoryHistory",
+    "Summary": "Host-free history and navigation update the current route.",
+    "Directory": "Router/MemoryHistory/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "Router",
+    "Feature": "RouteMatching",
+    "Summary": "Static routes outrank dynamic routes independently of declaration order.",
+    "Directory": "Router/RouteMatching/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "Utilities",
+    "Feature": "FileRoutes",
+    "Summary": "A declarative file-route descriptor becomes an ordinary eager route record.",
+    "Directory": "Utilities/FileRoutes/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "ServerRenderer",
+    "Feature": "RenderString",
+    "Summary": "Server rendering escapes text and writes complete host-neutral markup.",
+    "Directory": "ServerRenderer/RenderString/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "ServerRenderer",
+    "Feature": "Streaming",
+    "Summary": "A renderer writes to a caller-owned TextWriter.",
+    "Directory": "ServerRenderer/Streaming/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "DevTools",
+    "Feature": "Protocol",
+    "Summary": "DevTools transport batches use source-generated protocol serialization.",
+    "Directory": "DevTools/Protocol/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "DevTools",
+    "Feature": "Testing",
+    "Summary": "The in-memory renderer runs without a browser and records host operations.",
+    "Directory": "DevTools/Testing/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "Utilities",
+    "Feature": "UtilityCandidates",
+    "Summary": "The standalone utility parser accepts variant and arbitrary-value candidates.",
+    "Directory": "Utilities/UtilityCandidates/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "Runtime/Components",
+    "Feature": "AsynchronousComponent",
+    "Summary": "An explicit asynchronous definition loads one registered component identity.",
+    "Directory": "Runtime/Components/AsynchronousComponent/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Components",
+    "Feature": "Suspense",
+    "Summary": "A Suspense boundary owns the asynchronous child pending presentation.",
+    "Directory": "Runtime/Components/Suspense/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Components",
+    "Feature": "Services",
+    "Summary": "Application composition supplies an IServiceProvider, and the component reads a typed service.",
+    "Directory": "Runtime/Components/Services/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Reactivity",
+    "Feature": "ReactiveObject",
+    "Summary": "The SDK source-generates tracking for partial properties on an explicitly marked class.",
+    "Directory": "Runtime/Reactivity/ReactiveObject/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Router",
+    "Feature": "WebHistory",
+    "Summary": "Navigate between two small pages with RouterLink and RouterView; history ownership and startup are explicit.",
+    "Directory": "Router/WebHistory/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Router",
+    "Feature": "HashHistory",
+    "Summary": "Navigate between two small pages with RouterLink and RouterView; history ownership and startup are explicit.",
+    "Directory": "Router/HashHistory/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Router",
+    "Feature": "FolderRoutes",
+    "Summary": "Navigate between two small pages with RouterLink and RouterView; history ownership and startup are explicit.",
+    "Directory": "Router/FolderRoutes/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Browser",
+    "Feature": "Hydration",
+    "Summary": "Attach to server-shaped HTML, retain the existing button, and add reactive event behavior.",
+    "Directory": "Browser/Hydration/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Browser",
+    "Feature": "CustomElement",
+    "Summary": "Define a native custom element with a Viu counter inside its open shadow root.",
+    "Directory": "Browser/CustomElement/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Templates",
+    "Feature": "BindingSpread",
+    "Summary": "Spread an object-valued dictionary into element attributes and reactively update it.",
+    "Directory": "Syntax/Templates/BindingSpread/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Syntax/Styles",
+    "Feature": "ScopedEscapes",
+    "Summary": "Use :deep and :global selectively while ordinary scoped selectors retain native author ownership.",
+    "Directory": "Syntax/Styles/ScopedEscapes/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "Runtime/Reactivity",
+    "Feature": "WritableComputed",
+    "Summary": "Bind an input to a computed value with an explicit setter.",
+    "Directory": "Runtime/Reactivity/WritableComputed/Example1",
+    "Kind": "Browser"
+  },
+  {
+    "Area": "State",
+    "Feature": "PatchAndReset",
+    "Summary": "Apply an in-place mutator patch and restore the initial state through an explicit typed copier.",
+    "Directory": "State/PatchAndReset/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "State",
+    "Feature": "Actions",
+    "Summary": "Observe a named action without changing the store shape.",
+    "Directory": "State/Actions/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "State",
+    "Feature": "Subscriptions",
+    "Summary": "Subscribe to grouped state mutations for the store lifetime.",
+    "Directory": "State/Subscriptions/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "State",
+    "Feature": "Serialization",
+    "Summary": "Capture and restore a versioned registry payload with a typed serializer; no reflection discovers state.",
+    "Directory": "State/Serialization/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "State",
+    "Feature": "Persistence",
+    "Summary": "Persist selected state through a host-owned storage boundary and restore it in a new registry.",
+    "Directory": "State/Persistence/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "ServerRenderer",
+    "Feature": "StaticPrerender",
+    "Summary": "Render two complete static documents with an explicit fresh request scope and host-page shell.",
+    "Directory": "ServerRenderer/StaticPrerender/Example1",
+    "Kind": "Console"
+  },
+  {
+    "Area": "Utilities",
+    "Feature": "UtilityBuild",
+    "Summary": "Generate utility CSS from template classes through the standalone build package.",
+    "Directory": "Utilities/UtilityBuild/Example1",
+    "Kind": "Browser"
+  }
+]

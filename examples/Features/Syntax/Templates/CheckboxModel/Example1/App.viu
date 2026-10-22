@@ -1,0 +1,10 @@
+<template>
+    <label><input type="checkbox" v-model="Enabled"> Enabled</label>
+    <output>{{ Enabled }}</output>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    private readonly Reference<bool> enabled = Reactive.Reference(false);
+    public bool Enabled { get => enabled.Value; set => enabled.Value = value; }
+}

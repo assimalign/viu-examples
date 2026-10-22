@@ -1,0 +1,7 @@
+<Project Sdk="Assimalign.Viu.Sdk.Browser">
+  <PropertyGroup>
+    <ViuExamplesCustomElement>true</ViuExamplesCustomElement>
+    <ViuExamplesBrowser>true</ViuExamplesBrowser>
+    <ViuExamplesCustomProgram>true</ViuExamplesCustomProgram>
+  </PropertyGroup>
+</Project>

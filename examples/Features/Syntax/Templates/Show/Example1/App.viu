@@ -1,0 +1,11 @@
+<template>
+    <button @click="Toggle">Toggle</button>
+    <p v-show="Visible">This node stays mounted.</p>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    public Reference<bool> Visible { get; } = Reactive.Reference(true);
+
+    private void Toggle() => Visible.Value = !Visible.Value;
+}

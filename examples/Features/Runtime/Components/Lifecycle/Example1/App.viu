@@ -1,0 +1,10 @@
+<template>
+    <output>{{ Status }}</output>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    public Reference<string> Status { get; } = Reactive.Reference("Before mount");
+
+    partial void OnSetup() => Context!.Lifecycle.OnMounted(() => Status.Value = "Mounted");
+}

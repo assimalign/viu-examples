@@ -1,0 +1,8 @@
+<template>
+    <component :is="Deferred" />
+</template>
+@script {
+    using Assimalign.Viu.Components;
+
+    public ComponentReference Deferred => ComponentReference.ForName("DeferredGreeting");
+}

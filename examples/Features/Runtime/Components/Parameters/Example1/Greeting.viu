@@ -1,0 +1,9 @@
+<template>
+    <p>Hello, {{ Name }}</p>
+</template>
+@script {
+    using Assimalign.Viu.Components;
+
+    [Parameter(IsRequired = true)]
+    public string Name { get; set; } = "";
+}

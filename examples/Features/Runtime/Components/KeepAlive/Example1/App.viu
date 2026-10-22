@@ -1,0 +1,13 @@
+<template>
+    <button @click="Toggle">Switch counter</button>
+    <KeepAlive :max="2">
+        <Counter :key="Active" />
+    </KeepAlive>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    public Reference<int> Active { get; } = Reactive.Reference(0);
+
+    private void Toggle() => Active.Value = 1 - Active.Value;
+}

@@ -1,0 +1,8 @@
+<template>
+    <p>Child red</p>
+</template>
+<style scoped>
+    p {
+        color: red;
+    }
+</style>

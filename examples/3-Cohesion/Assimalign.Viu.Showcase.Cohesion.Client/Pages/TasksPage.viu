@@ -4,12 +4,10 @@
         <template #badge>
             <Pill :label="Status" />
         </template>
-
         <form class="task-form" @submit.prevent="AddAsync">
             <input v-model.trim="NewTitle" @keydown.enter.prevent="AddAsync" placeholder="Sent to POST /api/tasks" aria-label="Task title" />
             <button type="submit" :disabled="!CanAdd">Add task</button>
         </form>
-
         <p v-if="IsLoading">Loading…</p>
         <p v-else-if="Error.Length > 0" class="error">{{ Error }}</p>
         <ul v-else class="task-list">
@@ -18,7 +16,6 @@
                 <Pill :label="StatusLabel(task)" :tone="StatusTone(task)" />
             </li>
         </ul>
-
         <template #footer>
             <button type="button" @click="RefreshAsync">Refresh</button>
             · <a href="/report">See the same data rendered on the server ↗</a>
@@ -32,7 +29,6 @@
     using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Assimalign.Viu.Components;
     using Assimalign.Viu.Reactivity;
     using Assimalign.Viu.Showcase.Cohesion.Shared;
@@ -40,34 +36,24 @@
     private readonly Reference<IReadOnlyList<TaskSummary>> _tasks = Reactive.Reference<IReadOnlyList<TaskSummary>>([]);
     private readonly Reference<bool> _isLoading = Reactive.Reference(true);
     private readonly Reference<string> _error = Reactive.Reference(string.Empty);
-
     // The same ITaskCatalog contract the server-rendered report uses; here it is the HTTP client.
     private ITaskCatalog Catalog { get; set; } = null!;
-
     public IReadOnlyList<TaskSummary> Tasks => _tasks.Value;
-
     public bool IsLoading => _isLoading.Value;
-
     public string Error => _error.Value;
-
     public string Status => $"{Tasks.Count} tasks";
-
     public Reference<string> NewTitle { get; } = Reactive.Reference(string.Empty);
-
     public bool CanAdd => NewTitle.Value.Length > 0;
 
     partial void OnSetup()
     {
-        Catalog = (ITaskCatalog?)Context!.Services?.GetService(typeof(ITaskCatalog))
-            ?? throw new InvalidOperationException("ITaskCatalog is not registered.");
-
+        Catalog = (ITaskCatalog? )Context!.Services?.GetService(typeof(ITaskCatalog)) ?? throw new InvalidOperationException("ITaskCatalog is not registered.");
         // Mount does not wait for this task; the page shows "Loading…" until it completes.
         // The token is cancelled if the page unmounts first.
         OnMounted(LoadAsync);
     }
 
     private Task RefreshAsync() => LoadAsync(Context!.Lifecycle.CancellationToken);
-
     private async Task LoadAsync(CancellationToken cancellationToken)
     {
         _isLoading.Value = true;
@@ -100,7 +86,6 @@
     }
 
     private static string StatusLabel(TaskSummary task) => task.IsDone ? "done" : "open";
-
     private static string StatusTone(TaskSummary task) => task.IsDone ? "success" : "warning";
 }
 
@@ -110,7 +95,6 @@
         gap: 0.5rem;
         margin-bottom: 1rem;
     }
-
     .task-form input {
         flex: 1;
         padding: 0.5rem 0.65rem;
@@ -118,7 +102,6 @@
         border-radius: 0.5rem;
         font: inherit;
     }
-
     .task-list {
         display: grid;
         gap: 0.5rem;
@@ -126,12 +109,10 @@
         padding: 0;
         list-style: none;
     }
-
     .task-list li {
         display: flex;
         justify-content: space-between;
     }
-
     .error {
         color: #b91c1c;
     }

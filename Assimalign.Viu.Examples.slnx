@@ -1,33 +1,33 @@
 <Solution>
-	<Configurations>
-		<Platform Name="Any CPU" />
-		<Platform Name="x64" />
-		<Platform Name="x86" />
-	</Configurations>
-	<Folder Name="/viu-examples/">
-		<File Path=".gitignore" />
-		<File Path="Directory.Build.props" />
-		<File Path="Directory.Build.targets" />
-		<File Path="global.json" />
-		<File Path="nuget.config" />
-		<File Path="README.md" />
-	</Folder>
-	<Folder Name="/viu-examples/.claude/">
-		<File Path=".claude/launch.json" />
-	</Folder>
-	<Folder Name="/viu-examples/.github/" />
-	<Folder Name="/viu-examples/.github/workflows/">
-		<File Path=".github/workflows/showcase.yml" />
-	</Folder>
-	<Folder Name="/1-ComponentLib/">
-		<Project Path="examples/1-ComponentLib/Assimalign.Viu.Showcase.Components/Assimalign.Viu.Showcase.Components.csproj" />
-	</Folder>
-	<Folder Name="/2-StandAlone/">
-		<Project Path="examples/2-StandAlone/Assimalign.Viu.Showcase.StandAlone/Assimalign.Viu.Showcase.StandAlone.csproj" />
-	</Folder>
-	<Folder Name="/3-Cohesion/">
-		<Project Path="examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Shared/Assimalign.Viu.Showcase.Cohesion.Shared.csproj" />
-		<Project Path="examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Client/Assimalign.Viu.Showcase.Cohesion.Client.csproj" />
-		<Project Path="examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Server/Assimalign.Viu.Showcase.Cohesion.Server.csproj" />
-	</Folder>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/viu-examples/">
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="global.json" />
+    <File Path="nuget.config" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/viu-examples/.claude/">
+    <File Path=".claude/launch.json" />
+  </Folder>
+  <Folder Name="/viu-examples/.github/" />
+  <Folder Name="/viu-examples/.github/workflows/">
+    <File Path=".github/workflows/showcase.yml" />
+  </Folder>
+  <Folder Name="/1-ComponentLib/">
+    <Project Path="examples/1-ComponentLib/Assimalign.Viu.Showcase.Components/Assimalign.Viu.Showcase.Components.csproj" />
+  </Folder>
+  <Folder Name="/2-StandAlone/">
+    <Project Path="examples/2-StandAlone/Assimalign.Viu.Showcase.StandAlone/Assimalign.Viu.Showcase.StandAlone.csproj" />
+  </Folder>
+  <Folder Name="/3-Cohesion/">
+    <Project Path="examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Shared/Assimalign.Viu.Showcase.Cohesion.Shared.csproj" />
+    <Project Path="examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Client/Assimalign.Viu.Showcase.Cohesion.Client.csproj" />
+    <Project Path="examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Server/Assimalign.Viu.Showcase.Cohesion.Server.csproj" />
+  </Folder>
 </Solution>
