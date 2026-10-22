@@ -1,0 +1,110 @@
+<!-- Inputs and lists: native v-model, DOM events, keyed v-for, and shared application state. -->
+<template>
+    <Card title="Tasks">
+        <template #badge>
+            <Pill :label="Summary" :tone="SummaryTone" />
+        </template>
+
+        <form class="task-form" @submit.prevent="AddTask">
+            <input v-model.trim="NewTitle" @keydown.enter.prevent="AddTask" placeholder="What needs doing?" aria-label="Task title" />
+            <button type="submit" :disabled="!CanAdd">Add task</button>
+        </form>
+
+        <ul v-if="Tasks.Items.Count > 0" class="task-list">
+            <!-- :key gives each row a stable identity, so removals patch instead of re-render. -->
+            <li v-for="task in Tasks.Items" :key="task.Id" :class="TaskClass(task)">
+                <input type="checkbox" v-model="task.IsDone" :aria-label="task.Title" />
+                <RouterLink :to="DetailPath(task)">{{ task.Title }}</RouterLink>
+                <button type="button" class="task__remove" @click="Tasks.Remove(task)" aria-label="Remove">×</button>
+            </li>
+        </ul>
+        <p v-else>All clear.</p>
+
+        <template #footer>
+            <button type="button" :disabled="Tasks.Completed.Value == 0" @click="Tasks.ClearCompleted">
+                Clear completed
+            </button>
+        </template>
+    </Card>
+</template>
+
+@script {
+    using Assimalign.Viu.Components;
+    using Assimalign.Viu.Reactivity;
+    using Assimalign.Viu.Showcase.StandAlone.Models;
+    using Assimalign.Viu.Showcase.StandAlone.State;
+
+    public TaskStore Tasks { get; private set; } = null!;
+
+    public Reference<string> NewTitle { get; } = Reactive.Reference(string.Empty);
+
+    public bool CanAdd => NewTitle.Value.Length > 0;
+
+    public string Summary => $"{Tasks.Remaining.Value} of {Tasks.Items.Count} open";
+
+    public string SummaryTone => Tasks.Remaining.Value == 0 ? "success" : "warning";
+
+    partial void OnSetup()
+    {
+        Tasks = TaskStore.Definition.Use(Context!);
+    }
+
+    private static string TaskClass(TaskItem task) => task.IsDone ? "task task--done" : "task";
+
+    private static string DetailPath(TaskItem task) => $"/tasks/{task.Id}";
+
+    private void AddTask()
+    {
+        Tasks.Add(NewTitle.Value);
+        NewTitle.Value = string.Empty;
+    }
+}
+
+<style>
+    .task-form {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .task-form input {
+        flex: 1;
+        padding: 0.5rem 0.65rem;
+        border: 1px solid var(--viu-border);
+        border-radius: 0.5rem;
+        font: inherit;
+    }
+
+    .task-list {
+        display: grid;
+        gap: 0.25rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .task {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.4rem 0.25rem;
+    }
+
+    .task a {
+        flex: 1;
+        color: inherit;
+    }
+
+    .task--done a {
+        color: var(--viu-text-muted);
+        text-decoration: line-through;
+    }
+
+    .task__remove {
+        border: 0;
+        background: none;
+        color: var(--viu-text-muted);
+        font-size: 1.1rem;
+        cursor: pointer;
+    }
+</style>

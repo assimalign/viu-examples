@@ -1,0 +1,58 @@
+<!-- Library components with parameters, slots, events, and component v-model. -->
+<template>
+    <Card title="Counter">
+        <template #badge>
+            <Pill :label="LastChange" />
+        </template>
+
+        <!-- Step is a declared int parameter; @changed listens for the component's event. -->
+        <Counter :step="2" @changed="OnCounterChanged" />
+    </Card>
+
+    <Card title="Settings">
+        <div class="settings">
+            <!-- v-model on a component: binds modelValue and handles update:modelValue. -->
+            <Toggle v-model="ShowProgress" label="Show task progress" />
+        </div>
+        <ProgressBar v-if="ShowProgress" :value="Tasks.Completed.Value" :maximum="Tasks.Items.Count" />
+        <template #footer>
+            <component :is="FootnoteComponent" text="The toggle and progress bar come from the component library." />
+        </template>
+    </Card>
+</template>
+
+@script {
+    using Assimalign.Viu.Components;
+    using Assimalign.Viu.Reactivity;
+    using Assimalign.Viu.Showcase.StandAlone.State;
+
+    private readonly Reference<string> _lastChange = Reactive.Reference("no clicks yet");
+    private readonly Reference<bool> _showProgress = Reactive.Reference(true);
+
+    // Typed model assignment writes the property; the reference tracks renders that read it.
+    public bool ShowProgress
+    {
+        get => _showProgress.Value;
+        set => _showProgress.Value = value;
+    }
+
+    public string LastChange => _lastChange.Value;
+
+    public TaskStore Tasks { get; private set; } = null!;
+
+    // A code-first component is selected at run time by its registered name.
+    public ComponentReference FootnoteComponent { get; } = ComponentReference.ForName("Footnote");
+
+    partial void OnSetup()
+    {
+        Tasks = TaskStore.Definition.Use(Context!);
+    }
+
+    private void OnCounterChanged(int count) => _lastChange.Value = $"last value {count}";
+}
+
+<style>
+    .settings {
+        margin-bottom: 0.75rem;
+    }
+</style>

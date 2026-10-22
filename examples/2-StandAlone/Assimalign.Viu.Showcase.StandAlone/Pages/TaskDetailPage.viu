@@ -1,0 +1,51 @@
+<!-- A parameterized route: /tasks/:id passes "id" into the Id parameter. -->
+<template>
+    <Card v-if="Task is not null" :title="Task.Title">
+        <template #badge>
+            <Pill :label="StatusLabel" :tone="StatusTone" />
+        </template>
+        <!-- What v-model expands to, written out: a value in, an update event out. -->
+        <Toggle :model-value="Task.IsDone" @update:model-value="SetDone" label="Completed" />
+        <template #footer>
+            <RouterLink to="/tasks">← Back to tasks</RouterLink>
+        </template>
+    </Card>
+    <Card v-else title="Task not found">
+        <p>No task has id {{ Id }}.</p>
+        <template #footer>
+            <RouterLink to="/tasks">← Back to tasks</RouterLink>
+        </template>
+    </Card>
+</template>
+
+@script {
+    using Assimalign.Viu.Components;
+    using Assimalign.Viu.Showcase.StandAlone.Models;
+    using Assimalign.Viu.Showcase.StandAlone.State;
+
+    /// <summary>The route parameter, always a string.</summary>
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    private TaskStore Tasks { get; set; } = null!;
+
+    // Re-evaluated on render, so navigating /tasks/1 → /tasks/2 updates the same mounted page.
+    public TaskItem? Task => int.TryParse(Id, out int id) ? Tasks.Find(id) : null;
+
+    public string StatusLabel => Task?.IsDone == true ? "done" : "open";
+
+    public string StatusTone => Task?.IsDone == true ? "success" : "warning";
+
+    private void SetDone(bool value)
+    {
+        if (Task is { } task)
+        {
+            task.IsDone = value;
+        }
+    }
+
+    partial void OnSetup()
+    {
+        Tasks = TaskStore.Definition.Use(Context!);
+    }
+}

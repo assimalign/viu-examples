@@ -1,0 +1,75 @@
+<!-- A counter. Shows component-local reactive state, computed values, and a typed emitted event. -->
+<template>
+    <div class="counter">
+        <button type="button" @click="Decrement" aria-label="Decrement">−</button>
+        <output aria-live="polite">{{ Count }}</output>
+        <button type="button" @click="Increment" aria-label="Increment">+</button>
+        <span class="counter__hint">{{ Parity }}</span>
+    </div>
+</template>
+
+@script {
+    using Assimalign.Viu.Components;
+    using Assimalign.Viu.Reactivity;
+
+    /// <summary>Gets or sets the amount added or removed per click.</summary>
+    [Parameter]
+    public int Step { get; set; } = 1;
+
+    /// <summary>Raised after every change with the new count.</summary>
+    [Event]
+    public partial void Changed(int count);
+
+    // Each mounted Counter gets its own instance, so this reference is component-local.
+    public Reference<int> Count { get; } = Reactive.Reference(0);
+
+    // Reading Count.Value inside a computed subscribes it; the render subscribes to Parity in turn.
+    public Computed<string> Parity { get; private set; } = null!;
+
+    partial void OnSetup()
+    {
+        Parity = Reactive.Computed(() => Count.Value % 2 == 0 ? "even" : "odd");
+    }
+
+    private void Increment()
+    {
+        Count.Value += Step;
+        Changed(Count.Value);
+    }
+
+    private void Decrement()
+    {
+        Count.Value -= Step;
+        Changed(Count.Value);
+    }
+}
+
+<style>
+    .counter {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .counter button {
+        width: 2rem;
+        height: 2rem;
+        border: 1px solid var(--viu-border, #e2e8f0);
+        border-radius: 0.5rem;
+        background: var(--viu-surface, #ffffff);
+        font: inherit;
+        cursor: pointer;
+    }
+
+    .counter output {
+        min-width: 2.5rem;
+        text-align: center;
+        font-size: 1.25rem;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .counter__hint {
+        color: var(--viu-text-muted, #64748b);
+        font-size: 0.8rem;
+    }
+</style>

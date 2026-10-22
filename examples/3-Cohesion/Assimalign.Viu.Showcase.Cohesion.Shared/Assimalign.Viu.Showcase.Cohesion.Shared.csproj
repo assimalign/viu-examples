@@ -1,0 +1,16 @@
+<Project Sdk="Assimalign.Viu.Sdk">
+  <!--
+    Code both hosts compile against: the task contract (ITaskCatalog), its JSON wire format, and the
+    server-rendered pages. Host-neutral base SDK, so the server can reference it. ViuServerRendering
+    emits server-markup bodies and the GeneratedViuServerRenders catalog for the pages.
+  -->
+  <PropertyGroup>
+    <RootNamespace>Assimalign.Viu.Showcase.Cohesion.Shared</RootNamespace>
+    <IsAotCompatible>true</IsAotCompatible>
+    <ViuServerRendering>true</ViuServerRendering>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\1-ComponentLib\Assimalign.Viu.Showcase.Components\Assimalign.Viu.Showcase.Components.csproj" />
+  </ItemGroup>
+</Project>

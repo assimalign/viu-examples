@@ -1,0 +1,8 @@
+<template>
+    <Card title="Nothing here">
+        <p>That page does not exist.</p>
+        <template #footer>
+            <RouterLink to="/">Go home</RouterLink>
+        </template>
+    </Card>
+</template>

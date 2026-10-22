@@ -2,17 +2,24 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "showcase",
+      "name": "standalone",
       "runtimeExecutable": "dotnet",
       "runtimeArgs": [
         "run",
         "--project",
-        "examples/Assimalign.Viu.Showcase/Assimalign.Viu.Showcase.csproj",
-        "--configuration",
-        "Release",
-        "--no-launch-profile"
+        "examples/2-StandAlone/Assimalign.Viu.Showcase.StandAlone/Assimalign.Viu.Showcase.StandAlone.csproj"
       ],
-      "port": 8080
+      "port": 5180
+    },
+    {
+      "name": "cohesion",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": [
+        "run",
+        "--project",
+        "examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Server/Assimalign.Viu.Showcase.Cohesion.Server.csproj"
+      ],
+      "port": 5181
     }
   ]
 }
