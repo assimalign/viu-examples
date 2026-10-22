@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Assimalign.Viu.ServerRenderer;
 
 namespace Assimalign.Viu.Showcase.Cohesion.Server.Rendering;
-
 /// <summary>
 /// The HTML document around a server-rendered page. Viu streams the prefix, then the component
 /// markup, then the suffix. The report is static HTML, so the shell links only stylesheets (the
@@ -36,27 +34,21 @@ public sealed class ReportDocumentShell : IServerRenderDocumentShell
         <body>
         <div id="report">
         """;
-
     private const string Suffix = """
         </div>
         </body>
         </html>
         """;
-
     public ValueTask WritePrefixAsync(IServerRenderOutput output, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(output);
         return output.WriteAsync(Prefix.AsMemory(), cancellationToken);
     }
 
-    public ValueTask WriteSuffixAsync(
-        IServerRenderOutput output,
-        IReadOnlyDictionary<string, string> teleports,
-        CancellationToken cancellationToken = default)
+    public ValueTask WriteSuffixAsync(IServerRenderOutput output, IReadOnlyDictionary<string, string> teleports, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(output);
         ArgumentNullException.ThrowIfNull(teleports);
-
         // The report uses no <Teleport>; a shell that supports them writes each payload here.
         return output.WriteAsync(Suffix.AsMemory(), cancellationToken);
     }

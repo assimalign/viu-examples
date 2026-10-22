@@ -1,0 +1,15 @@
+<template>
+    <button @click="Toggle">Toggle</button>
+    <p :style="Style">Style binding</p>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    public Reference<bool> Visible { get; } = Reactive.Reference(true);
+
+    private void Toggle() => Visible.Value = !Visible.Value;
+    public object Style => new System.Collections.Generic.Dictionary<string, object?>
+    {
+        ["color"] = Visible.Value ? "green" : "gray"
+    };
+}

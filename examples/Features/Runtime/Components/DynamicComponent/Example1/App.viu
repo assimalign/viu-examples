@@ -1,0 +1,8 @@
+<template>
+    <component :is="Current" />
+</template>
+@script {
+    using Assimalign.Viu.Components;
+
+    public ComponentReference Current { get; } = ComponentNode.For<Greeting>().Component;
+}

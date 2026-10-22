@@ -1,0 +1,10 @@
+<template>
+    <p>{{ Greeting }}</p>
+</template>
+@script {
+    using Assimalign.Viu.Examples;
+
+    public string Greeting { get; private set; } = "";
+
+    partial void OnSetup() => Greeting = ((GreetingMessage)Context!.Services!.GetService(typeof(GreetingMessage))!).Text;
+}

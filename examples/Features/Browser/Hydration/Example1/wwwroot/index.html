@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Viu feature example</title>
+        <link rel="preload" id="webassembly">
+        <script type="importmap"></script>
+        <script type="module" src="main#[.{fingerprint}].js"></script>
+    </head>
+    <body>
+        <div id="app"><button data-ready="no">0</button></div>
+        <script>window.preRenderedButton=document.querySelector("#app button");</script>
+        <div id="overlay"></div>
+    </body>
+</html>

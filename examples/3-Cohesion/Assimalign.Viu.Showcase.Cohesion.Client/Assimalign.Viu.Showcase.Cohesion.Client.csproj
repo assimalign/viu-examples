@@ -15,11 +15,9 @@
     <EnablePreviewFeatures>true</EnablePreviewFeatures>
     <GenerateRequiresPreviewFeaturesAttribute>true</GenerateRequiresPreviewFeaturesAttribute>
   </PropertyGroup>
-
   <ItemGroup>
     <StaticWebAssetFingerprintPattern Include="JS" Pattern="*.js" Expression="#[.{fingerprint}]!" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Assimalign.Cohesion.Viu.Hosting" />
     <PackageReference Include="Assimalign.Cohesion.Viu.Hosting.Browser" />

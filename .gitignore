@@ -405,3 +405,7 @@ examples/**/wwwroot/_content/
 
 # Local pack/SDK output feed
 _out/
+
+# Focused consumer builds and isolated package caches
+.nuget/
+.artifacts/

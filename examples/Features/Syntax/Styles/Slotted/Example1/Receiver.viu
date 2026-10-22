@@ -1,0 +1,11 @@
+<template>
+    <section>
+        <slot />
+        <p>Ordinary receiver content</p>
+    </section>
+</template>
+<style scoped>
+    :slotted(p) {
+        color: purple;
+    }
+</style>

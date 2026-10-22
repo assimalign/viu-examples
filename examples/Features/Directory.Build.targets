@@ -1,0 +1,24 @@
+<Project>
+  <ItemGroup Condition="'$(ViuExamplesBrowser)' == 'true' and '$(ViuExamplesCustomProgram)' != 'true'">
+    <Compile Include="$(ViuFeaturesDirectory)Shared/BrowserProgram.cs" Link="Program.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Assimalign.Cohesion.Viu.Hosting" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(ViuExamplesBrowser)' != 'true'">
+    <PackageReference Include="Assimalign.Viu.Testing" Condition="'$(MSBuildProjectName)' != 'Viu.DevTools.Testing.Example1'" />
+    <Compile Include="$(ViuFeaturesDirectory)Shared/ConsoleExample.cs" Link="ConsoleExample.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(ViuExamplesBrowser)' == 'true'">
+    <PackageReference Include="Assimalign.Cohesion.Viu.Hosting.Browser" />
+    <PackageReference Include="Assimalign.Viu.Browser" />
+    <StaticWebAssetFingerprintPattern Include="JS" Pattern="*.js" Expression="#[.{fingerprint}]!" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(ViuExamplesBrowser)' != 'true' or '$(ViuExamplesCustomElement)' == 'true'">
+    <Compile Include="$(ViuFeaturesDirectory)Shared/ExampleHostFactory.cs" Link="ExampleHostFactory.cs" />
+  </ItemGroup>
+  <Import Project="../../Directory.Build.targets" />
+  <ItemGroup>
+    <PackageReference Update="Assimalign.Viu.Browser;Assimalign.Viu.Browser.Router;Assimalign.Viu.UtilityCss.Build;Assimalign.Viu.Core;Assimalign.Viu.Testing;Assimalign.Viu.ServerRenderer;Assimalign.Viu.DevTools;Assimalign.Viu.FileRouting;Assimalign.Viu.UtilityCss" Version="$(ViuVersion)" />
+  </ItemGroup>
+</Project>

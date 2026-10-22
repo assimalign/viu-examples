@@ -1,0 +1,167 @@
+<Solution>
+  <Folder Name="/Runtime/Reactivity/Reference/">
+    <Project Path="Runtime/Reactivity/Reference/Example1/Viu.Runtime.Reactivity.Reference.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Reactivity/Computed/">
+    <Project Path="Runtime/Reactivity/Computed/Example1/Viu.Runtime.Reactivity.Computed.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Reactivity/Watch/">
+    <Project Path="Runtime/Reactivity/Watch/Example1/Viu.Runtime.Reactivity.Watch.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Reactivity/ReactiveList/">
+    <Project Path="Runtime/Reactivity/ReactiveList/Example1/Viu.Runtime.Reactivity.ReactiveList.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Reactivity/Batch/">
+    <Project Path="Runtime/Reactivity/Batch/Example1/Viu.Runtime.Reactivity.Batch.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Components/Parameters/">
+    <Project Path="Runtime/Components/Parameters/Example1/Viu.Runtime.Components.Parameters.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Components/Events/">
+    <Project Path="Runtime/Components/Events/Example1/Viu.Runtime.Components.Events.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Components/Slots/">
+    <Project Path="Runtime/Components/Slots/Example1/Viu.Runtime.Components.Slots.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Components/NamedSlots/">
+    <Project Path="Runtime/Components/NamedSlots/Example1/Viu.Runtime.Components.NamedSlots.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Components/SlotArguments/">
+    <Project Path="Runtime/Components/SlotArguments/Example1/Viu.Runtime.Components.SlotArguments.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Components/Lifecycle/">
+    <Project Path="Runtime/Components/Lifecycle/Example1/Viu.Runtime.Components.Lifecycle.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Components/DynamicComponent/">
+    <Project Path="Runtime/Components/DynamicComponent/Example1/Viu.Runtime.Components.DynamicComponent.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/Templates/Conditionals/">
+    <Project Path="Syntax/Templates/Conditionals/Example1/Viu.Syntax.Templates.Conditionals.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/Templates/Show/">
+    <Project Path="Syntax/Templates/Show/Example1/Viu.Syntax.Templates.Show.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/Templates/ClassBinding/">
+    <Project Path="Syntax/Templates/ClassBinding/Example1/Viu.Syntax.Templates.ClassBinding.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/Templates/StyleBinding/">
+    <Project Path="Syntax/Templates/StyleBinding/Example1/Viu.Syntax.Templates.StyleBinding.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/Templates/EventModifiers/">
+    <Project Path="Syntax/Templates/EventModifiers/Example1/Viu.Syntax.Templates.EventModifiers.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/Templates/TextModel/">
+    <Project Path="Syntax/Templates/TextModel/Example1/Viu.Syntax.Templates.TextModel.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/Templates/CheckboxModel/">
+    <Project Path="Syntax/Templates/CheckboxModel/Example1/Viu.Syntax.Templates.CheckboxModel.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/Templates/SelectModel/">
+    <Project Path="Syntax/Templates/SelectModel/Example1/Viu.Syntax.Templates.SelectModel.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/Templates/NumericModel/">
+    <Project Path="Syntax/Templates/NumericModel/Example1/Viu.Syntax.Templates.NumericModel.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/Templates/Once/">
+    <Project Path="Syntax/Templates/Once/Example1/Viu.Syntax.Templates.Once.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/Templates/RawHtml/">
+    <Project Path="Syntax/Templates/RawHtml/Example1/Viu.Syntax.Templates.RawHtml.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/Styles/Scoped/">
+    <Project Path="Syntax/Styles/Scoped/Example1/Viu.Syntax.Styles.Scoped.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/Styles/Slotted/">
+    <Project Path="Syntax/Styles/Slotted/Example1/Viu.Syntax.Styles.Slotted.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/Styles/CssModules/">
+    <Project Path="Syntax/Styles/CssModules/Example1/Viu.Syntax.Styles.CssModules.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/Styles/GlobalStyle/">
+    <Project Path="Syntax/Styles/GlobalStyle/Example1/Viu.Syntax.Styles.GlobalStyle.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Browser/Teleport/">
+    <Project Path="Browser/Teleport/Example1/Viu.Browser.Teleport.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Browser/Transition/">
+    <Project Path="Browser/Transition/Example1/Viu.Browser.Transition.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Browser/TransitionGroup/">
+    <Project Path="Browser/TransitionGroup/Example1/Viu.Browser.TransitionGroup.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Components/KeepAlive/">
+    <Project Path="Runtime/Components/KeepAlive/Example1/Viu.Runtime.Components.KeepAlive.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Components/ComponentModel/">
+    <Project Path="Runtime/Components/ComponentModel/Example1/Viu.Runtime.Components.ComponentModel.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Syntax/VueCompatibility/">
+    <Project Path="Syntax/VueCompatibility/Example1/Viu.Syntax.VueCompatibility.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Reactivity/EffectScope/">
+    <Project Path="Runtime/Reactivity/EffectScope/Example1/Viu.Runtime.Reactivity.EffectScope.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Reactivity/WatchEffect/">
+    <Project Path="Runtime/Reactivity/WatchEffect/Example1/Viu.Runtime.Reactivity.WatchEffect.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Reactivity/ReactiveDictionary/">
+    <Project Path="Runtime/Reactivity/ReactiveDictionary/Example1/Viu.Runtime.Reactivity.ReactiveDictionary.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Reactivity/ReactiveSet/">
+    <Project Path="Runtime/Reactivity/ReactiveSet/Example1/Viu.Runtime.Reactivity.ReactiveSet.Example1.csproj" />
+  </Folder>
+  <Folder Name="/State/SetupStore/">
+    <Project Path="State/SetupStore/Example1/Viu.State.SetupStore.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Router/MemoryHistory/">
+    <Project Path="Router/MemoryHistory/Example1/Viu.Router.MemoryHistory.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Router/RouteMatching/">
+    <Project Path="Router/RouteMatching/Example1/Viu.Router.RouteMatching.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Utilities/FileRoutes/">
+    <Project Path="Utilities/FileRoutes/Example1/Viu.Utilities.FileRoutes.Example1.csproj" />
+  </Folder>
+  <Folder Name="/ServerRenderer/RenderString/">
+    <Project Path="ServerRenderer/RenderString/Example1/Viu.ServerRenderer.RenderString.Example1.csproj" />
+  </Folder>
+  <Folder Name="/ServerRenderer/Streaming/">
+    <Project Path="ServerRenderer/Streaming/Example1/Viu.ServerRenderer.Streaming.Example1.csproj" />
+  </Folder>
+  <Folder Name="/DevTools/Protocol/">
+    <Project Path="DevTools/Protocol/Example1/Viu.DevTools.Protocol.Example1.csproj" />
+  </Folder>
+  <Folder Name="/DevTools/Testing/">
+    <Project Path="DevTools/Testing/Example1/Viu.DevTools.Testing.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Utilities/UtilityCandidates/">
+    <Project Path="Utilities/UtilityCandidates/Example1/Viu.Utilities.UtilityCandidates.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Components/AsynchronousComponent/">
+    <Project Path="Runtime/Components/AsynchronousComponent/Example1/Viu.Runtime.Components.AsynchronousComponent.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Components/Suspense/">
+    <Project Path="Runtime/Components/Suspense/Example1/Viu.Runtime.Components.Suspense.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Components/Services/">
+    <Project Path="Runtime/Components/Services/Example1/Viu.Runtime.Components.Services.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/Reactivity/ReactiveObject/">
+    <Project Path="Runtime/Reactivity/ReactiveObject/Example1/Viu.Runtime.Reactivity.ReactiveObject.Example1.csproj" />
+  </Folder>
+  <Project Path="Router/WebHistory/Example1/Viu.Router.WebHistory.Example1.csproj" />
+  <Project Path="Router/HashHistory/Example1/Viu.Router.HashHistory.Example1.csproj" />
+  <Project Path="Router/FolderRoutes/Example1/Viu.Router.FolderRoutes.Example1.csproj" />
+  <Project Path="Browser/Hydration/Example1/Viu.Browser.Hydration.Example1.csproj" />
+  <Project Path="Browser/CustomElement/Example1/Viu.Browser.CustomElement.Example1.csproj" />
+  <Project Path="Syntax/Templates/BindingSpread/Example1/Viu.Syntax.Templates.BindingSpread.Example1.csproj" />
+  <Project Path="Syntax/Styles/ScopedEscapes/Example1/Viu.Syntax.Styles.ScopedEscapes.Example1.csproj" />
+  <Project Path="Runtime/Reactivity/WritableComputed/Example1/Viu.Runtime.Reactivity.WritableComputed.Example1.csproj" />
+  <Project Path="State/PatchAndReset/Example1/Viu.State.PatchAndReset.Example1.csproj" />
+  <Project Path="State/Actions/Example1/Viu.State.Actions.Example1.csproj" />
+  <Project Path="State/Subscriptions/Example1/Viu.State.Subscriptions.Example1.csproj" />
+  <Project Path="State/Serialization/Example1/Viu.State.Serialization.Example1.csproj" />
+  <Project Path="State/Persistence/Example1/Viu.State.Persistence.Example1.csproj" />
+  <Project Path="ServerRenderer/StaticPrerender/Example1/Viu.ServerRenderer.StaticPrerender.Example1.csproj" />
+  <Project Path="Utilities/UtilityBuild/Example1/Viu.Utilities.UtilityBuild.Example1.csproj" />
+</Solution>

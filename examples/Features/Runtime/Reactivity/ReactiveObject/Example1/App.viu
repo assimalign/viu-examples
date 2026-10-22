@@ -1,0 +1,8 @@
+<template>
+    <button @click="Increment">{{ Model.Count }}</button>
+</template>
+@script {
+    public CounterState Model { get; } = new();
+
+    private void Increment() => Model.Count++;
+}

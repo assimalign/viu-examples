@@ -1,0 +1,7 @@
+<template>
+    <div v-html="Markup"></div>
+    <pre>{{ Markup }}</pre>
+</template>
+@script {
+    public string Markup => "<strong>Rendered markup</strong>";
+}

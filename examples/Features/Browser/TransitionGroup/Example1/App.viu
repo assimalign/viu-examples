@@ -1,0 +1,24 @@
+<template>
+    <button @click="Add">Add</button>
+    <TransitionGroup name="fade" tag="ul">
+        <li v-for="item in Items" :key="item">{{ item }}</li>
+    </TransitionGroup>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    public ReactiveList<string> Items { get; } = new()
+    {
+        "first"
+    };
+
+    private void Add() => Items.Add($"item {Items.Count + 1}");
+}
+<style>
+    .fade-enter-active {
+        transition: opacity .2s;
+    }
+    .fade-enter-from {
+        opacity: 0;
+    }
+</style>

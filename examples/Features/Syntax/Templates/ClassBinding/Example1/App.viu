@@ -1,0 +1,19 @@
+<template>
+    <button @click="Toggle">Toggle</button>
+    <p :class="Visible ? &quot;active&quot; : &quot;inactive&quot;">Class binding</p>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    public Reference<bool> Visible { get; } = Reactive.Reference(true);
+
+    private void Toggle() => Visible.Value = !Visible.Value;
+}
+<style>
+    .active {
+        color: green;
+    }
+    .inactive {
+        color: gray;
+    }
+</style>

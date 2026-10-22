@@ -1,0 +1,10 @@
+<template>
+    <button @click="Choose">Choose blue</button>
+</template>
+@script {
+    using Assimalign.Viu.Components;
+
+    [Event]
+    public partial void Selected(string value);
+    private void Choose() => Selected("blue");
+}

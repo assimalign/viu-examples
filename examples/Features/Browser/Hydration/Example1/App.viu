@@ -1,0 +1,12 @@
+<template>
+    <button @click="Increment" :data-ready="Ready ? &quot;yes&quot; : &quot;no&quot;">{{ Count }}</button>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    public Reference<int> Count { get; } = Reactive.Reference(0);
+    public Reference<bool> Ready { get; } = Reactive.Reference(false);
+
+    partial void OnSetup() => Context!.Lifecycle.OnMounted(() => Ready.Value = true);
+    private void Increment() => Count.Value++;
+}

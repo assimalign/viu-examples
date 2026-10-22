@@ -1,0 +1,9 @@
+<Project Sdk="Assimalign.Viu.Sdk.Browser">
+  <PropertyGroup>
+    <ViuExamplesBrowser>true</ViuExamplesBrowser>
+    <ViuUtilityCssBundleName>utilities.css</ViuUtilityCssBundleName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Assimalign.Viu.UtilityCss.Build" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

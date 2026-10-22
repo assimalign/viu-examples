@@ -1,6 +1,8 @@
 # Viu examples
 
-Three small, runnable examples of [Viu](https://github.com/assimalign/viu), a C#/.NET UI framework
+The [65 focused feature examples](examples/Features/README.md) demonstrate individual features in small independent projects, all composed through Cohesion `ViuApplicationBuilder`. The three composition examples below show how those pieces fit together.
+
+Runnable compositions of [Viu](https://github.com/assimalign/viu), a C#/.NET UI framework
 for the browser (WebAssembly). Each one builds on the previous:
 
 | Folder | What it is | Run |

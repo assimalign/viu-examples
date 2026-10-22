@@ -1,0 +1,10 @@
+<template>
+    <Editor v-model="Text" />
+    <output>{{ Text }}</output>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    private readonly Reference<string> text = Reactive.Reference("Hello");
+    public string Text { get => text.Value; set => text.Value = value; }
+}

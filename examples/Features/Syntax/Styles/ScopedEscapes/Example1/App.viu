@@ -1,0 +1,14 @@
+<template>
+    <section>
+        <Child />
+    </section>
+    <p class="notice">Global notice</p>
+</template>
+<style scoped>
+    section :deep(.message) {
+        color: green;
+    }
+    :global(.notice) {
+        color: purple;
+    }
+</style>

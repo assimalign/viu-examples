@@ -1,0 +1,7 @@
+<template>
+    <Provider>
+        <template #default="arguments">
+            <output>{{ arguments["message"] }}</output>
+        </template>
+    </Provider>
+</template>

@@ -1,0 +1,9 @@
+<template>
+    <p>Person {{ Id }}</p>
+</template>
+@script {
+    using Assimalign.Viu.Components;
+
+    [Parameter(Name = "id")]
+    public string Id { get; set; } = "";
+}

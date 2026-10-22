@@ -1,0 +1,12 @@
+<Project Sdk="Assimalign.Viu.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Assimalign.Viu.Core" />
+    <Compile Include="$(ViuFeaturesDirectory)Shared/CounterState.cs" Link="CounterState.cs" />
+    <Compile Include="$(ViuFeaturesDirectory)Shared/CounterStore.cs" Link="CounterStore.cs" />
+    <Compile Include="$(ViuFeaturesDirectory)Shared/CounterSerializer.cs" Link="CounterSerializer.cs" />
+    <Compile Include="$(ViuFeaturesDirectory)Shared/MemoryStateStorage.cs" Link="MemoryStateStorage.cs" />
+  </ItemGroup>
+</Project>

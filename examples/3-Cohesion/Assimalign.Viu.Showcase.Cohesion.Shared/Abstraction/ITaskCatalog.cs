@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Assimalign.Viu.Showcase.Cohesion.Shared;
-
 /// <summary>
 /// The task data contract. Components depend only on this interface and resolve it from
 /// <c>Context.Services</c>; each host registers its own implementation in dependency injection:
@@ -13,6 +12,5 @@ namespace Assimalign.Viu.Showcase.Cohesion.Shared;
 public interface ITaskCatalog
 {
     Task<IReadOnlyList<TaskSummary>> GetTasksAsync(CancellationToken cancellationToken = default);
-
     Task<TaskSummary> AddAsync(string title, CancellationToken cancellationToken = default);
 }

@@ -1,0 +1,8 @@
+<template>
+    <p class="notice">An ordinary stylesheet</p>
+</template>
+<style>
+    .notice {
+        color: darkorange;
+    }
+</style>

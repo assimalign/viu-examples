@@ -1,0 +1,8 @@
+<Project Sdk="Assimalign.Viu.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Assimalign.Viu.ServerRenderer" />
+  </ItemGroup>
+</Project>

@@ -9,11 +9,9 @@
             <h1>Task report</h1>
             <Pill label="server-rendered" tone="accent" />
         </header>
-
         <Card title="Progress">
             <ProgressBar :value="CompletedCount" :maximum="Tasks.Count" />
         </Card>
-
         <Card title="All tasks">
             <ul v-if="Tasks.Count > 0" class="report__list">
                 <li v-for="task in Tasks" :key="task.Id">
@@ -37,9 +35,7 @@
     using System.Threading.Tasks;
 
     public IReadOnlyList<TaskSummary> Tasks { get; private set; } = [];
-
     public int CompletedCount => Tasks.Count(task => task.IsDone);
-
     public string RenderedAt { get; } = DateTimeOffset.UtcNow.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
 
     partial void OnSetup()
@@ -51,12 +47,10 @@
 
     private async Task LoadAsync(CancellationToken cancellationToken)
     {
-        ITaskCatalog catalog = (ITaskCatalog?)Context!.Services?.GetService(typeof(ITaskCatalog))
-            ?? throw new InvalidOperationException("ITaskCatalog is not registered.");
+        ITaskCatalog catalog = (ITaskCatalog? )Context!.Services?.GetService(typeof(ITaskCatalog)) ?? throw new InvalidOperationException("ITaskCatalog is not registered.");
         Tasks = await catalog.GetTasksAsync(cancellationToken);
     }
 
     private static string StatusLabel(TaskSummary task) => task.IsDone ? "done" : "open";
-
     private static string StatusTone(TaskSummary task) => task.IsDone ? "success" : "warning";
 }

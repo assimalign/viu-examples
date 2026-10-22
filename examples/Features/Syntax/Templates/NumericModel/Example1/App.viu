@@ -1,0 +1,10 @@
+<template>
+    <input type="number" v-model="Value">
+    <output>{{ Value }}</output>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    private readonly Reference<int> number = Reactive.Reference(1);
+    public int Value { get => number.Value; set => number.Value = value; }
+}

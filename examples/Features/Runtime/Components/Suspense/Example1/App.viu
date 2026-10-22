@@ -1,0 +1,13 @@
+<template>
+    <Suspense>
+        <component :is="Deferred" />
+        <template #fallback>
+            <p>Waiting for the child…</p>
+        </template>
+    </Suspense>
+</template>
+@script {
+    using Assimalign.Viu.Components;
+
+    public ComponentReference Deferred => ComponentReference.ForName("DeferredGreeting");
+}

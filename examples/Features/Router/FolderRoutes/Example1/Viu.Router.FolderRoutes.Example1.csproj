@@ -1,0 +1,14 @@
+<Project Sdk="Assimalign.Viu.Sdk.Browser">
+  <PropertyGroup>
+    <ViuExamplesBrowser>true</ViuExamplesBrowser>
+    <ViuExamplesCustomProgram>true</ViuExamplesCustomProgram>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Assimalign.Viu.Browser.Router" />
+    <PackageReference Include="Assimalign.Cohesion.Viu.Routing" />
+    <PackageReference Include="Assimalign.Viu.FileRouting" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(ViuFeaturesDirectory)Shared/RoutingBootstrap.cs" Link="RoutingBootstrap.cs" />
+  </ItemGroup>
+</Project>

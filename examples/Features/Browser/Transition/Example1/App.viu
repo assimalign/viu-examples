@@ -1,0 +1,21 @@
+<template>
+    <button @click="Toggle">Toggle</button>
+    <Transition name="fade">
+        <p v-if="Visible">Fading content</p>
+    </Transition>
+</template>
+@script {
+    using Assimalign.Viu.Reactivity;
+
+    public Reference<bool> Visible { get; } = Reactive.Reference(true);
+
+    private void Toggle() => Visible.Value = !Visible.Value;
+}
+<style>
+    .fade-enter-active,.fade-leave-active {
+        transition: opacity .2s;
+    }
+    .fade-enter-from,.fade-leave-to {
+        opacity: 0;
+    }
+</style>

@@ -9,7 +9,6 @@
                 <a href="/report">Server report ↗</a>
             </nav>
         </header>
-
         <main class="app__main">
             <h1>{{ PageTitle }}</h1>
             <RouterView />
@@ -35,8 +34,7 @@
     partial void OnSetup()
     {
         // AddRouting registered the router as a singleton in the Cohesion container.
-        Router = (Assimalign.Viu.Router.Router?)Context!.Services?.GetService(typeof(Assimalign.Viu.Router.Router))
-            ?? throw new InvalidOperationException("Routing is not registered.");
+        Router = (Assimalign.Viu.Router.Router? )Context!.Services?.GetService(typeof(Assimalign.Viu.Router.Router)) ?? throw new InvalidOperationException("Routing is not registered.");
     }
 }
 
@@ -50,12 +48,10 @@
         color: #0f172a;
         font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     }
-
     body {
         margin: 0;
         background: #f1f5f9;
     }
-
     .app__header {
         display: flex;
         align-items: center;
@@ -64,22 +60,18 @@
         background: var(--viu-surface);
         border-bottom: 1px solid var(--viu-border);
     }
-
     .app__nav {
         display: flex;
         gap: 1rem;
     }
-
     .app__nav a {
         color: var(--viu-text-muted);
         text-decoration: none;
     }
-
     .app__nav a.router-link-exact-active {
         color: var(--viu-accent);
         font-weight: 600;
     }
-
     .app__main {
         display: grid;
         gap: 1rem;
@@ -87,7 +79,6 @@
         margin: 0 auto;
         padding: 1.5rem;
     }
-
     .app__main h1 {
         margin: 0;
     }

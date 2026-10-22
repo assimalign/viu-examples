@@ -1,0 +1,17 @@
+<template>
+    <button @click="Increment">Increment</button>
+    <p v-bind="Attributes">Inspect my title</p>
+</template>
+@script {
+    using System.Collections.Generic;
+    using Assimalign.Viu.Reactivity;
+
+    public Reference<int> Count { get; } = Reactive.Reference(0);
+    public object Attributes => new Dictionary<string, object?>
+    {
+        ["title"] = $"Count: {Count.Value}",
+        ["data-count"] = Count.Value
+    };
+
+    private void Increment() => Count.Value++;
+}
