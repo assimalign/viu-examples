@@ -7,9 +7,10 @@ for the browser (WebAssembly). Each one builds on the previous:
 | --- | --- | --- |
 | [`examples/1-ComponentLib`](examples/1-ComponentLib) | A reusable, host-neutral component library | (library, used by 2 and 3) |
 | [`examples/2-StandAlone`](examples/2-StandAlone) | A single-page app on the SDK's default dev server | `dotnet run --project examples/2-StandAlone/Assimalign.Viu.Showcase.StandAlone` |
-| [`examples/3-Cohesion`](examples/3-Cohesion) | A client + Cohesion Web server with DI on both sides and server rendering | `dotnet run --project examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Server` |
+| [`examples/3-Cohesion`](examples/3-Cohesion) | A client + Cohesion Web server with DI on both sides and server rendering, plus a gateway that runs the server as a managed resource | `dotnet run --project examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Server` (or `…Cohesion.Gateway`) |
 
-StandAlone listens on <http://127.0.0.1:5180>, Cohesion on <http://127.0.0.1:5181>.
+StandAlone listens on <http://127.0.0.1:5180>, the Cohesion server on <http://127.0.0.1:5181>. Under the
+gateway, the platform assigns the server's port and the gateway prints it.
 
 ## Prerequisites
 
@@ -35,16 +36,19 @@ dotnet build Assimalign.Viu.Examples.slnx
 
 ## Versions
 
-All pins are CI builds from the GitHub Packages feed and must move together:
+All pins come from the GitHub Packages feed and must move together:
 
 | Pin | Where | Value |
 | --- | --- | --- |
-| Viu SDK and packages | `global.json` → `Assimalign.Viu.Sdk[.Browser]` | `10.0.0-preview.0.ci.7` |
-| Cohesion SDK | `global.json` → `Assimalign.Cohesion.Sdk[.Web]` | `10.0.0-preview.0.ci.70` |
-| Cohesion.Viu hosting | `Directory.Build.props` → `CohesionViuVersion` | `10.0.0-preview.0.ci.12` |
+| Viu SDK and packages | `global.json` → `Assimalign.Viu.Sdk[.Browser]` | `10.0.0-preview.2` |
+| Cohesion SDKs and packages | `global.json` → `Assimalign.Cohesion.Sdk`, `.Sdk.Web`, `.Sdk.Gateway` | `10.0.0-preview.0.pr.1759.172` |
+| Cohesion.Viu hosting | `Directory.Build.props` → `CohesionViuVersion` | `10.0.0-preview.0.pr.7.16` |
 
-`ViuVersion` is read back from `global.json`, so the SDK and every Viu package reference always agree.
-Projects reference packages by id only; versions are applied centrally in `Directory.Build.targets`.
+The Cohesion.Viu packages are built against exactly those Viu and Cohesion versions and require Viu
+`>= 10.0.0-preview.2`. `ViuVersion` is read back from `global.json`, and the Cohesion packages
+(`ApplicationModel.Hosting.InProcess`, `ApplicationModel.Gateway.InProcess`) take the Cohesion SDK's
+`$(CohesionVersion)`, so SDKs and package references always agree. Projects reference packages by id
+only; versions are applied centrally in `Directory.Build.targets`.
 
 ## 1 — Component library
 
@@ -99,19 +103,55 @@ SDK's default WebAssembly dev host — no server project.
   Typed event listeners, static template helpers, compound interpolations, and boolean ARIA bindings
   work directly.
 
-## 3 — Cohesion client + server
+## 3 — Cohesion client + server + gateway
 
-Three projects:
+Four projects:
 
 | Project | SDK | Role |
 | --- | --- | --- |
 | `…Cohesion.Shared` | `Assimalign.Viu.Sdk` | The `ITaskCatalog` contract, JSON wire types, and the server-rendered `ServerReport.viu` page |
 | `…Cohesion.Client` | `Assimalign.Viu.Sdk.Browser` | The WebAssembly app, composed with the Cohesion hosting model |
-| `…Cohesion.Server` | `Assimalign.Cohesion.Sdk.Web` | Serves the client, a JSON API, and server-rendered pages |
+| `…Cohesion.Server` | `Assimalign.Cohesion.Sdk.Web` | Serves the client, a JSON API, and server-rendered pages; the `showcase-web` resource when managed |
+| `…Cohesion.Gateway` | `Assimalign.Cohesion.Sdk.Gateway` | Declares the application model and runs the Server on Cohesion's in-process platform |
 
-Run the **Server**; its `<ProjectReference ... ViuClient="true" />` restores and builds the client.
+Run the **Server** on its own, or the **Gateway**, which runs it. The Server's
+`<ProjectReference ... ViuClient="true" PrivateAssets="all" />` restores and builds the client
+(`PrivateAssets` keeps the browser client out of the Gateway's references).
 `builder.Services.AddViuClient()` infers that client and serves its output. Publishing the server
 also publishes the trimmed Release client and bundles its complete `wwwroot`.
+
+### Managed or unmanaged
+
+The Server is an ordinary Web application. One registration in
+[`Server/Program.cs`](examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Server/Program.cs) makes it
+a managed resource when a gateway starts it:
+
+```csharp
+builder.Services.AddResource("showcase-web", resource => resource.UseInProcess());
+```
+
+- **Unmanaged** (`dotnet run --project …Cohesion.Server`): no gateway platform is named in the
+  environment, so `AddResource` registers nothing. The launch profile picks the port through the
+  runtime contract (`COHESION_ENDPOINT_HTTP_SCHEME`/`_HOST`/`_PORT` = `http`/`127.0.0.1`/`5181`), and
+  `/_cohesion/client.json` reports no application, resource, or gateway. Without the profile (the
+  built or published executable run directly) the server binds Web.Hosting's default,
+  `http://127.0.0.1:5000`.
+- **Managed** (`dotnet run --project …Cohesion.Gateway`):
+  [`Gateway/Program.cs`](examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Gateway/Program.cs)
+  registers the Server's `Program.MainAsync` on an `InProcessInfrastructure` with
+  `AddProgram("Web", "showcase-web", …)`, builds `ApplicationGateway.CreateBuilder("viu-showcase")
+  .UseInProcess(infrastructure)`, declares `AddResource("Web", "showcase-web")`, then
+  `StartAsync()` and prints each resource's endpoint output before awaiting `Completion`. The
+  platform runs the Server on a thread of the gateway's process in an environment of its own (its
+  name, the gateway, its http endpoint), so `/_cohesion/client.json` reports
+  `"application":"viu-showcase"`, `"resource":"showcase-web"`, and `"gateway":"inprocess"`. Ctrl+C
+  stops the gateway, and disposing the infrastructure stops the Server.
+
+The Server therefore declares no `Http:Endpoints` section: a configured section wins over the
+platform-assigned endpoint, and under an in-process gateway the Server's configuration and client
+document are read from the gateway's directory. A gateway passes settings with
+`builder.AddResource(...).WithSetting(key, value)`; they arrive in the Server as configuration. An
+in-process gateway runs the site from a build, not from a publish.
 
 ### Dependency injection — client
 
@@ -164,8 +204,11 @@ still receive `index.html`.
 ## End-to-end validation
 
 These examples exercise the pinned Viu and viu-platforms builds end to end. Start fresh
-instances of both apps (StandAlone on 5180, the Cohesion server on 5181; the server keeps tasks in
-memory), then:
+instances of both apps with `dotnet run --project` (StandAlone on 5180, the Cohesion server on 5181
+through its launch profile; the server keeps tasks in memory). The script expects those two ports:
+to validate the published Cohesion server instead, set the launch profile's three variables first
+(`COHESION_ENDPOINT_HTTP_SCHEME`/`_HOST`/`_PORT` = `http`/`127.0.0.1`/`5181`; the runtime contract
+reads none of them alone), since the executable alone binds 5000. Then:
 
 ```powershell
 npm install --prefix _out/validation playwright
@@ -177,13 +220,12 @@ The browser script drives both apps in Chrome (set `CHROME_PATH` elsewhere), che
 component and native `v-model`, forms with `@submit.prevent` and Enter, routing, library styles,
 the JSON API, and the server-rendered `/report`, and fails on any console warning or error other
 than the missing favicon. `Verify-LibraryStyles.ps1` checks that a published library stylesheet and
-its compressed variants contain CSS.
-
-The former Viu ci.4 workarounds have all been removed; no known issues remain on the pinned builds.
+its compressed variants contain CSS. CI also runs the built Gateway and checks that the managed site
+answers at the printed endpoint and that its client document reports `"gateway":"inprocess"`.
 
 ## Development notes
 
 - Each runnable project has a `Properties/launchSettings.json` profile; `.claude/launch.json` holds the
-  same two entries for Claude Code's preview.
+  StandAlone and Server entries for Claude Code's preview (the Gateway's port is assigned at run time).
 - `examples/**/wwwroot/_content/` is generated by the build (library styles, framework scripts) and
   ignored by git.

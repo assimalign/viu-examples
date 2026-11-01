@@ -1,5 +1,5 @@
 # The examples are external consumers of Viu's packaged SDKs and libraries. Everything restores from
-# the assimalign GitHub Packages feed at the CI builds pinned in global.json and
+# the assimalign GitHub Packages feed at the builds (PR, CI, or release) pinned in global.json and
 # Directory.Build.props; the workflow token reads organization packages.
 name: examples
 
@@ -54,6 +54,28 @@ jobs:
 
       - name: Build
         run: dotnet build Assimalign.Viu.Examples.slnx --no-restore -warnaserror
+
+      # The slnx build includes the Gateway. Run it: it starts the Server as its managed showcase-web
+      # resource on the in-process platform and prints the address that platform assigned.
+      - name: Run the Cohesion gateway and check the managed site
+        shell: bash
+        run: |
+          gateway_dll=$(find examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Gateway/bin/Debug -name Assimalign.Viu.Showcase.Cohesion.Gateway.dll | head -n 1)
+          dotnet "$gateway_dll" > gateway.log 2>&1 &
+          gateway=$!
+          trap 'kill "$gateway" 2>/dev/null || true; cat gateway.log' EXIT
+          for _ in $(seq 1 120); do
+            grep -q '^showcase-web: ' gateway.log && break
+            sleep 0.5
+          done
+          endpoint=$(sed -n 's/^showcase-web: //p' gateway.log | tr -d '\r' | head -n 1)
+          test -n "$endpoint"
+          curl --fail --silent --show-error --retry 20 --retry-connrefused --retry-delay 1 "$endpoint/" > /dev/null
+          curl --fail --silent --show-error "$endpoint/api/tasks" > /dev/null
+          client=$(curl --fail --silent --show-error "$endpoint/_cohesion/client.json")
+          echo "$client"
+          grep -q '"gateway":"inprocess"' <<< "$client"
+          grep -q '"resource":"showcase-web"' <<< "$client"
 
       - name: Publish trimmed StandAlone app
         run: >-
