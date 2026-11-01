@@ -29,5 +29,6 @@
 		<Project Path="examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Shared/Assimalign.Viu.Showcase.Cohesion.Shared.csproj" />
 		<Project Path="examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Client/Assimalign.Viu.Showcase.Cohesion.Client.csproj" />
 		<Project Path="examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Server/Assimalign.Viu.Showcase.Cohesion.Server.csproj" />
+		<Project Path="examples/3-Cohesion/Assimalign.Viu.Showcase.Cohesion.Gateway/Assimalign.Viu.Showcase.Cohesion.Gateway.csproj" />
 	</Folder>
 </Solution>

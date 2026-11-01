@@ -1,0 +1,20 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Gateway">
+  <!--
+    The gateway: it declares the application model and manages the Server as its showcase-web
+    resource. Sdk.Gateway references Assimalign.Cohesion.ApplicationModel.Gateway; the platform the
+    model runs on is the one package added here, the in-process platform, which runs the Server's
+    program on a thread of this process. That is why the gateway references the Server project
+    whose entry point it registers.
+  -->
+  <PropertyGroup>
+    <RootNamespace>Assimalign.Viu.Showcase.Cohesion.Gateway</RootNamespace>
+    <!-- Cohesion assemblies are marked [RequiresPreviewFeatures] (CA2252). -->
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
+    <GenerateRequiresPreviewFeaturesAttribute>true</GenerateRequiresPreviewFeaturesAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Assimalign.Cohesion.ApplicationModel.Gateway.InProcess" />
+    <ProjectReference Include="..\Assimalign.Viu.Showcase.Cohesion.Server\Assimalign.Viu.Showcase.Cohesion.Server.csproj" />
+  </ItemGroup>
+</Project>

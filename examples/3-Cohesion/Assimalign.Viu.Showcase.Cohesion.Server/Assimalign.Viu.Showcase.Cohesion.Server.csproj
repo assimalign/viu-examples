@@ -1,7 +1,9 @@
 <Project Sdk="Assimalign.Cohesion.Sdk.Web">
   <!--
     The Cohesion Web host. It serves the WebAssembly client (static assets + SPA fallback), a small
-    JSON API the client calls, and server-rendered Viu pages.
+    JSON API the client calls, and server-rendered Viu pages. Program.cs makes it the showcase-web
+    resource when the Gateway project starts it; the in-process platform's instance half is the one
+    Cohesion package it adds (AddResource itself ships in the App.Web framework).
   -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -13,9 +15,11 @@
 
   <ItemGroup>
     <PackageReference Include="Assimalign.Cohesion.Viu.Server" />
+    <PackageReference Include="Assimalign.Cohesion.ApplicationModel.Hosting.InProcess" />
     <ProjectReference Include="..\Assimalign.Viu.Showcase.Cohesion.Shared\Assimalign.Viu.Showcase.Cohesion.Shared.csproj" />
     <!-- Builds the client first and records its output location (viu-client.json) beside this
-         executable; publishing bundles the client's wwwroot. -->
-    <ProjectReference Include="..\Assimalign.Viu.Showcase.Cohesion.Client\Assimalign.Viu.Showcase.Cohesion.Client.csproj" ViuClient="true" />
+         executable; publishing bundles the client's wwwroot. PrivateAssets keeps the browser
+         client out of the Gateway's references when the Gateway references this project. -->
+    <ProjectReference Include="..\Assimalign.Viu.Showcase.Cohesion.Client\Assimalign.Viu.Showcase.Cohesion.Client.csproj" ViuClient="true" PrivateAssets="all" />
   </ItemGroup>
 </Project>

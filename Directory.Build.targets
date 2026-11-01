@@ -7,5 +7,8 @@
     <PackageReference Update="Assimalign.Cohesion.Viu.Hosting.Browser" Version="$(CohesionViuVersion)" />
     <PackageReference Update="Assimalign.Cohesion.Viu.Routing" Version="$(CohesionViuVersion)" />
     <PackageReference Update="Assimalign.Cohesion.Viu.Server" Version="$(CohesionViuVersion)" />
+    <!-- Cohesion libraries take the Cohesion SDK's own $(CohesionVersion), the global.json pin. -->
+    <PackageReference Update="Assimalign.Cohesion.ApplicationModel.Hosting.InProcess" Version="$(CohesionVersion)" />
+    <PackageReference Update="Assimalign.Cohesion.ApplicationModel.Gateway.InProcess" Version="$(CohesionVersion)" />
   </ItemGroup>
 </Project>
